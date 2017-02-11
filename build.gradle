@@ -9,6 +9,46 @@ repositories {
     mavenCentral()
 }
 
+compileJava {
+    options.compilerArgs << "-s"
+    options.compilerArgs << "$projectDir/src/main/generated/java"
+
+    doFirst {
+        // make sure that directory exists
+        file(new File(projectDir, "/src/main/generated/java")).mkdirs()
+    }
+}
+
+compileTestJava {
+    options.compilerArgs << "-s"
+    options.compilerArgs << "$projectDir/src/test/generated/java"
+
+    doFirst {
+        // make sure that directory exists
+        file(new File(projectDir, "/src/test/generated/java")).mkdirs()
+    }
+}
+
+clean.doLast {
+    // clean-up directory when necessary
+    file(new File(projectDir, "/src/main/generated/java")).deleteDir()
+    file(new File(projectDir, "/src/test/generated/java")).deleteDir()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir "$projectDir/src/main/generated/java"
+        }
+    }
+
+    test {
+        java {
+            srcDir "$projectDir/src/test/generated/java"
+        }
+    }
+}
+
 dependencies {
     compile 'com.squareup:javapoet:1.8.0'
 

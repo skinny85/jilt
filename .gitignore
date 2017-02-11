@@ -1,3 +1,5 @@
 /.idea/
 /.gradle/
 /build/
+src/main/generated
+src/test/generated
