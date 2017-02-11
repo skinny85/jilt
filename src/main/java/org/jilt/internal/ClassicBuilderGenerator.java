@@ -20,15 +20,16 @@ import java.util.List;
 
 import static java.lang.String.format;
 
-public class BuilderGenerator {
+public class ClassicBuilderGenerator extends AbstractBuilderGenerator {
     private final Elements elements;
     private final Filer filer;
 
-    public BuilderGenerator(Elements elements, Filer filer) {
+    public ClassicBuilderGenerator(Elements elements, Filer filer) {
         this.elements = elements;
         this.filer = filer;
     }
 
+    @Override
     public void generateBuilderClass(Element annotatedElement) throws Exception {
         if (annotatedElement.getKind() != ElementKind.CLASS) {
             throw new IllegalArgumentException(format(
