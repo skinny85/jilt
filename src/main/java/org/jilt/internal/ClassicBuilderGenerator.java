@@ -20,33 +20,35 @@ import java.util.List;
 
 import static java.lang.String.format;
 
-public class ClassicBuilderGenerator extends AbstractBuilderGenerator {
+class ClassicBuilderGenerator extends AbstractBuilderGenerator {
+    private final Element targetClass;
     private final Elements elements;
     private final Filer filer;
 
-    public ClassicBuilderGenerator(Elements elements, Filer filer) {
+    public ClassicBuilderGenerator(Element targetClass, Elements elements, Filer filer) {
+        this.targetClass = targetClass;
         this.elements = elements;
         this.filer = filer;
     }
 
     @Override
-    public void generateBuilderClass(Element annotatedElement) throws Exception {
-        if (annotatedElement.getKind() != ElementKind.CLASS) {
+    public void generateBuilderClass() throws Exception {
+        if (targetClass.getKind() != ElementKind.CLASS) {
             throw new IllegalArgumentException(format(
                     "Only classes can be annotated with @%s",
                     Builder.class.getName()));
         }
 
-        TypeElement targetClass = (TypeElement) annotatedElement;
-        String builderClassName = targetClass.getSimpleName() + "Builder";
-        String builderClassPackage = elements.getPackageOf(targetClass).toString();
+        TypeElement targetClassType = (TypeElement) targetClass;
+        String builderClassName = targetClassType.getSimpleName() + "Builder";
+        String builderClassPackage = elements.getPackageOf(targetClassType).toString();
         ClassName builderClass = ClassName.get(builderClassPackage, builderClassName);
 
         TypeSpec.Builder builderClassBuilder = TypeSpec.classBuilder(builderClassName)
                 .addModifiers(Modifier.PUBLIC);
 
         List<String> fields = new LinkedList<String>();
-        for (Element field : targetClass.getEnclosedElements()) {
+        for (Element field : targetClassType.getEnclosedElements()) {
             if (field.getKind() != ElementKind.FIELD ||
                     field.getModifiers().contains(Modifier.STATIC))
                 continue;
@@ -72,7 +74,7 @@ public class ClassicBuilderGenerator extends AbstractBuilderGenerator {
                     .build());
         }
 
-        TypeName targetClassName = TypeName.get(targetClass.asType());
+        TypeName targetClassName = TypeName.get(targetClassType.asType());
         builderClassBuilder.addMethod(MethodSpec.methodBuilder("build")
                 .addModifiers(Modifier.PUBLIC)
                 .returns(targetClassName)

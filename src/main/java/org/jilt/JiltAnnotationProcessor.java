@@ -1,8 +1,6 @@
 package org.jilt;
 
-import org.jilt.internal.AbstractBuilderGenerator;
-import org.jilt.internal.ClassicBuilderGenerator;
-import org.jilt.internal.TypeSafeBuilderGenerator;
+import org.jilt.internal.BuilderGeneratorFactory;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
@@ -21,8 +19,7 @@ public class JiltAnnotationProcessor extends AbstractProcessor {
     private Messager messager;
     private Filer filer;
     private Elements elements;
-    private ClassicBuilderGenerator classicBuilderGenerator;
-    private TypeSafeBuilderGenerator typeSafeBuilderGenerator;
+    private BuilderGeneratorFactory builderGeneratorFactory;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -31,31 +28,25 @@ public class JiltAnnotationProcessor extends AbstractProcessor {
         messager = processingEnv.getMessager();
         filer = processingEnv.getFiler();
         elements = processingEnv.getElementUtils();
-        classicBuilderGenerator = new ClassicBuilderGenerator(elements, filer);
-        typeSafeBuilderGenerator = new TypeSafeBuilderGenerator();
+        builderGeneratorFactory = new BuilderGeneratorFactory(filer, elements);
     }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         for (Element annotatedElement : roundEnv.getElementsAnnotatedWith(Builder.class)) {
-            Builder builderAnnotation = annotatedElement.getAnnotation(Builder.class);
             try {
-                AbstractBuilderGenerator generator =
-                        builderAnnotation.variant() == BuilderVariant.TYPE_SAFE
-                                ? typeSafeBuilderGenerator
-                                : classicBuilderGenerator;
-                generator.generateBuilderClass(annotatedElement);
+                builderGeneratorFactory.forClass(annotatedElement).generateBuilderClass();
             } catch (Exception e) {
-                return error(annotatedElement, e.getMessage());
+                error(annotatedElement, e.getMessage());
+                return true;
             }
         }
 
         return true;
     }
 
-    private boolean error(Element element, String msg, Object... args) {
+    private void error(Element element, String msg, Object... args) {
         messager.printMessage(Diagnostic.Kind.ERROR, String.format(msg, args), element);
-        return true;
     }
 
     @Override
