@@ -19,7 +19,7 @@ public class BuilderGeneratorFactory {
     public BuilderGenerator forClass(Element targetClass) throws Exception {
         Builder builderAnnotation = targetClass.getAnnotation(Builder.class);
         return builderAnnotation.variant() == BuilderVariant.TYPE_SAFE
-                ? new TypeSafeBuilderGenerator()
+                ? new TypeSafeBuilderGenerator(targetClass, elements, filer)
                 : new ClassicBuilderGenerator(targetClass, elements, filer);
     }
 }
