@@ -42,7 +42,8 @@ public class BuilderGenerator {
                 .addModifiers(Modifier.PUBLIC);
 
         for (Element field : typeElement.getEnclosedElements()) {
-            if (field.getKind() != ElementKind.FIELD)
+            if (field.getKind() != ElementKind.FIELD ||
+                    field.getModifiers().contains(Modifier.STATIC))
                 continue;
 
             String fieldName = field.getSimpleName().toString();
