@@ -1,4 +1,4 @@
-group 'org.juilt'
+group 'org.jilt'
 version '1.0'
 
 apply plugin: 'java'

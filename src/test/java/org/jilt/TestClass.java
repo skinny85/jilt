@@ -1,4 +1,4 @@
-package org.juilt;
+package org.jilt;
 
 @Builder
 public class TestClass {

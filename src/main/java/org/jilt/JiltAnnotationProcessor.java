@@ -1,4 +1,4 @@
-package org.juilt;
+package org.jilt;
 
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
 
-public class JuiltAnnotationProcessor extends AbstractProcessor {
+public class JiltAnnotationProcessor extends AbstractProcessor {
     private Messager messager;
     private Filer filer;
     private Elements elements;
