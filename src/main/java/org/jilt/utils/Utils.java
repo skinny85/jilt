@@ -17,4 +17,11 @@ public abstract class Utils {
 
         return sb.toString();
     }
+
+    public static String capitalize(String str) {
+        if (str == null || str.length() == 0) {
+            return str;
+        }
+        return String.valueOf(Character.toUpperCase(str.charAt(0))) + str.substring(1);
+    }
 }

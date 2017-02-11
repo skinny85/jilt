@@ -113,6 +113,10 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return targetClassType;
     }
 
+    protected final Map<String, Element> fields() {
+        return fields;
+    }
+
     protected final String builderClassPackage() {
         return builderClassPackage;
     }
