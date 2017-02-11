@@ -1,6 +1,6 @@
 package org.jilt;
 
-@Builder
+@Builder(variant = BuilderVariant.TYPE_SAFE)
 public class ValueClass {
     private static String staticName;
 

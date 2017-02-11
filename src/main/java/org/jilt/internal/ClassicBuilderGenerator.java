@@ -12,6 +12,10 @@ class ClassicBuilderGenerator extends AbstractBuilderGenerator {
     }
 
     @Override
+    protected void generateClassesNeededByBuilder() {
+    }
+
+    @Override
     protected TypeSpec.Builder enhance(TypeSpec.Builder builderClassBuilder) {
         return builderClassBuilder;
     }

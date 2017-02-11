@@ -15,6 +15,7 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -22,14 +23,14 @@ import java.util.Map;
 import static java.lang.String.format;
 
 abstract class AbstractBuilderGenerator implements BuilderGenerator {
-    protected final Elements elements;
-    protected final Filer filer;
+    private final Elements elements;
+    private final Filer filer;
 
-    protected final TypeElement targetClassType;
-    protected final Map<String, Element> fields;
+    private final TypeElement targetClassType;
+    private final Map<String, Element> fields;
 
-    protected final String builderClassPackage;
-    protected final ClassName builderClassName;
+    private final String builderClassPackage;
+    private final ClassName builderClassName;
 
     AbstractBuilderGenerator(Element targetClass, Elements elements, Filer filer) {
         if (targetClass.getKind() != ElementKind.CLASS) {
@@ -50,6 +51,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     @Override
     public final void generateBuilderClass() throws Exception {
+        generateClassesNeededByBuilder();
+
         TypeSpec.Builder builderClassBuilder = TypeSpec.classBuilder(builderClassName)
                 .addModifiers(Modifier.PUBLIC);
 
@@ -88,6 +91,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         javaFile.writeTo(filer);
     }
 
+    protected abstract void generateClassesNeededByBuilder() throws Exception;
+
     protected abstract TypeSpec.Builder enhance(TypeSpec.Builder builderClassBuilder);
 
     private Map<String, Element> initFields() {
@@ -98,5 +103,17 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 ret.put(field.getSimpleName().toString(), field);
         }
         return ret;
+    }
+
+    protected final Filer filer() {
+        return filer;
+    }
+
+    protected final TypeElement targetClassType() {
+        return targetClassType;
+    }
+
+    protected final String builderClassPackage() {
+        return builderClassPackage;
     }
 }
