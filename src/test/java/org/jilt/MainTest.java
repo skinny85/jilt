@@ -2,10 +2,19 @@ package org.jilt;
 
 import org.junit.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class MainTest {
     @Test
     public void test_builder_class_generation() throws Exception {
-        new TestClassBuilder()
-                .name("some name");
+        ValueClass value = new ValueClassBuilder()
+                .name("some name")
+                .age(23)
+                .nick("some nickname")
+                .build();
+
+        assertThat(value.getName()).isEqualTo("some name");
+        assertThat(value.getAge()).isEqualTo(23);
+        assertThat(value.getNick()).isEqualTo("some nickname");
     }
 }

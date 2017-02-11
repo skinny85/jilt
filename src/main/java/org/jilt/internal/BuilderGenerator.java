@@ -7,6 +7,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.jilt.Builder;
+import org.jilt.utils.Utils;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Element;
@@ -14,6 +15,8 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
+import java.util.LinkedList;
+import java.util.List;
 
 import static java.lang.String.format;
 
@@ -33,46 +36,52 @@ public class BuilderGenerator {
                     Builder.class.getName()));
         }
 
-        TypeElement typeElement = (TypeElement) annotatedElement;
-        String builderClassName = typeElement.getSimpleName() + "Builder";
-        String builderClassPackage = elements.getPackageOf(typeElement).toString();
+        TypeElement targetClass = (TypeElement) annotatedElement;
+        String builderClassName = targetClass.getSimpleName() + "Builder";
+        String builderClassPackage = elements.getPackageOf(targetClass).toString();
         ClassName builderClass = ClassName.get(builderClassPackage, builderClassName);
 
-        TypeSpec.Builder classBuilder = TypeSpec.classBuilder(builderClassName)
+        TypeSpec.Builder builderClassBuilder = TypeSpec.classBuilder(builderClassName)
                 .addModifiers(Modifier.PUBLIC);
 
-        for (Element field : typeElement.getEnclosedElements()) {
+        List<String> fields = new LinkedList<String>();
+        for (Element field : targetClass.getEnclosedElements()) {
             if (field.getKind() != ElementKind.FIELD ||
                     field.getModifiers().contains(Modifier.STATIC))
                 continue;
 
             String fieldName = field.getSimpleName().toString();
             TypeName fieldType = TypeName.get(field.asType());
+            fields.add(fieldName);
 
-            classBuilder.addField(FieldSpec
+            builderClassBuilder.addField(FieldSpec
                     .builder(
                             fieldType,
                             fieldName,
                             Modifier.PRIVATE)
                     .build());
 
-            MethodSpec setterMethod = MethodSpec.methodBuilder(fieldName)
+            builderClassBuilder.addMethod(MethodSpec
+                    .methodBuilder(fieldName)
                     .addModifiers(Modifier.PUBLIC)
                     .returns(builderClass)
                     .addParameter(fieldType, "value")
                     .addStatement("this.$L = value", fieldName)
                     .addStatement("return this")
-                    .build();
-
-            classBuilder.addMethod(setterMethod);
+                    .build());
         }
 
-        TypeSpec typeSpec = classBuilder.build();
+        TypeName targetClassName = TypeName.get(targetClass.asType());
+        builderClassBuilder.addMethod(MethodSpec.methodBuilder("build")
+                .addModifiers(Modifier.PUBLIC)
+                .returns(targetClassName)
+                .addStatement("return new $T($L)", targetClassName, Utils.join(fields))
+                .build());
 
+        TypeSpec builderClassSpec = builderClassBuilder.build();
         JavaFile javaFile = JavaFile
-                .builder(builderClassPackage, typeSpec)
+                .builder(builderClassPackage, builderClassSpec)
                 .build();
-
         javaFile.writeTo(filer);
     }
 }
