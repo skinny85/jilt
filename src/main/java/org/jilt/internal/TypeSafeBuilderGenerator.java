@@ -3,6 +3,7 @@ package org.jilt.internal;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.jilt.utils.Utils;
 
@@ -37,6 +38,7 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
                                 builderClassPackage(),
                                 interfacesName,
                                 interfaceNameForField(nextField)))
+                        .addParameter(TypeName.get(field.asType()), fieldSimpleName(field))
                         .build());
             }
 

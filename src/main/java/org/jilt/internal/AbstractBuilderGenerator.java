@@ -70,8 +70,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                     .methodBuilder(builderSetterMethodName(field))
                     .addModifiers(Modifier.PUBLIC)
                     .returns(builderClassName)
-                    .addParameter(fieldType, "value")
-                    .addStatement("this.$L = value", fieldName)
+                    .addParameter(fieldType, fieldName)
+                    .addStatement("this.$1L = $1L", fieldName)
                     .addStatement("return this")
                     .build());
         }
@@ -129,11 +129,11 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return builderClassPackage;
     }
 
-    protected final String fieldSimpleName(VariableElement fieldName) {
-        return fieldName.getSimpleName().toString();
+    protected final String fieldSimpleName(VariableElement field) {
+        return field.getSimpleName().toString();
     }
 
-    protected final String builderSetterMethodName(VariableElement fieldName) {
-        return fieldSimpleName(fieldName);
+    protected final String builderSetterMethodName(VariableElement field) {
+        return fieldSimpleName(field);
     }
 }
