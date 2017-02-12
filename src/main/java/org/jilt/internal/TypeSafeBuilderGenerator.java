@@ -74,12 +74,27 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
 
     @Override
     protected TypeSpec.Builder enhance(TypeSpec.Builder builderClassBuilder) {
-        if (!fields().isEmpty())
-            builderClassBuilder.addSuperinterface(ClassName.get(
+        if (!fields().isEmpty()) {
+            ClassName firstInnerInterface = ClassName.get(
                     outerInterfacesPackage(),
                     outerInterfacesName,
-                    interfaceNameForField(fields().get(0))
-            ));
+                    interfaceNameForField(fields().get(0)));
+
+            builderClassBuilder.addSuperinterface(firstInnerInterface);
+
+            builderClassBuilder.addMethod(MethodSpec
+                    .methodBuilder(Utils.deCapitalize(targetClassType().getSimpleName().toString()))
+                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                    .returns(firstInnerInterface)
+                    .addStatement("return new $T()", builderClassTypeName())
+                    .build());
+
+            builderClassBuilder.addMethod(MethodSpec
+                    .constructorBuilder()
+                    .addModifiers(Modifier.PRIVATE)
+                    .build());
+        }
+
         for (VariableElement field : fields()) {
             builderClassBuilder.addSuperinterface(returnTypeForSetterFor(field));
         }
