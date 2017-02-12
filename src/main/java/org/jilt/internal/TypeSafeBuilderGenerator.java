@@ -27,12 +27,12 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
         String finalInterfaceName = "Build";
         for (int i = 0; i < fields().size(); i++) {
             VariableElement field = fields().get(i);
-            TypeSpec.Builder interfaceBuilder = TypeSpec
+            TypeSpec.Builder innerInterfaceBuilder = TypeSpec
                     .interfaceBuilder(interfaceNameForField(field))
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
             VariableElement nextField = nextField(i);
-            interfaceBuilder.addMethod(MethodSpec
+            innerInterfaceBuilder.addMethod(MethodSpec
                     .methodBuilder(builderSetterMethodName(field))
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                     .returns(ClassName.get(
@@ -42,11 +42,18 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
                     .addParameter(TypeName.get(field.asType()), fieldSimpleName(field))
                     .build());
 
-            interfacesBuilder.addType(interfaceBuilder.build());
+            interfacesBuilder.addType(innerInterfaceBuilder.build());
         }
         TypeSpec.Builder finalInterfaceBuilder = TypeSpec
                 .interfaceBuilder(finalInterfaceName)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+
+        finalInterfaceBuilder.addMethod(MethodSpec
+                .methodBuilder(buildMethodName())
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .returns(targetClassTypeName())
+                .build());
+
         interfacesBuilder.addType(finalInterfaceBuilder.build());
 
         JavaFile javaFile = JavaFile

@@ -76,7 +76,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                     .build());
         }
 
-        TypeName targetClassName = TypeName.get(targetClassType.asType());
+        TypeName targetClassName = targetClassTypeName();
         builderClassBuilder.addMethod(MethodSpec.methodBuilder(buildMethodName())
                 .addModifiers(Modifier.PUBLIC)
                 .returns(targetClassName)
@@ -119,6 +119,10 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     protected final TypeElement targetClassType() {
         return targetClassType;
+    }
+
+    protected TypeName targetClassTypeName() {
+        return TypeName.get(targetClassType.asType());
     }
 
     protected final List<VariableElement> fields() {
