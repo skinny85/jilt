@@ -24,6 +24,7 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
         TypeSpec.Builder interfacesBuilder = TypeSpec.interfaceBuilder(interfacesName)
                 .addModifiers(Modifier.PUBLIC);
 
+        String finalInterfaceName = "Build";
         for (int i = 0; i < fields().size(); i++) {
             VariableElement field = fields().get(i);
             TypeSpec.Builder interfaceBuilder = TypeSpec
@@ -31,19 +32,22 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
             VariableElement nextField = nextField(i);
-            if (nextField != null) {
-                interfaceBuilder.addMethod(MethodSpec.methodBuilder(builderSetterMethodName(field))
-                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                        .returns(ClassName.get(
-                                builderClassPackage(),
-                                interfacesName,
-                                interfaceNameForField(nextField)))
-                        .addParameter(TypeName.get(field.asType()), fieldSimpleName(field))
-                        .build());
-            }
+            interfaceBuilder.addMethod(MethodSpec
+                    .methodBuilder(builderSetterMethodName(field))
+                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                    .returns(ClassName.get(
+                            builderClassPackage(),
+                            interfacesName,
+                            nextField == null ? finalInterfaceName : interfaceNameForField(nextField)))
+                    .addParameter(TypeName.get(field.asType()), fieldSimpleName(field))
+                    .build());
 
             interfacesBuilder.addType(interfaceBuilder.build());
         }
+        TypeSpec.Builder finalInterfaceBuilder = TypeSpec
+                .interfaceBuilder(finalInterfaceName)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+        interfacesBuilder.addType(finalInterfaceBuilder.build());
 
         JavaFile javaFile = JavaFile
                 .builder(builderClassPackage(), interfacesBuilder.build())

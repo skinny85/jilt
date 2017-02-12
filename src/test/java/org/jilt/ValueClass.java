@@ -8,6 +8,10 @@ public class ValueClass {
     private final int age;
     private final String nick;
 
+    {
+        int localVariable = -1;
+    }
+
     public ValueClass(String name, int age, String nick) {
         this.name = name;
         this.age = age;

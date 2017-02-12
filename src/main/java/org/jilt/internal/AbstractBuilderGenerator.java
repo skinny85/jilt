@@ -77,7 +77,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         }
 
         TypeName targetClassName = TypeName.get(targetClassType.asType());
-        builderClassBuilder.addMethod(MethodSpec.methodBuilder("build")
+        builderClassBuilder.addMethod(MethodSpec.methodBuilder(buildMethodName())
                 .addModifiers(Modifier.PUBLIC)
                 .returns(targetClassName)
                 .addStatement("return new $T($L)", targetClassName, Utils.join(fieldNames()))
@@ -135,5 +135,9 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     protected final String builderSetterMethodName(VariableElement field) {
         return fieldSimpleName(field);
+    }
+
+    protected final String buildMethodName() {
+        return "build";
     }
 }
