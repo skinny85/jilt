@@ -14,15 +14,15 @@ public class TypeSafeOptionalsTest {
                 .opt3('c')
                 .req1(3.14)
                 .req2("req2")
-                .opt5("opt5") // I can skip opt4, but not actually opt5
-                .build();
+                .opt4(2.71F)
+                .build(); // we skip opt5 and go straight to the build
 
         assertThat(optionalsValue.getOpt1()).isNull();
         assertThat(optionalsValue.getOpt2()).isTrue();
         assertThat(optionalsValue.getOpt3()).isEqualTo('c');
         assertThat(optionalsValue.getReq1()).isEqualTo(3.14);
         assertThat(optionalsValue.getReq2()).isEqualTo("req2");
-        assertThat(optionalsValue.getOpt4()).isNull();
-        assertThat(optionalsValue.getOpt5()).isEqualTo("opt5");
+        assertThat(optionalsValue.getOpt4()).isEqualTo(2.71F);
+        assertThat(optionalsValue.getOpt5()).isNull();
     }
 }

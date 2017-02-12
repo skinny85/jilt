@@ -46,6 +46,10 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
                                 nextField == null ? finalInterfaceName : interfaceNameForField(nextField)))
                         .addParameter(TypeName.get(field.asType()), fieldSimpleName(field))
                         .build());
+
+                if (nextField == null && isOptional(field)) {
+                    addBuildMethodToInterface(innerInterfaceBuilder);
+                }
             } while (nextField != null
                     && isOptional(field)
                     && (field = nextField) != null
@@ -57,11 +61,7 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
                 .interfaceBuilder(finalInterfaceName)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
-        finalInterfaceBuilder.addMethod(MethodSpec
-                .methodBuilder(buildMethodName())
-                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                .returns(targetClassTypeName())
-                .build());
+        addBuildMethodToInterface(finalInterfaceBuilder);
 
         outerInterfacesBuilder.addType(finalInterfaceBuilder.build());
 
@@ -106,6 +106,14 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
         }
 
         return builderClassBuilder;
+    }
+
+    private void addBuildMethodToInterface(TypeSpec.Builder interfaceBuilder) {
+        interfaceBuilder.addMethod(MethodSpec
+                .methodBuilder(buildMethodName())
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .returns(targetClassTypeName())
+                .build());
     }
 
     private String outerInterfacesPackage() {
