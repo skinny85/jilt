@@ -29,7 +29,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private final List<VariableElement> fields;
 
     private final String builderClassPackage;
-    private final ClassName builderClassName;
+    private final ClassName builderClassTypeName;
 
     AbstractBuilderGenerator(Element targetClass, Elements elements, Filer filer) {
         if (targetClass.getKind() != ElementKind.CLASS) {
@@ -45,14 +45,14 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
         builderClassPackage = elements.getPackageOf(targetClassType).toString();
         String builderClassStringName = targetClassType.getSimpleName() + "Builder";
-        builderClassName = ClassName.get(builderClassPackage, builderClassStringName);
+        builderClassTypeName = ClassName.get(builderClassPackage, builderClassStringName);
     }
 
     @Override
     public final void generateBuilderClass() throws Exception {
         generateClassesNeededByBuilder();
 
-        TypeSpec.Builder builderClassBuilder = TypeSpec.classBuilder(builderClassName)
+        TypeSpec.Builder builderClassBuilder = TypeSpec.classBuilder(builderClassTypeName)
                 .addModifiers(Modifier.PUBLIC);
 
         for (VariableElement field : fields) {
@@ -69,7 +69,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             builderClassBuilder.addMethod(MethodSpec
                     .methodBuilder(builderSetterMethodName(field))
                     .addModifiers(Modifier.PUBLIC)
-                    .returns(builderClassName)
+                    .returns(returnTypeForSetterFor(field))
                     .addParameter(fieldType, fieldName)
                     .addStatement("this.$1L = $1L", fieldName)
                     .addStatement("return this")
@@ -99,6 +99,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     }
 
     protected abstract void generateClassesNeededByBuilder() throws Exception;
+
+    protected abstract TypeName returnTypeForSetterFor(VariableElement field);
 
     protected abstract TypeSpec.Builder enhance(TypeSpec.Builder builderClassBuilder);
 
@@ -131,6 +133,10 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     protected final String builderClassPackage() {
         return builderClassPackage;
+    }
+
+    protected final TypeName builderClassTypeName() {
+        return builderClassTypeName;
     }
 
     protected final String fieldSimpleName(VariableElement field) {

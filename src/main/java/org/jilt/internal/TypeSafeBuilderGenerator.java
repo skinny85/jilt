@@ -14,17 +14,20 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 
 class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
+    private final String outerInterfacesName;
+    private final String finalInterfaceName;
+
     TypeSafeBuilderGenerator(Element targetClass, Elements elements, Filer filer) {
         super(targetClass, elements, filer);
+        outerInterfacesName = targetClassType().getSimpleName() + "Builders";
+        finalInterfaceName = "Build";
     }
 
     @Override
     protected void generateClassesNeededByBuilder() throws Exception {
-        String interfacesName = targetClassType().getSimpleName() + "Builders";
-        TypeSpec.Builder interfacesBuilder = TypeSpec.interfaceBuilder(interfacesName)
+        TypeSpec.Builder outerInterfacesBuilder = TypeSpec.interfaceBuilder(outerInterfacesName)
                 .addModifiers(Modifier.PUBLIC);
 
-        String finalInterfaceName = "Build";
         for (int i = 0; i < fields().size(); i++) {
             VariableElement field = fields().get(i);
             TypeSpec.Builder innerInterfaceBuilder = TypeSpec
@@ -36,13 +39,13 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
                     .methodBuilder(builderSetterMethodName(field))
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                     .returns(ClassName.get(
-                            builderClassPackage(),
-                            interfacesName,
+                            outerInterfacesPackage(),
+                            outerInterfacesName,
                             nextField == null ? finalInterfaceName : interfaceNameForField(nextField)))
                     .addParameter(TypeName.get(field.asType()), fieldSimpleName(field))
                     .build());
 
-            interfacesBuilder.addType(innerInterfaceBuilder.build());
+            outerInterfacesBuilder.addType(innerInterfaceBuilder.build());
         }
         TypeSpec.Builder finalInterfaceBuilder = TypeSpec
                 .interfaceBuilder(finalInterfaceName)
@@ -54,25 +57,50 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
                 .returns(targetClassTypeName())
                 .build());
 
-        interfacesBuilder.addType(finalInterfaceBuilder.build());
+        outerInterfacesBuilder.addType(finalInterfaceBuilder.build());
 
         JavaFile javaFile = JavaFile
-                .builder(builderClassPackage(), interfacesBuilder.build())
+                .builder(outerInterfacesPackage(), outerInterfacesBuilder.build())
                 .build();
         javaFile.writeTo(filer());
+    }
+
+    @Override
+    protected TypeName returnTypeForSetterFor(VariableElement field) {
+        VariableElement nextField = nextField(field);
+        String returnTypeName = nextField == null ? finalInterfaceName :  interfaceNameForField(nextField);
+        return ClassName.get(outerInterfacesPackage(), outerInterfacesName, returnTypeName);
+    }
+
+    @Override
+    protected TypeSpec.Builder enhance(TypeSpec.Builder builderClassBuilder) {
+        if (!fields().isEmpty())
+            builderClassBuilder.addSuperinterface(ClassName.get(
+                    outerInterfacesPackage(),
+                    outerInterfacesName,
+                    interfaceNameForField(fields().get(0))
+            ));
+        for (VariableElement field : fields()) {
+            builderClassBuilder.addSuperinterface(returnTypeForSetterFor(field));
+        }
+
+        return builderClassBuilder;
+    }
+
+    private String outerInterfacesPackage() {
+        return builderClassPackage();
     }
 
     private String interfaceNameForField(VariableElement field) {
         return Utils.capitalize(fieldSimpleName(field));
     }
 
+    private VariableElement nextField(VariableElement field) {
+        return nextField(fields().indexOf(field));
+    }
+
     private VariableElement nextField(int index) {
         int i = index + 1;
         return i < fields().size() ? fields().get(i) : null;
-    }
-
-    @Override
-    protected TypeSpec.Builder enhance(TypeSpec.Builder builderClassBuilder) {
-        return builderClassBuilder;
     }
 }

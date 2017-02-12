@@ -1,9 +1,11 @@
 package org.jilt.internal;
 
+import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 
 class ClassicBuilderGenerator extends AbstractBuilderGenerator {
@@ -13,6 +15,11 @@ class ClassicBuilderGenerator extends AbstractBuilderGenerator {
 
     @Override
     protected void generateClassesNeededByBuilder() {
+    }
+
+    @Override
+    protected TypeName returnTypeForSetterFor(VariableElement field) {
+        return builderClassTypeName();
     }
 
     @Override
