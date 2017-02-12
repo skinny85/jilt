@@ -30,20 +30,26 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
 
         for (int i = 0; i < fields().size(); i++) {
             VariableElement field = fields().get(i);
+            VariableElement nextField = nextField(i);
+
             TypeSpec.Builder innerInterfaceBuilder = TypeSpec
                     .interfaceBuilder(interfaceNameForField(field))
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
-            VariableElement nextField = nextField(i);
-            innerInterfaceBuilder.addMethod(MethodSpec
-                    .methodBuilder(builderSetterMethodName(field))
-                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                    .returns(ClassName.get(
-                            outerInterfacesPackage(),
-                            outerInterfacesName,
-                            nextField == null ? finalInterfaceName : interfaceNameForField(nextField)))
-                    .addParameter(TypeName.get(field.asType()), fieldSimpleName(field))
-                    .build());
+            do {
+                innerInterfaceBuilder.addMethod(MethodSpec
+                        .methodBuilder(builderSetterMethodName(field))
+                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                        .returns(ClassName.get(
+                                outerInterfacesPackage(),
+                                outerInterfacesName,
+                                nextField == null ? finalInterfaceName : interfaceNameForField(nextField)))
+                        .addParameter(TypeName.get(field.asType()), fieldSimpleName(field))
+                        .build());
+            } while (nextField != null
+                    && isOptional(field)
+                    && (field = nextField) != null
+                    && Utils.truth(nextField = nextField(field)));
 
             outerInterfacesBuilder.addType(innerInterfaceBuilder.build());
         }
@@ -68,7 +74,7 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
     @Override
     protected TypeName returnTypeForSetterFor(VariableElement field) {
         VariableElement nextField = nextField(field);
-        String returnTypeName = nextField == null ? finalInterfaceName :  interfaceNameForField(nextField);
+        String returnTypeName = nextField == null ? finalInterfaceName : interfaceNameForField(nextField);
         return ClassName.get(outerInterfacesPackage(), outerInterfacesName, returnTypeName);
     }
 

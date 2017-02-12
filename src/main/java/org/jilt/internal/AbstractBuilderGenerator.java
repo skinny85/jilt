@@ -17,9 +17,12 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 
 abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private final Elements elements;
@@ -27,6 +30,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     private final TypeElement targetClassType;
     private final List<VariableElement> fields;
+    private final Set<String> optionalProperties;
 
     private final String builderClassPackage;
     private final ClassName builderClassTypeName;
@@ -40,8 +44,12 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         this.elements = elements;
         this.filer = filer;
 
+        Builder builderAnnotation = targetClass.getAnnotation(Builder.class);
+
         this.targetClassType = (TypeElement) targetClass;
         this.fields = initFields();
+        this.optionalProperties = new HashSet<String>(
+                asList(builderAnnotation.optionalProperties()));
 
         builderClassPackage = elements.getPackageOf(targetClassType).toString();
         String builderClassStringName = targetClassType.getSimpleName() + "Builder";
@@ -129,6 +137,10 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     protected final List<VariableElement> fields() {
         return fields;
+    }
+
+    protected final boolean isOptional(VariableElement field) {
+        return optionalProperties.contains(fieldSimpleName(field));
     }
 
     protected final String builderClassPackage() {

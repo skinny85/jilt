@@ -31,4 +31,8 @@ public abstract class Utils {
         }
         return String.valueOf(Character.toLowerCase(str.charAt(0))) + str.substring(1);
     }
+
+    public static boolean truth(Object any) {
+        return true;
+    }
 }
