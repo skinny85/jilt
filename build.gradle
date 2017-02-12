@@ -17,6 +17,11 @@ shadowJar {
     relocate 'com.squareup', 'org.jilt.shaded.com.squareup'
 }
 
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
 repositories {
     mavenCentral()
 }
