@@ -1,7 +1,21 @@
 group 'org.jilt'
 version '0.1'
 
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
+    }
+}
+
 apply plugin: 'java'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+shadowJar {
+    relocate 'com.squareup', 'org.jilt.shaded.com.squareup'
+}
 
 repositories {
     mavenCentral()
