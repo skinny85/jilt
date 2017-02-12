@@ -10,7 +10,6 @@ import javax.annotation.processing.Filer;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.util.Elements;
-import java.util.Map;
 
 class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
     TypeSafeBuilderGenerator(Element targetClass, Elements elements, Filer filer) {
@@ -23,16 +22,15 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
         TypeSpec.Builder interfacesBuilder = TypeSpec.interfaceBuilder(interfacesName)
                 .addModifiers(Modifier.PUBLIC);
 
-        for (Map.Entry<String, Element> fieldEntry : fields().entrySet()) {
-            String fieldName = fieldEntry.getKey();
-            Element field = fieldEntry.getValue();
+        for (int i = 0; i < fields().size(); i++) {
+            Element field = fields().get(i);
             TypeSpec.Builder interfaceBuilder = TypeSpec
                     .interfaceBuilder(interfaceNameForField(field))
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
-            Element nextField = next(fieldName);
+            Element nextField = next(i);
             if (nextField != null) {
-                interfaceBuilder.addMethod(MethodSpec.methodBuilder(fieldName)
+                interfaceBuilder.addMethod(MethodSpec.methodBuilder(builderSetterMethodName(field))
                         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                         .returns(ClassName.get(
                                 builderClassPackage(),
@@ -42,7 +40,6 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
             }
 
             interfacesBuilder.addType(interfaceBuilder.build());
-
         }
 
         JavaFile javaFile = JavaFile
@@ -55,16 +52,9 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
         return Utils.capitalize(field.getSimpleName().toString());
     }
 
-    private Element next(String fieldName) {
-        boolean fieldFound = false;
-        for (Map.Entry<String, Element> fieldEntry : fields().entrySet()) {
-            if (fieldFound) {
-                return fieldEntry.getValue();
-            } else if (fieldName.equals(fieldEntry.getKey())) {
-                fieldFound = true;
-            }
-        }
-        return null;
+    private Element next(int index) {
+        int i = index + 1;
+        return i < fields().size() ? fields().get(i) : null;
     }
 
     @Override

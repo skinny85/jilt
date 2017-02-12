@@ -15,10 +15,8 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.lang.String.format;
 
@@ -27,7 +25,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private final Filer filer;
 
     private final TypeElement targetClassType;
-    private final Map<String, Element> fields;
+    private final List<Element> fields;
 
     private final String builderClassPackage;
     private final ClassName builderClassName;
@@ -56,9 +54,9 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         TypeSpec.Builder builderClassBuilder = TypeSpec.classBuilder(builderClassName)
                 .addModifiers(Modifier.PUBLIC);
 
-        for (Map.Entry<String, Element> fieldEntry : fields.entrySet()) {
-            String fieldName = fieldEntry.getKey();
-            TypeName fieldType = TypeName.get(fieldEntry.getValue().asType());
+        for (Element field : fields) {
+            String fieldName = field.getSimpleName().toString();
+            TypeName fieldType = TypeName.get(field.asType());
 
             builderClassBuilder.addField(FieldSpec
                     .builder(
@@ -68,7 +66,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                     .build());
 
             builderClassBuilder.addMethod(MethodSpec
-                    .methodBuilder(fieldName)
+                    .methodBuilder(builderSetterMethodName(field))
                     .addModifiers(Modifier.PUBLIC)
                     .returns(builderClassName)
                     .addParameter(fieldType, "value")
@@ -81,7 +79,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         builderClassBuilder.addMethod(MethodSpec.methodBuilder("build")
                 .addModifiers(Modifier.PUBLIC)
                 .returns(targetClassName)
-                .addStatement("return new $T($L)", targetClassName, Utils.join(fields.keySet()))
+                .addStatement("return new $T($L)", targetClassName, Utils.join(fieldNames()))
                 .build());
 
         TypeSpec builderClassSpec = enhance(builderClassBuilder).build();
@@ -91,16 +89,25 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         javaFile.writeTo(filer);
     }
 
+    private List<String> fieldNames() {
+        List<String> ret = new ArrayList<String>(fields.size());
+        for (Element field : fields) {
+            ret.add(field.getSimpleName().toString());
+        }
+        return ret;
+    }
+
     protected abstract void generateClassesNeededByBuilder() throws Exception;
 
     protected abstract TypeSpec.Builder enhance(TypeSpec.Builder builderClassBuilder);
 
-    private Map<String, Element> initFields() {
-        HashMap<String, Element> ret = new LinkedHashMap<String, Element>();
-        for (Element field : targetClassType.getEnclosedElements()) {
+    private List<Element> initFields() {
+        List<? extends Element> enclosedElements = targetClassType.getEnclosedElements();
+        List<Element> ret = new ArrayList<Element>(enclosedElements.size());
+        for (Element field : enclosedElements) {
             if (field.getKind() == ElementKind.FIELD &&
                     !field.getModifiers().contains(Modifier.STATIC))
-                ret.put(field.getSimpleName().toString(), field);
+                ret.add(field);
         }
         return ret;
     }
@@ -113,11 +120,15 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return targetClassType;
     }
 
-    protected final Map<String, Element> fields() {
+    protected final List<Element> fields() {
         return fields;
     }
 
     protected final String builderClassPackage() {
         return builderClassPackage;
+    }
+
+    protected final String builderSetterMethodName(Element fieldName) {
+        return fieldName.getSimpleName().toString();
     }
 }
