@@ -14,6 +14,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private final Filer filer;
 
     private final TypeElement targetClassType;
-    private final List<Element> fields;
+    private final List<VariableElement> fields;
 
     private final String builderClassPackage;
     private final ClassName builderClassName;
@@ -54,8 +55,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         TypeSpec.Builder builderClassBuilder = TypeSpec.classBuilder(builderClassName)
                 .addModifiers(Modifier.PUBLIC);
 
-        for (Element field : fields) {
-            String fieldName = field.getSimpleName().toString();
+        for (VariableElement field : fields) {
+            String fieldName = fieldSimpleName(field);
             TypeName fieldType = TypeName.get(field.asType());
 
             builderClassBuilder.addField(FieldSpec
@@ -91,8 +92,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     private List<String> fieldNames() {
         List<String> ret = new ArrayList<String>(fields.size());
-        for (Element field : fields) {
-            ret.add(field.getSimpleName().toString());
+        for (VariableElement field : fields) {
+            ret.add(fieldSimpleName(field));
         }
         return ret;
     }
@@ -101,13 +102,13 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     protected abstract TypeSpec.Builder enhance(TypeSpec.Builder builderClassBuilder);
 
-    private List<Element> initFields() {
+    private List<VariableElement> initFields() {
         List<? extends Element> enclosedElements = targetClassType.getEnclosedElements();
-        List<Element> ret = new ArrayList<Element>(enclosedElements.size());
+        List<VariableElement> ret = new ArrayList<VariableElement>(enclosedElements.size());
         for (Element field : enclosedElements) {
             if (field.getKind() == ElementKind.FIELD &&
                     !field.getModifiers().contains(Modifier.STATIC))
-                ret.add(field);
+                ret.add((VariableElement) field);
         }
         return ret;
     }
@@ -120,7 +121,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return targetClassType;
     }
 
-    protected final List<Element> fields() {
+    protected final List<VariableElement> fields() {
         return fields;
     }
 
@@ -128,7 +129,11 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return builderClassPackage;
     }
 
-    protected final String builderSetterMethodName(Element fieldName) {
+    protected final String fieldSimpleName(VariableElement fieldName) {
         return fieldName.getSimpleName().toString();
+    }
+
+    protected final String builderSetterMethodName(VariableElement fieldName) {
+        return fieldSimpleName(fieldName);
     }
 }

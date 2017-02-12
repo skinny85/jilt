@@ -9,6 +9,7 @@ import org.jilt.utils.Utils;
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 
 class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
@@ -23,12 +24,12 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
                 .addModifiers(Modifier.PUBLIC);
 
         for (int i = 0; i < fields().size(); i++) {
-            Element field = fields().get(i);
+            VariableElement field = fields().get(i);
             TypeSpec.Builder interfaceBuilder = TypeSpec
                     .interfaceBuilder(interfaceNameForField(field))
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
-            Element nextField = next(i);
+            VariableElement nextField = nextField(i);
             if (nextField != null) {
                 interfaceBuilder.addMethod(MethodSpec.methodBuilder(builderSetterMethodName(field))
                         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
@@ -48,11 +49,11 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
         javaFile.writeTo(filer());
     }
 
-    private String interfaceNameForField(Element field) {
-        return Utils.capitalize(field.getSimpleName().toString());
+    private String interfaceNameForField(VariableElement field) {
+        return Utils.capitalize(fieldSimpleName(field));
     }
 
-    private Element next(int index) {
+    private VariableElement nextField(int index) {
         int i = index + 1;
         return i < fields().size() ? fields().get(i) : null;
     }
