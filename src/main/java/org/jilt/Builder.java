@@ -9,4 +9,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 public @interface Builder {
     BuilderStyle style() default BuilderStyle.CLASSIC;
+
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Ignore {
+    }
 }

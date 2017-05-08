@@ -116,7 +116,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         List<VariableElement> ret = new ArrayList<VariableElement>(enclosedElements.size());
         for (Element field : enclosedElements) {
             if (field.getKind() == ElementKind.FIELD &&
-                    !field.getModifiers().contains(Modifier.STATIC))
+                    !field.getModifiers().contains(Modifier.STATIC) &&
+                    field.getAnnotation(Builder.Ignore.class) == null)
                 ret.add((VariableElement) field);
         }
         return ret;
