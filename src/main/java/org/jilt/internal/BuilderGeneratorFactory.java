@@ -1,7 +1,7 @@
 package org.jilt.internal;
 
 import org.jilt.Builder;
-import org.jilt.BuilderVariant;
+import org.jilt.BuilderStyle;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Element;
@@ -18,7 +18,7 @@ public class BuilderGeneratorFactory {
 
     public BuilderGenerator forClass(Element targetClass) throws Exception {
         Builder builderAnnotation = targetClass.getAnnotation(Builder.class);
-        return builderAnnotation.variant() == BuilderVariant.TYPE_SAFE
+        return builderAnnotation.style() == BuilderStyle.TYPE_SAFE
                 ? new TypeSafeBuilderGenerator(targetClass, elements, filer)
                 : new ClassicBuilderGenerator(targetClass, elements, filer);
     }

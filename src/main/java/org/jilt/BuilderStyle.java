@@ -1,6 +1,6 @@
 package org.jilt;
 
-public enum BuilderVariant {
+public enum BuilderStyle {
     CLASSIC,
     TYPE_SAFE
 }

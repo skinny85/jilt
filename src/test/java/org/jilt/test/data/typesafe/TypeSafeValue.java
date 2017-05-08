@@ -1,9 +1,9 @@
 package org.jilt.test.data.typesafe;
 
 import org.jilt.Builder;
-import org.jilt.BuilderVariant;
+import org.jilt.BuilderStyle;
 
-@Builder(variant = BuilderVariant.TYPE_SAFE)
+@Builder(style = BuilderStyle.TYPE_SAFE)
 public class TypeSafeValue {
     private final String name;
     private final int age;
