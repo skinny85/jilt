@@ -7,6 +7,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.jilt.Builder;
+import org.jilt.Opt;
 import org.jilt.utils.Utils;
 
 import javax.annotation.processing.Filer;
@@ -22,7 +23,6 @@ import java.util.List;
 import java.util.Set;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 
 abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private final Elements elements;
@@ -30,7 +30,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     private final TypeElement targetClassType;
     private final List<VariableElement> fields;
-    private final Set<String> optionalProperties;
+    private final Set<VariableElement> optionalProperties;
 
     private final String builderClassPackage;
     private final ClassName builderClassTypeName;
@@ -48,8 +48,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
         this.targetClassType = (TypeElement) targetClass;
         this.fields = initFields();
-        this.optionalProperties = new HashSet<String>(
-                asList(builderAnnotation.optionalProperties()));
+        this.optionalProperties = initOptionalProperties();
 
         builderClassPackage = elements.getPackageOf(targetClassType).toString();
         String builderClassStringName = targetClassType.getSimpleName() + "Builder";
@@ -123,6 +122,15 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return ret;
     }
 
+    private Set<VariableElement> initOptionalProperties() {
+        Set<VariableElement> ret = new HashSet<VariableElement>();
+        for (VariableElement field : fields) {
+            if (field.getAnnotation(Opt.class) != null)
+                ret.add(field);
+        }
+        return ret;
+    }
+
     protected final Filer filer() {
         return filer;
     }
@@ -140,7 +148,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     }
 
     protected final boolean isOptional(VariableElement field) {
-        return optionalProperties.contains(fieldSimpleName(field));
+        return optionalProperties.contains(field);
     }
 
     protected final String builderClassPackage() {

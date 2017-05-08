@@ -2,21 +2,17 @@ package org.jilt.test.data.typesafe.optional;
 
 import org.jilt.Builder;
 import org.jilt.BuilderVariant;
+import org.jilt.Opt;
 
-@Builder(
-        variant = BuilderVariant.TYPE_SAFE,
-        optionalProperties = {
-                "opt1", "opt2", "opt3", "opt4", "opt5"
-        }
-)
+@Builder(variant = BuilderVariant.TYPE_SAFE)
 public class TypeSafeOptionalsValue {
-    private final Integer opt1;
-    private final Boolean opt2;
-    private final Character opt3;
+    @Opt private final Integer opt1;
+    @Opt private final Boolean opt2;
+    @Opt private final Character opt3;
     private final double req1;
     private final String req2;
-    private final Float opt4;
-    private final String opt5;
+    @Opt private final Float opt4;
+    @Opt private final String opt5;
 
     public TypeSafeOptionalsValue(Integer opt1, Boolean opt2, Character opt3, double req1, String req2, Float opt4, String opt5) {
         this.opt1 = opt1;
