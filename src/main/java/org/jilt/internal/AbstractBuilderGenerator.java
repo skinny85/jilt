@@ -59,8 +59,17 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     public final void generateBuilderClass() throws Exception {
         generateClassesNeededByBuilder();
 
+        // builder class
         TypeSpec.Builder builderClassBuilder = TypeSpec.classBuilder(builderClassTypeName)
                 .addModifiers(Modifier.PUBLIC);
+
+        // add a static factory method to the builder class
+        builderClassBuilder.addMethod(MethodSpec
+                .methodBuilder(factoryMethodName())
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(factoryMethodReturnType())
+                .addStatement("return new $T()", builderClassTypeName())
+                .build());
 
         for (VariableElement field : fields) {
             String fieldName = fieldSimpleName(field);
@@ -106,6 +115,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     }
 
     protected abstract void generateClassesNeededByBuilder() throws Exception;
+
+    protected abstract TypeName factoryMethodReturnType();
 
     protected abstract TypeName returnTypeForSetterFor(VariableElement field);
 
@@ -166,6 +177,10 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     protected final String builderSetterMethodName(VariableElement field) {
         return fieldSimpleName(field);
+    }
+
+    protected final String factoryMethodName() {
+        return Utils.deCapitalize(targetClassType().getSimpleName().toString());
     }
 
     protected final String buildMethodName() {

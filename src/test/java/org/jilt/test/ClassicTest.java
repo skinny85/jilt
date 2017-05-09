@@ -23,4 +23,9 @@ public class ClassicTest {
         assertThat(value.getNick()).isEqualTo("other nickname");
         assertThat(value.getSecurityAnswers()).containsExactly("Irene", "Whiskers");
     }
+
+    @Test
+    public void classic_builder_has_a_factory_method() {
+        assertThat(ClassicValueBuilder.classicValue()).isNotNull();
+    }
 }

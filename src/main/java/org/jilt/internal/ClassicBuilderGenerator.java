@@ -18,6 +18,11 @@ class ClassicBuilderGenerator extends AbstractBuilderGenerator {
     }
 
     @Override
+    protected TypeName factoryMethodReturnType() {
+        return builderClassTypeName();
+    }
+
+    @Override
     protected TypeName returnTypeForSetterFor(VariableElement field) {
         return builderClassTypeName();
     }

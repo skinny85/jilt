@@ -72,6 +72,11 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
     }
 
     @Override
+    protected TypeName factoryMethodReturnType() {
+        return firstInnerInterface();
+    }
+
+    @Override
     protected TypeName returnTypeForSetterFor(VariableElement field) {
         VariableElement nextField = nextField(field);
         String returnTypeName = nextField == null ? finalInterfaceName : interfaceNameForField(nextField);
@@ -80,30 +85,17 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
 
     @Override
     protected TypeSpec.Builder enhance(TypeSpec.Builder builderClassBuilder) {
-        if (!fields().isEmpty()) {
-            ClassName firstInnerInterface = ClassName.get(
-                    outerInterfacesPackage(),
-                    outerInterfacesName,
-                    interfaceNameForField(fields().get(0)));
+        TypeName firstInnerInterface = firstInnerInterface();
 
-            builderClassBuilder.addSuperinterface(firstInnerInterface);
-
-            builderClassBuilder.addMethod(MethodSpec
-                    .methodBuilder(Utils.deCapitalize(targetClassType().getSimpleName().toString()))
-                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .returns(firstInnerInterface)
-                    .addStatement("return new $T()", builderClassTypeName())
-                    .build());
-
-            builderClassBuilder.addMethod(MethodSpec
-                    .constructorBuilder()
-                    .addModifiers(Modifier.PRIVATE)
-                    .build());
-        }
-
+        builderClassBuilder.addSuperinterface(firstInnerInterface);
         for (VariableElement field : fields()) {
             builderClassBuilder.addSuperinterface(returnTypeForSetterFor(field));
         }
+
+        builderClassBuilder.addMethod(MethodSpec
+                .constructorBuilder()
+                .addModifiers(Modifier.PRIVATE)
+                .build());
 
         return builderClassBuilder;
     }
@@ -114,6 +106,15 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .returns(targetClassTypeName())
                 .build());
+    }
+
+    private TypeName firstInnerInterface() {
+        return ClassName.get(
+                outerInterfacesPackage(),
+                outerInterfacesName,
+                fields().isEmpty()
+                        ? finalInterfaceName
+                        : interfaceNameForField(fields().get(0)));
     }
 
     private String outerInterfacesPackage() {
