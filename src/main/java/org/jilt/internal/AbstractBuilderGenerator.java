@@ -99,7 +99,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 .addStatement("return new $T($L)", targetClassName, Utils.join(fieldNames()))
                 .build());
 
-        TypeSpec builderClassSpec = enhance(builderClassBuilder).build();
+        enhance(builderClassBuilder);
+        TypeSpec builderClassSpec = builderClassBuilder.build();
         JavaFile javaFile = JavaFile
                 .builder(builderClassPackage, builderClassSpec)
                 .build();
@@ -120,7 +121,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     protected abstract TypeName returnTypeForSetterFor(VariableElement field);
 
-    protected abstract TypeSpec.Builder enhance(TypeSpec.Builder builderClassBuilder);
+    protected abstract void enhance(TypeSpec.Builder builderClassBuilder);
 
     private List<VariableElement> initFields() {
         List<? extends Element> enclosedElements = targetClassType.getEnclosedElements();

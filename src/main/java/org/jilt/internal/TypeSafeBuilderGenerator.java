@@ -84,7 +84,7 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
     }
 
     @Override
-    protected TypeSpec.Builder enhance(TypeSpec.Builder builderClassBuilder) {
+    protected void enhance(TypeSpec.Builder builderClassBuilder) {
         TypeName firstInnerInterface = firstInnerInterface();
 
         builderClassBuilder.addSuperinterface(firstInnerInterface);
@@ -96,8 +96,6 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
                 .constructorBuilder()
                 .addModifiers(Modifier.PRIVATE)
                 .build());
-
-        return builderClassBuilder;
     }
 
     private void addBuildMethodToInterface(TypeSpec.Builder interfaceBuilder) {
