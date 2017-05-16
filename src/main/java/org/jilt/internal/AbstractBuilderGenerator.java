@@ -100,9 +100,9 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 .build());
 
         enhance(builderClassBuilder);
-        TypeSpec builderClassSpec = builderClassBuilder.build();
+
         JavaFile javaFile = JavaFile
-                .builder(builderClassPackage, builderClassSpec)
+                .builder(builderClassPackage, builderClassBuilder.build())
                 .build();
         javaFile.writeTo(filer);
     }
