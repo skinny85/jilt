@@ -4,13 +4,14 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import javax.annotation.processing.Filer;
-import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
+import java.util.List;
 
-class ClassicBuilderGenerator extends AbstractBuilderGenerator {
-    public ClassicBuilderGenerator(Element targetClass, Elements elements, Filer filer) {
-        super(targetClass, elements, filer);
+final class ClassicBuilderGenerator extends AbstractBuilderGenerator {
+    ClassicBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes, Elements elements, Filer filer) {
+        super(targetClass, attributes, elements, filer);
     }
 
     @Override
@@ -23,7 +24,7 @@ class ClassicBuilderGenerator extends AbstractBuilderGenerator {
     }
 
     @Override
-    protected TypeName returnTypeForSetterFor(VariableElement field) {
+    protected TypeName returnTypeForSetterFor(VariableElement attribute) {
         return builderClassTypeName();
     }
 

@@ -11,8 +11,6 @@ import org.jilt.Opt;
 import org.jilt.utils.Utils;
 
 import javax.annotation.processing.Filer;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -29,26 +27,21 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private final Filer filer;
 
     private final TypeElement targetClassType;
-    private final List<VariableElement> fields;
-    private final Set<VariableElement> optionalProperties;
+    private final List<? extends VariableElement> attributes;
+    private final Set<VariableElement> optionalAttributes;
 
     private final String builderClassPackage;
     private final ClassName builderClassTypeName;
 
-    AbstractBuilderGenerator(Element targetClass, Elements elements, Filer filer) {
-        if (targetClass.getKind() != ElementKind.CLASS) {
-            throw new IllegalArgumentException(format(
-                    "Only classes can be annotated with @%s",
-                    Builder.class.getName()));
-        }
+    AbstractBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes, Elements elements, Filer filer) {
         this.elements = elements;
         this.filer = filer;
 
         Builder builderAnnotation = targetClass.getAnnotation(Builder.class);
 
-        this.targetClassType = (TypeElement) targetClass;
-        this.fields = initFields();
-        this.optionalProperties = initOptionalProperties();
+        this.targetClassType = targetClass;
+        this.attributes = attributes;
+        this.optionalAttributes = initOptionalAttributes();
 
         builderClassPackage = elements.getPackageOf(targetClassType).toString();
         String builderClassStringName = targetClassType.getSimpleName() + "Builder";
@@ -71,9 +64,9 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 .addStatement("return new $T()", builderClassTypeName())
                 .build());
 
-        for (VariableElement field : fields) {
-            String fieldName = fieldSimpleName(field);
-            TypeName fieldType = TypeName.get(field.asType());
+        for (VariableElement attribute : attributes) {
+            String fieldName = attributeSimpleName(attribute);
+            TypeName fieldType = TypeName.get(attribute.asType());
 
             builderClassBuilder.addField(FieldSpec
                     .builder(
@@ -83,9 +76,9 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                     .build());
 
             builderClassBuilder.addMethod(MethodSpec
-                    .methodBuilder(builderSetterMethodName(field))
+                    .methodBuilder(builderSetterMethodName(attribute))
                     .addModifiers(Modifier.PUBLIC)
-                    .returns(returnTypeForSetterFor(field))
+                    .returns(returnTypeForSetterFor(attribute))
                     .addParameter(fieldType, fieldName)
                     .addStatement("this.$1L = $1L", fieldName)
                     .addStatement("return this")
@@ -96,7 +89,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         builderClassBuilder.addMethod(MethodSpec.methodBuilder(buildMethodName())
                 .addModifiers(Modifier.PUBLIC)
                 .returns(targetClassName)
-                .addStatement("return new $T($L)", targetClassName, Utils.join(fieldNames()))
+                .addStatement("return new $T($L)", targetClassName, Utils.join(attributeNames()))
                 .build());
 
         enhance(builderClassBuilder);
@@ -107,10 +100,10 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         javaFile.writeTo(filer);
     }
 
-    private List<String> fieldNames() {
-        List<String> ret = new ArrayList<String>(fields.size());
-        for (VariableElement field : fields) {
-            ret.add(fieldSimpleName(field));
+    private List<String> attributeNames() {
+        List<String> ret = new ArrayList<String>(attributes.size());
+        for (VariableElement attribute : attributes) {
+            ret.add(attributeSimpleName(attribute));
         }
         return ret;
     }
@@ -119,27 +112,15 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     protected abstract TypeName factoryMethodReturnType();
 
-    protected abstract TypeName returnTypeForSetterFor(VariableElement field);
+    protected abstract TypeName returnTypeForSetterFor(VariableElement attribute);
 
     protected abstract void enhance(TypeSpec.Builder builderClassBuilder);
 
-    private List<VariableElement> initFields() {
-        List<? extends Element> enclosedElements = targetClassType.getEnclosedElements();
-        List<VariableElement> ret = new ArrayList<VariableElement>(enclosedElements.size());
-        for (Element field : enclosedElements) {
-            if (field.getKind() == ElementKind.FIELD &&
-                    !field.getModifiers().contains(Modifier.STATIC) &&
-                    field.getAnnotation(Builder.Ignore.class) == null)
-                ret.add((VariableElement) field);
-        }
-        return ret;
-    }
-
-    private Set<VariableElement> initOptionalProperties() {
+    private Set<VariableElement> initOptionalAttributes() {
         Set<VariableElement> ret = new HashSet<VariableElement>();
-        for (VariableElement field : fields) {
-            if (field.getAnnotation(Opt.class) != null)
-                ret.add(field);
+        for (VariableElement attribute : attributes) {
+            if (attribute.getAnnotation(Opt.class) != null)
+                ret.add(attribute);
         }
         return ret;
     }
@@ -156,12 +137,12 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return TypeName.get(targetClassType.asType());
     }
 
-    protected final List<VariableElement> fields() {
-        return fields;
+    protected final List<? extends VariableElement> attributes() {
+        return attributes;
     }
 
-    protected final boolean isOptional(VariableElement field) {
-        return optionalProperties.contains(field);
+    protected final boolean isOptional(VariableElement attribute) {
+        return optionalAttributes.contains(attribute);
     }
 
     protected final String builderClassPackage() {
@@ -172,12 +153,12 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return builderClassTypeName;
     }
 
-    protected final String fieldSimpleName(VariableElement field) {
-        return field.getSimpleName().toString();
+    protected final String attributeSimpleName(VariableElement attribute) {
+        return attribute.getSimpleName().toString();
     }
 
-    protected final String builderSetterMethodName(VariableElement field) {
-        return fieldSimpleName(field);
+    protected final String builderSetterMethodName(VariableElement attribute) {
+        return attributeSimpleName(attribute);
     }
 
     protected final String factoryMethodName() {

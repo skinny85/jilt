@@ -35,7 +35,7 @@ public class JiltAnnotationProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         for (Element annotatedElement : roundEnv.getElementsAnnotatedWith(Builder.class)) {
             try {
-                builderGeneratorFactory.forClass(annotatedElement).generateBuilderClass();
+                builderGeneratorFactory.forElement(annotatedElement).generateBuilderClass();
             } catch (Exception e) {
                 error(annotatedElement, e.getMessage());
                 return true;

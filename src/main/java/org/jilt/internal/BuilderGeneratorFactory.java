@@ -5,9 +5,16 @@ import org.jilt.BuilderStyle;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
+import java.util.ArrayList;
+import java.util.List;
 
-public class BuilderGeneratorFactory {
+public final class BuilderGeneratorFactory {
     private final Filer filer;
     private final Elements elements;
 
@@ -16,10 +23,33 @@ public class BuilderGeneratorFactory {
         this.elements = elements;
     }
 
-    public BuilderGenerator forClass(Element targetClass) throws Exception {
-        Builder builderAnnotation = targetClass.getAnnotation(Builder.class);
+    public BuilderGenerator forElement(Element annotatedElement) throws Exception {
+        TypeElement targetClass;
+        List<? extends VariableElement> attributes;
+
+        if (annotatedElement.getKind() == ElementKind.CLASS) {
+            targetClass = (TypeElement) annotatedElement;
+            List<? extends Element> enclosedElements = targetClass.getEnclosedElements();
+            List<VariableElement> fields = new ArrayList<VariableElement>(enclosedElements.size());
+            for (Element field : enclosedElements) {
+                if (field.getKind() == ElementKind.FIELD &&
+                        !field.getModifiers().contains(Modifier.STATIC) &&
+                        field.getAnnotation(Builder.Ignore.class) == null)
+                    fields.add((VariableElement) field);
+            }
+            attributes = fields;
+        } else if (annotatedElement.getKind() == ElementKind.CONSTRUCTOR) {
+            targetClass = (TypeElement) annotatedElement.getEnclosingElement();
+            ExecutableElement constructor = (ExecutableElement) annotatedElement;
+            attributes = constructor.getParameters();
+        } else {
+            throw new IllegalArgumentException(
+                    "@Builder can only be placed on classes or constructors");
+        }
+
+        Builder builderAnnotation = annotatedElement.getAnnotation(Builder.class);
         return builderAnnotation.style() == BuilderStyle.TYPE_SAFE
-                ? new TypeSafeBuilderGenerator(targetClass, elements, filer)
-                : new ClassicBuilderGenerator(targetClass, elements, filer);
+                ? new TypeSafeBuilderGenerator(targetClass, attributes, elements, filer)
+                : new ClassicBuilderGenerator(targetClass, attributes, elements, filer);
     }
 }

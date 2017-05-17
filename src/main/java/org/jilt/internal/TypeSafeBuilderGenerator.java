@@ -8,17 +8,18 @@ import com.squareup.javapoet.TypeSpec;
 import org.jilt.utils.Utils;
 
 import javax.annotation.processing.Filer;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
+import java.util.List;
 
-class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
+final class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
     private final String outerInterfacesName;
     private final String finalInterfaceName;
 
-    TypeSafeBuilderGenerator(Element targetClass, Elements elements, Filer filer) {
-        super(targetClass, elements, filer);
+    TypeSafeBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes, Elements elements, Filer filer) {
+        super(targetClass, attributes, elements, filer);
         outerInterfacesName = targetClassType().getSimpleName() + "Builders";
         finalInterfaceName = "Build";
     }
@@ -28,32 +29,32 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
         TypeSpec.Builder outerInterfacesBuilder = TypeSpec.interfaceBuilder(outerInterfacesName)
                 .addModifiers(Modifier.PUBLIC);
 
-        for (int i = 0; i < fields().size(); i++) {
-            VariableElement field = fields().get(i);
-            VariableElement nextField = nextField(i);
+        for (int i = 0; i < attributes().size(); i++) {
+            VariableElement currentAttribute = attributes().get(i);
+            VariableElement nextAttribute = nextAttribute(i);
 
             TypeSpec.Builder innerInterfaceBuilder = TypeSpec
-                    .interfaceBuilder(interfaceNameForField(field))
+                    .interfaceBuilder(interfaceNameForAttribute(currentAttribute))
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
             do {
                 innerInterfaceBuilder.addMethod(MethodSpec
-                        .methodBuilder(builderSetterMethodName(field))
+                        .methodBuilder(builderSetterMethodName(currentAttribute))
                         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                         .returns(ClassName.get(
                                 outerInterfacesPackage(),
                                 outerInterfacesName,
-                                nextField == null ? finalInterfaceName : interfaceNameForField(nextField)))
-                        .addParameter(TypeName.get(field.asType()), fieldSimpleName(field))
+                                nextAttribute == null ? finalInterfaceName : interfaceNameForAttribute(nextAttribute)))
+                        .addParameter(TypeName.get(currentAttribute.asType()), attributeSimpleName(currentAttribute))
                         .build());
 
-                if (nextField == null && isOptional(field)) {
+                if (nextAttribute == null && isOptional(currentAttribute)) {
                     addBuildMethodToInterface(innerInterfaceBuilder);
                 }
-            } while (nextField != null
-                    && isOptional(field)
-                    && (field = nextField) != null
-                    && Utils.truth(nextField = nextField(field)));
+            } while (nextAttribute != null
+                    && isOptional(currentAttribute)
+                    && (currentAttribute = nextAttribute) != null
+                    && Utils.truth(nextAttribute = nextAttribute(currentAttribute)));
 
             outerInterfacesBuilder.addType(innerInterfaceBuilder.build());
         }
@@ -77,9 +78,9 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
     }
 
     @Override
-    protected TypeName returnTypeForSetterFor(VariableElement field) {
-        VariableElement nextField = nextField(field);
-        String returnTypeName = nextField == null ? finalInterfaceName : interfaceNameForField(nextField);
+    protected TypeName returnTypeForSetterFor(VariableElement attribute) {
+        VariableElement nextAttribute = nextAttribute(attribute);
+        String returnTypeName = nextAttribute == null ? finalInterfaceName : interfaceNameForAttribute(nextAttribute);
         return ClassName.get(outerInterfacesPackage(), outerInterfacesName, returnTypeName);
     }
 
@@ -88,8 +89,8 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
         TypeName firstInnerInterface = firstInnerInterface();
 
         builderClassBuilder.addSuperinterface(firstInnerInterface);
-        for (VariableElement field : fields()) {
-            builderClassBuilder.addSuperinterface(returnTypeForSetterFor(field));
+        for (VariableElement attribute : attributes()) {
+            builderClassBuilder.addSuperinterface(returnTypeForSetterFor(attribute));
         }
 
         builderClassBuilder.addMethod(MethodSpec
@@ -110,25 +111,25 @@ class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
         return ClassName.get(
                 outerInterfacesPackage(),
                 outerInterfacesName,
-                fields().isEmpty()
+                attributes().isEmpty()
                         ? finalInterfaceName
-                        : interfaceNameForField(fields().get(0)));
+                        : interfaceNameForAttribute(attributes().get(0)));
     }
 
     private String outerInterfacesPackage() {
         return builderClassPackage();
     }
 
-    private String interfaceNameForField(VariableElement field) {
-        return Utils.capitalize(fieldSimpleName(field));
+    private String interfaceNameForAttribute(VariableElement attribute) {
+        return Utils.capitalize(attributeSimpleName(attribute));
     }
 
-    private VariableElement nextField(VariableElement field) {
-        return nextField(fields().indexOf(field));
+    private VariableElement nextAttribute(VariableElement attribute) {
+        return nextAttribute(attributes().indexOf(attribute));
     }
 
-    private VariableElement nextField(int index) {
+    private VariableElement nextAttribute(int index) {
         int i = index + 1;
-        return i < fields().size() ? fields().get(i) : null;
+        return i < attributes().size() ? attributes().get(i) : null;
     }
 }
