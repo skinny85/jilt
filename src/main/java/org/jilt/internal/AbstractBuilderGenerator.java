@@ -12,6 +12,7 @@ import org.jilt.utils.Utils;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
@@ -29,11 +30,15 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private final TypeElement targetClassType;
     private final List<? extends VariableElement> attributes;
     private final Set<VariableElement> optionalAttributes;
+    private final TypeElement targetFactoryClass;
+    private final Name targetFactoryMethod;
 
     private final String builderClassPackage;
     private final ClassName builderClassTypeName;
 
-    AbstractBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes, Elements elements, Filer filer) {
+    AbstractBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
+                             TypeElement targetFactoryClass, Name targetFactoryMethod,
+                             Elements elements, Filer filer) {
         this.elements = elements;
         this.filer = filer;
 
@@ -42,6 +47,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         this.targetClassType = targetClass;
         this.attributes = attributes;
         this.optionalAttributes = initOptionalAttributes();
+        this.targetFactoryClass = targetFactoryClass;
+        this.targetFactoryMethod = targetFactoryMethod;
 
         builderClassPackage = elements.getPackageOf(targetClassType).toString();
         String builderClassStringName = targetClassType.getSimpleName() + "Builder";
@@ -58,9 +65,9 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
         // add a static factory method to the builder class
         builderClassBuilder.addMethod(MethodSpec
-                .methodBuilder(factoryMethodName())
+                .methodBuilder(builderFactoryMethodName())
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .returns(factoryMethodReturnType())
+                .returns(builderFactoryMethodReturnType())
                 .addStatement("return new $T()", builderClassTypeName())
                 .build());
 
@@ -85,12 +92,18 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                     .build());
         }
 
-        TypeName targetClassName = targetClassTypeName();
-        builderClassBuilder.addMethod(MethodSpec.methodBuilder(buildMethodName())
+        // add the 'buid' method
+        MethodSpec.Builder buildMethod = MethodSpec
+                .methodBuilder(buildMethodName())
                 .addModifiers(Modifier.PUBLIC)
-                .returns(targetClassName)
-                .addStatement("return new $T($L)", targetClassName, Utils.join(attributeNames()))
-                .build());
+                .returns(targetClassTypeName());
+        String attributes = Utils.join(attributeNames());
+        if (targetFactoryClass == null) {
+            buildMethod.addStatement("return new $T($L)", targetClassTypeName(), attributes);
+        } else {
+            buildMethod.addStatement("return $T.$L($L)", targetFactoryClass, targetFactoryMethod, attributes);
+        }
+        builderClassBuilder.addMethod(buildMethod.build());
 
         enhance(builderClassBuilder);
 
@@ -110,7 +123,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     protected abstract void generateClassesNeededByBuilder() throws Exception;
 
-    protected abstract TypeName factoryMethodReturnType();
+    protected abstract TypeName builderFactoryMethodReturnType();
 
     protected abstract TypeName returnTypeForSetterFor(VariableElement attribute);
 
@@ -161,7 +174,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return attributeSimpleName(attribute);
     }
 
-    protected final String factoryMethodName() {
+    protected final String builderFactoryMethodName() {
         return Utils.deCapitalize(targetClassType().getSimpleName().toString());
     }
 

@@ -9,6 +9,7 @@ import org.jilt.utils.Utils;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
@@ -18,8 +19,10 @@ final class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
     private final String outerInterfacesName;
     private final String finalInterfaceName;
 
-    TypeSafeBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes, Elements elements, Filer filer) {
-        super(targetClass, attributes, elements, filer);
+    TypeSafeBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
+                             TypeElement targetFactoryClass, Name targetFactoryName,
+                             Elements elements, Filer filer) {
+        super(targetClass, attributes, targetFactoryClass, targetFactoryName, elements, filer);
         outerInterfacesName = targetClassType().getSimpleName() + "Builders";
         finalInterfaceName = "Build";
     }
@@ -73,7 +76,7 @@ final class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
     }
 
     @Override
-    protected TypeName factoryMethodReturnType() {
+    protected TypeName builderFactoryMethodReturnType() {
         return firstInnerInterface();
     }
 
