@@ -1,12 +1,12 @@
 package org.jilt.test;
 
-import org.jilt.test.data.typesafe.TypeSafeValue;
-import org.jilt.test.data.typesafe.TypeSafeValueBuilder;
+import org.jilt.test.data.typesafe_ungrouped.TypeSafeValue;
+import org.jilt.test.data.typesafe_ungrouped.TypeSafeValueBuilder;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TypeSafeTest {
+public class TypeSafeUngroupedTest {
     @Test
     public void test_type_safe_builder() throws Exception {
         TypeSafeValue value = TypeSafeValueBuilder.typeSafeValue()

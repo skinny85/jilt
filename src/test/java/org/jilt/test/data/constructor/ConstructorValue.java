@@ -9,7 +9,7 @@ public final class ConstructorValue {
     public final boolean attr3;
     public final int attr4;
 
-    @Builder(style = BuilderStyle.TYPE_SAFE)
+    @Builder(style = BuilderStyle.TYPE_SAFE_UNGROUPED_OPTIONALS)
     public ConstructorValue(String attr2, int attr4, boolean attr3) {
         this.attr1 = 123;
         this.attr2 = attr2;

@@ -60,8 +60,8 @@ public final class BuilderGeneratorFactory {
         }
 
         Builder builderAnnotation = annotatedElement.getAnnotation(Builder.class);
-        return builderAnnotation.style() == BuilderStyle.TYPE_SAFE
-                ? new TypeSafeBuilderGenerator(targetClass, attributes, targetFactoryClass, targetFactoryMethod, elements, filer)
+        return builderAnnotation.style() == BuilderStyle.TYPE_SAFE_UNGROUPED_OPTIONALS
+                ? new TypeSafeUngroupedOptionalsBuilderGenerator(targetClass, attributes, targetFactoryClass, targetFactoryMethod, elements, filer)
                 : new ClassicBuilderGenerator(targetClass, attributes, targetFactoryClass, targetFactoryMethod, elements, filer);
     }
 }

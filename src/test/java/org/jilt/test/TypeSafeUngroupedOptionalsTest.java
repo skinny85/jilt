@@ -1,12 +1,12 @@
 package org.jilt.test;
 
-import org.jilt.test.data.typesafe.optional.TypeSafeOptionalsValue;
-import org.jilt.test.data.typesafe.optional.TypeSafeOptionalsValueBuilder;
+import org.jilt.test.data.typesafe_ungrouped.optional.TypeSafeOptionalsValue;
+import org.jilt.test.data.typesafe_ungrouped.optional.TypeSafeOptionalsValueBuilder;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TypeSafeOptionalsTest {
+public class TypeSafeUngroupedOptionalsTest {
     @Test
     public void test_type_safe_builder_with_optional_values() throws Exception {
         TypeSafeOptionalsValue optionalsValue = TypeSafeOptionalsValueBuilder.typeSafeOptionalsValue()

@@ -1,10 +1,10 @@
-package org.jilt.test.data.typesafe.optional;
+package org.jilt.test.data.typesafe_ungrouped.optional;
 
 import org.jilt.Builder;
 import org.jilt.BuilderStyle;
 import org.jilt.Opt;
 
-@Builder(style = BuilderStyle.TYPE_SAFE)
+@Builder(style = BuilderStyle.TYPE_SAFE_UNGROUPED_OPTIONALS)
 public class TypeSafeOptionalsValue {
     @Opt private final Integer opt1;
     @Opt private final Boolean opt2;

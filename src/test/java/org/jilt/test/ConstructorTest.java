@@ -2,8 +2,6 @@ package org.jilt.test;
 
 import org.jilt.test.data.constructor.ConstructorValue;
 import org.jilt.test.data.constructor.ConstructorValueBuilder;
-import org.jilt.test.data.typesafe.TypeSafeValue;
-import org.jilt.test.data.typesafe.TypeSafeValueBuilder;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

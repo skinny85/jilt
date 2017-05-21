@@ -1,9 +1,9 @@
-package org.jilt.test.data.typesafe;
+package org.jilt.test.data.typesafe_ungrouped;
 
 import org.jilt.Builder;
 import org.jilt.BuilderStyle;
 
-@Builder(style = BuilderStyle.TYPE_SAFE)
+@Builder(style = BuilderStyle.TYPE_SAFE_UNGROUPED_OPTIONALS)
 public class TypeSafeValue {
     private final String name;
     private final int age;

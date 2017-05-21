@@ -15,13 +15,13 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 import java.util.List;
 
-final class TypeSafeBuilderGenerator extends AbstractBuilderGenerator {
+final class TypeSafeUngroupedOptionalsBuilderGenerator extends AbstractBuilderGenerator {
     private final String outerInterfacesName;
     private final String finalInterfaceName;
 
-    TypeSafeBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
-                             TypeElement targetFactoryClass, Name targetFactoryName,
-                             Elements elements, Filer filer) {
+    TypeSafeUngroupedOptionalsBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
+                                               TypeElement targetFactoryClass, Name targetFactoryName,
+                                               Elements elements, Filer filer) {
         super(targetClass, attributes, targetFactoryClass, targetFactoryName, elements, filer);
         outerInterfacesName = targetClassType().getSimpleName() + "Builders";
         finalInterfaceName = "Build";
