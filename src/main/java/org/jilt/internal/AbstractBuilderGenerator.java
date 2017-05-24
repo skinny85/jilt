@@ -6,7 +6,6 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import org.jilt.Builder;
 import org.jilt.Opt;
 import org.jilt.utils.Utils;
 
@@ -20,8 +19,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static java.lang.String.format;
 
 abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private final Elements elements;
@@ -41,8 +38,6 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                              Elements elements, Filer filer) {
         this.elements = elements;
         this.filer = filer;
-
-        Builder builderAnnotation = targetClass.getAnnotation(Builder.class);
 
         this.targetClassType = targetClass;
         this.attributes = attributes;
@@ -92,7 +87,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                     .build());
         }
 
-        // add the 'buid' method
+        // add the 'build' method
         MethodSpec.Builder buildMethod = MethodSpec
                 .methodBuilder(buildMethodName())
                 .addModifiers(Modifier.PUBLIC)
@@ -146,7 +141,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return targetClassType;
     }
 
-    protected TypeName targetClassTypeName() {
+    protected final TypeName targetClassTypeName() {
         return TypeName.get(targetClassType.asType());
     }
 
