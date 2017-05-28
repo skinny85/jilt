@@ -6,6 +6,7 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import org.jilt.Builder;
 import org.jilt.Opt;
 import org.jilt.utils.Utils;
 
@@ -27,6 +28,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private final TypeElement targetClassType;
     private final List<? extends VariableElement> attributes;
     private final Set<VariableElement> optionalAttributes;
+    private final Builder builderAnnotation;
     private final TypeElement targetFactoryClass;
     private final Name targetFactoryMethod;
 
@@ -34,7 +36,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private final ClassName builderClassTypeName;
 
     AbstractBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
-                             TypeElement targetFactoryClass, Name targetFactoryMethod,
+                             Builder builderAnnotation, TypeElement targetFactoryClass, Name targetFactoryMethod,
                              Elements elements, Filer filer) {
         this.elements = elements;
         this.filer = filer;
@@ -42,12 +44,12 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         this.targetClassType = targetClass;
         this.attributes = attributes;
         this.optionalAttributes = initOptionalAttributes();
+        this.builderAnnotation = builderAnnotation;
         this.targetFactoryClass = targetFactoryClass;
         this.targetFactoryMethod = targetFactoryMethod;
 
         builderClassPackage = elements.getPackageOf(targetClassType).toString();
-        String builderClassStringName = targetClassType.getSimpleName() + "Builder";
-        builderClassTypeName = ClassName.get(builderClassPackage, builderClassStringName);
+        builderClassTypeName = ClassName.get(builderClassPackage, builderClassStringName());
     }
 
     @Override
@@ -55,7 +57,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         generateClassesNeededByBuilder();
 
         // builder class
-        TypeSpec.Builder builderClassBuilder = TypeSpec.classBuilder(builderClassTypeName)
+        TypeSpec.Builder builderClassBuilder = TypeSpec.classBuilder(builderClassTypeName())
                 .addModifiers(Modifier.PUBLIC);
 
         // add a static factory method to the builder class
@@ -133,6 +135,13 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return ret;
     }
 
+    private String builderClassStringName() {
+        String annotationBuilderClassName = builderAnnotation.className();
+        return annotationBuilderClassName.isEmpty()
+                ? targetClassType.getSimpleName() + "Builder"
+                : annotationBuilderClassName;
+    }
+
     protected final Filer filer() {
         return filer;
     }
@@ -157,7 +166,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return builderClassPackage;
     }
 
-    protected final TypeName builderClassTypeName() {
+    protected final ClassName builderClassTypeName() {
         return builderClassTypeName;
     }
 

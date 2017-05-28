@@ -1,7 +1,7 @@
 package org.jilt.test;
 
 import org.jilt.test.data.typesafe_ungrouped.TypeSafeValue;
-import org.jilt.test.data.typesafe_ungrouped.TypeSafeValueBuilder;
+import org.jilt.test.data.typesafe_ungrouped.TypeSafeValueCreator;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TypeSafeUngroupedTest {
     @Test
     public void test_type_safe_builder() throws Exception {
-        TypeSafeValue value = TypeSafeValueBuilder.typeSafeValue()
+        TypeSafeValue value = TypeSafeValueCreator.typeSafeValue()
                 .name("some name")
                 .age(23)
                 .nick("some nickname")

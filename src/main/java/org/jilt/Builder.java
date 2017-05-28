@@ -10,6 +10,8 @@ import java.lang.annotation.Target;
 public @interface Builder {
     BuilderStyle style() default BuilderStyle.CLASSIC;
 
+    String className() default "";
+
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.SOURCE)
     public @interface Ignore {

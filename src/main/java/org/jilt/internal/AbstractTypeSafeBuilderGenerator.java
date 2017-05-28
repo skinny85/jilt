@@ -3,6 +3,7 @@ package org.jilt.internal;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
+import org.jilt.Builder;
 import org.jilt.utils.Utils;
 
 import javax.annotation.processing.Filer;
@@ -17,9 +18,9 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
     private final String outerInterfacesName;
 
     AbstractTypeSafeBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
-                                     TypeElement targetFactoryClass, Name targetFactoryMethod,
+                                     Builder builderAnnotation, TypeElement targetFactoryClass, Name targetFactoryMethod,
                                      Elements elements, Filer filer) {
-        super(targetClass, attributes, targetFactoryClass, targetFactoryMethod, elements, filer);
+        super(targetClass, attributes, builderAnnotation, targetFactoryClass, targetFactoryMethod, elements, filer);
         outerInterfacesName = targetClassType().getSimpleName() + "Builders";
     }
 

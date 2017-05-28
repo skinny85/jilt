@@ -62,15 +62,15 @@ public final class BuilderGeneratorFactory {
         Builder builderAnnotation = annotatedElement.getAnnotation(Builder.class);
         switch (builderAnnotation.style()) {
             case TYPE_SAFE:
-                return new TypeSafeBuilderGenerator(targetClass, attributes, targetFactoryClass,
-                        targetFactoryMethod, elements, filer);
+                return new TypeSafeBuilderGenerator(targetClass, attributes, builderAnnotation,
+                        targetFactoryClass, targetFactoryMethod, elements, filer);
             case TYPE_SAFE_UNGROUPED_OPTIONALS:
-                return new TypeSafeUngroupedOptionalsBuilderGenerator(targetClass, attributes, targetFactoryClass,
-                        targetFactoryMethod, elements, filer);
+                return new TypeSafeUngroupedOptionalsBuilderGenerator(targetClass, attributes, builderAnnotation,
+                        targetFactoryClass, targetFactoryMethod, elements, filer);
             case CLASSIC:
             default:
-                return new ClassicBuilderGenerator(targetClass, attributes, targetFactoryClass,
-                        targetFactoryMethod, elements, filer);
+                return new ClassicBuilderGenerator(targetClass, attributes, builderAnnotation,
+                        targetFactoryClass, targetFactoryMethod, elements, filer);
         }
     }
 }

@@ -2,6 +2,7 @@ package org.jilt.internal;
 
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import org.jilt.Builder;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Name;
@@ -12,9 +13,9 @@ import java.util.List;
 
 final class ClassicBuilderGenerator extends AbstractBuilderGenerator {
     ClassicBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
-                            TypeElement targetFactoryClass, Name targetFactoryName,
+                            Builder builderAnnotation, TypeElement targetFactoryClass, Name targetFactoryName,
                             Elements elements, Filer filer) {
-        super(targetClass, attributes, targetFactoryClass, targetFactoryName, elements, filer);
+        super(targetClass, attributes, builderAnnotation, targetFactoryClass, targetFactoryName, elements, filer);
     }
 
     @Override
