@@ -6,7 +6,8 @@ import org.jilt.BuilderStyle;
 @Builder(
         style = BuilderStyle.TYPE_SAFE_UNGROUPED_OPTIONALS,
         className = "TypeSafeValueCreator",
-        packageName = "org.jilt.test.data.typesafe_ungrouped.custom"
+        packageName = "org.jilt.test.data.typesafe_ungrouped.custom",
+        setterPrefix = "with"
 )
 public class TypeSafeValue {
     private final String name;

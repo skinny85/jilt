@@ -188,7 +188,11 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     }
 
     protected final String builderSetterMethodName(VariableElement attribute) {
-        return attributeSimpleName(attribute);
+        String annotationSetterPrefix = builderAnnotation.setterPrefix();
+        String attributeSimpleName = attributeSimpleName(attribute);
+        return annotationSetterPrefix.isEmpty()
+                ? attributeSimpleName
+                : annotationSetterPrefix + Utils.capitalize(attributeSimpleName);
     }
 
     protected final String builderFactoryMethodName() {

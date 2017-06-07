@@ -10,9 +10,9 @@ public class TypeSafeUngroupedTest {
     @Test
     public void test_type_safe_builder() throws Exception {
         TypeSafeValue value = TypeSafeValueCreator.typeSafeValue()
-                .name("some name")
-                .age(23)
-                .nick("some nickname")
+                .withName("some name")
+                .withAge(23)
+                .withNick("some nickname")
                 .build();
 
         assertThat(value.getName()).isEqualTo("some name");
