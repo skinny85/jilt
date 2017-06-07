@@ -12,6 +12,8 @@ public @interface Builder {
 
     String className() default "";
 
+    String packageName() default "";
+
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.SOURCE)
     public @interface Ignore {

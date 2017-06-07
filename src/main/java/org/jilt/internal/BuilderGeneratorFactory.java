@@ -1,7 +1,6 @@
 package org.jilt.internal;
 
 import org.jilt.Builder;
-import org.jilt.BuilderStyle;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Element;

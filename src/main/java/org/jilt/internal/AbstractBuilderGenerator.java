@@ -13,6 +13,7 @@ import org.jilt.utils.Utils;
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
@@ -48,8 +49,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         this.targetFactoryClass = targetFactoryClass;
         this.targetFactoryMethod = targetFactoryMethod;
 
-        builderClassPackage = elements.getPackageOf(targetClassType).toString();
-        builderClassTypeName = ClassName.get(builderClassPackage, builderClassStringName());
+        builderClassPackage = initBuilderClassPackage();
+        builderClassTypeName = ClassName.get(builderClassPackage(), builderClassStringName());
     }
 
     @Override
@@ -105,7 +106,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         enhance(builderClassBuilder);
 
         JavaFile javaFile = JavaFile
-                .builder(builderClassPackage, builderClassBuilder.build())
+                .builder(builderClassPackage(), builderClassBuilder.build())
                 .build();
         javaFile.writeTo(filer);
     }
@@ -133,6 +134,18 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 ret.add(attribute);
         }
         return ret;
+    }
+
+    private String initBuilderClassPackage() {
+        String annotationBuilderPackageName = builderAnnotation.packageName();
+        if (annotationBuilderPackageName.isEmpty()) {
+            PackageElement targetClassPackage = elements.getPackageOf(targetClassType);
+            return targetClassPackage.isUnnamed()
+                    ? ""
+                    : targetClassPackage.toString();
+        } else {
+            return annotationBuilderPackageName;
+        }
     }
 
     private String builderClassStringName() {

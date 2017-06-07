@@ -3,7 +3,11 @@ package org.jilt.test.data.typesafe_ungrouped;
 import org.jilt.Builder;
 import org.jilt.BuilderStyle;
 
-@Builder(style = BuilderStyle.TYPE_SAFE_UNGROUPED_OPTIONALS, className = "TypeSafeValueCreator")
+@Builder(
+        style = BuilderStyle.TYPE_SAFE_UNGROUPED_OPTIONALS,
+        className = "TypeSafeValueCreator",
+        packageName = "org.jilt.test.data.typesafe_ungrouped.custom"
+)
 public class TypeSafeValue {
     private final String name;
     private final int age;

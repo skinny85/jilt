@@ -1,7 +1,7 @@
 package org.jilt.test;
 
 import org.jilt.test.data.typesafe_ungrouped.TypeSafeValue;
-import org.jilt.test.data.typesafe_ungrouped.TypeSafeValueCreator;
+import org.jilt.test.data.typesafe_ungrouped.custom.TypeSafeValueCreator;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
