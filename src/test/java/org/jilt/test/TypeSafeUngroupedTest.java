@@ -13,7 +13,7 @@ public class TypeSafeUngroupedTest {
                 .withName("some name")
                 .withAge(23)
                 .withNick("some nickname")
-                .build();
+                .create();
 
         assertThat(value.getName()).isEqualTo("some name");
         assertThat(value.getAge()).isEqualTo(23);

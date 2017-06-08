@@ -18,6 +18,8 @@ public @interface Builder {
 
     String factoryMethod() default "";
 
+    String buildMethod() default "";
+
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.SOURCE)
     public @interface Ignore {

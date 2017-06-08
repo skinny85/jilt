@@ -203,6 +203,9 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     }
 
     protected final String buildMethodName() {
-        return "build";
+        String annotationBuildMethod = builderAnnotation.buildMethod();
+        return annotationBuildMethod.isEmpty()
+                ? "build"
+                : annotationBuildMethod;
     }
 }
