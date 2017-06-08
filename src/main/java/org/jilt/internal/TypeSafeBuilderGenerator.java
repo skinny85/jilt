@@ -27,9 +27,11 @@ final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
     @Override
     protected void generateClassesNeededByBuilder() throws Exception {
         TypeSpec.Builder outerInterfacesBuilder = TypeSpec.interfaceBuilder(outerInterfacesName())
+                .addAnnotation(generatedAnnotation())
                 .addModifiers(Modifier.PUBLIC);
 
         TypeSpec.Builder optionalsInterfaceBuilder = TypeSpec.interfaceBuilder(optionalsInterfaceName)
+                .addAnnotation(generatedAnnotation())
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
         for (VariableElement currentAttribute : attributes()) {
@@ -45,6 +47,7 @@ final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
             } else {
                 TypeSpec.Builder innerInterfaceBuilder = TypeSpec
                         .interfaceBuilder(interfaceNameForAttribute(currentAttribute))
+                        .addAnnotation(generatedAnnotation())
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
                 innerInterfaceBuilder.addMethod(setterMethod);

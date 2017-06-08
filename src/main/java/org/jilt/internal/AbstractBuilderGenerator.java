@@ -1,5 +1,6 @@
 package org.jilt.internal;
 
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
@@ -10,6 +11,7 @@ import org.jilt.Builder;
 import org.jilt.Opt;
 import org.jilt.utils.Utils;
 
+import javax.annotation.Generated;
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
@@ -59,6 +61,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
         // builder class
         TypeSpec.Builder builderClassBuilder = TypeSpec.classBuilder(builderClassTypeName())
+                .addAnnotation(generatedAnnotation())
                 .addModifiers(Modifier.PUBLIC);
 
         // add a static factory method to the builder class
@@ -207,5 +210,12 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return annotationBuildMethod.isEmpty()
                 ? "build"
                 : annotationBuildMethod;
+    }
+
+    protected final AnnotationSpec generatedAnnotation() {
+        return AnnotationSpec
+                .builder(Generated.class)
+                .addMember("value", "$S", "Jilt-1.0")
+                .build();
     }
 }

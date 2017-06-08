@@ -28,6 +28,7 @@ final class TypeSafeUngroupedOptionalsBuilderGenerator extends AbstractTypeSafeB
     @Override
     protected void generateClassesNeededByBuilder() throws Exception {
         TypeSpec.Builder outerInterfacesBuilder = TypeSpec.interfaceBuilder(outerInterfacesName())
+                .addAnnotation(generatedAnnotation())
                 .addModifiers(Modifier.PUBLIC);
 
         for (int i = 0; i < attributes().size(); i++) {
@@ -36,6 +37,7 @@ final class TypeSafeUngroupedOptionalsBuilderGenerator extends AbstractTypeSafeB
 
             TypeSpec.Builder innerInterfaceBuilder = TypeSpec
                     .interfaceBuilder(interfaceNameForAttribute(currentAttribute))
+                    .addAnnotation(generatedAnnotation())
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
             do {
@@ -59,6 +61,7 @@ final class TypeSafeUngroupedOptionalsBuilderGenerator extends AbstractTypeSafeB
 
         TypeSpec.Builder finalInterfaceBuilder = TypeSpec
                 .interfaceBuilder(finalInterfaceName)
+                .addAnnotation(generatedAnnotation())
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         addBuildMethodToInterface(finalInterfaceBuilder);
         outerInterfacesBuilder.addType(finalInterfaceBuilder.build());
