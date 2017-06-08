@@ -196,7 +196,10 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     }
 
     protected final String builderFactoryMethodName() {
-        return Utils.deCapitalize(targetClassType().getSimpleName().toString());
+        String annotationFactoryMethod = builderAnnotation.factoryMethod();
+        return annotationFactoryMethod.isEmpty()
+                ? Utils.deCapitalize(targetClassType().getSimpleName().toString())
+                : annotationFactoryMethod;
     }
 
     protected final String buildMethodName() {

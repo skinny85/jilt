@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TypeSafeUngroupedTest {
     @Test
     public void test_type_safe_builder() throws Exception {
-        TypeSafeValue value = TypeSafeValueCreator.typeSafeValue()
+        TypeSafeValue value = TypeSafeValueCreator.creator()
                 .withName("some name")
                 .withAge(23)
                 .withNick("some nickname")
