@@ -26,6 +26,9 @@ repositories {
     mavenCentral()
 }
 
+sourceCompatibility = '1.5'
+targetCompatibility = '1.5'
+
 compileJava {
     options.compilerArgs << "-s"
     options.compilerArgs << "$projectDir/src/main/generated/java"
