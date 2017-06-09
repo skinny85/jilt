@@ -37,7 +37,6 @@ final class TypeSafeUngroupedOptionalsBuilderGenerator extends AbstractTypeSafeB
 
             TypeSpec.Builder innerInterfaceBuilder = TypeSpec
                     .interfaceBuilder(interfaceNameForAttribute(currentAttribute))
-                    .addAnnotation(generatedAnnotation())
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
             do {
@@ -61,7 +60,6 @@ final class TypeSafeUngroupedOptionalsBuilderGenerator extends AbstractTypeSafeB
 
         TypeSpec.Builder finalInterfaceBuilder = TypeSpec
                 .interfaceBuilder(finalInterfaceName)
-                .addAnnotation(generatedAnnotation())
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         addBuildMethodToInterface(finalInterfaceBuilder);
         outerInterfacesBuilder.addType(finalInterfaceBuilder.build());
