@@ -400,7 +400,7 @@ Eclipse is a lot more cumbersome. Right click on the project -> `Properties` -> 
 (expand the submenus) -> `Annotation Processing`, tick the `Enable project-specific settings` checkbox,
 and then `Enable annotation processing`.
 Then, go to the `Factory Path` submenu, tick the `Enable project-specific settings` checkbox there,
-and add the Jilt jar to the Factory path.
+and add the Jilt JAR to the Factory path.
 Make sure that the `Generated source directory` is marked as a Source Folder.
 
 #### License
