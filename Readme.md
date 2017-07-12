@@ -68,7 +68,7 @@ Check out the [documentation below](#customizing-the-generated-code) for ways to
 
 #### Getting Jilt
 
-Jilt is available from the [Bintray](https://bintray.com/) Maven repository.
+Jilt is available from the [JCenter](https://bintray.com/bintray/jcenter) Maven repository.
 
 Example Maven settings:
 
@@ -78,9 +78,9 @@ Example Maven settings:
         <snapshots>
             <enabled>false</enabled>
         </snapshots>
-        <id>bintray-jilt</id>
-        <name>bintray-jilt</name>
-        <url>http://dl.bintray.com/skinny85/maven-repo</url>
+        <id>central</id>
+        <name>bintray</name>
+        <url>http://jcenter.bintray.com</url>
     </repository>
 </repositories>
 
@@ -100,9 +100,7 @@ Example Gradle settings:
 
 ```groovy
 repositories {
-    maven {
-        url 'http://dl.bintray.com/skinny85/maven-repo'
-    }
+    jcenter()
 }
 
 dependencies {
@@ -112,7 +110,7 @@ dependencies {
 ```
 
 If you're not using dependency managers, you can
-[download the JAR directly](https://bintray.com/skinny85/maven-repo/download_file?file_path=org%2Fjilt%2Fjilt%2F1.0%2Fjilt-1.0.jar)
+[download the JAR directly](https://jcenter.bintray.com/org/jilt/jilt/1.0/jilt-1.0.jar)
 (it's distributed as a self-contained JAR, you don't need any additional dependencies for it)
 and add it to your classpath.
 
