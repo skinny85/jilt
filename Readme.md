@@ -6,7 +6,7 @@ used for automatically generating classes that implement the
 
 Jilt's "killer features" compared to other tools in this same space are:
 * Support for the Type-Safe (sometimes also called Staged, or
-    Telescopic) variant of the Builder pattern.
+    Telescopic, or Step) variant of the Builder pattern.
     For more information on the Type-Safe Builder pattern, check out my
     [blog article on the subject](http://endoflineblog.com/type-safe-builder-pattern-in-java-and-the-jilt-library).
 * The capability to generate Builders for any class,
