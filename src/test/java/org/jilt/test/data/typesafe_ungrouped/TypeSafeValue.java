@@ -1,6 +1,7 @@
 package org.jilt.test.data.typesafe_ungrouped;
 
 import org.jilt.Builder;
+import org.jilt.BuilderInterfaces;
 import org.jilt.BuilderStyle;
 
 @Builder(
@@ -10,6 +11,9 @@ import org.jilt.BuilderStyle;
         setterPrefix = "with",
         factoryMethod = "creator",
         buildMethod = "create"
+)
+@BuilderInterfaces(
+        outerName = "TypeSafeValueCreators"
 )
 public class TypeSafeValue {
     private final String name;

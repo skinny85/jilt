@@ -1,6 +1,7 @@
 package org.jilt.internal;
 
 import org.jilt.Builder;
+import org.jilt.BuilderInterfaces;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Element;
@@ -59,13 +60,14 @@ public final class BuilderGeneratorFactory {
         }
 
         Builder builderAnnotation = annotatedElement.getAnnotation(Builder.class);
+        BuilderInterfaces builderInterfaces = annotatedElement.getAnnotation(BuilderInterfaces.class);
         switch (builderAnnotation.style()) {
             case TYPE_SAFE:
                 return new TypeSafeBuilderGenerator(targetClass, attributes, builderAnnotation,
-                        targetFactoryClass, targetFactoryMethod, elements, filer);
+                        builderInterfaces, targetFactoryClass, targetFactoryMethod, elements, filer);
             case TYPE_SAFE_UNGROUPED_OPTIONALS:
                 return new TypeSafeUngroupedOptionalsBuilderGenerator(targetClass, attributes, builderAnnotation,
-                        targetFactoryClass, targetFactoryMethod, elements, filer);
+                        builderInterfaces, targetFactoryClass, targetFactoryMethod, elements, filer);
             case CLASSIC:
             default:
                 return new ClassicBuilderGenerator(targetClass, attributes, builderAnnotation,
