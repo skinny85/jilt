@@ -218,6 +218,7 @@ import java.lang.annotation.Target;
  * @see Opt
  * @see BuilderStyle
  * @see #style
+ * @see #className
  * @see #packageName
  * @see #setterPrefix
  * @see #factoryMethod
