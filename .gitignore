@@ -1,4 +1,5 @@
 /.idea/
+out/
 /.gradle/
 /build/
 src/main/generated
