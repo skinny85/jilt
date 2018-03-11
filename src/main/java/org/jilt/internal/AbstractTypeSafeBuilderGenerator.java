@@ -4,6 +4,7 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import org.jilt.Builder;
+import org.jilt.BuilderInterfaces;
 import org.jilt.utils.Utils;
 
 import javax.annotation.processing.Filer;
@@ -18,10 +19,10 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
     private final String outerInterfacesName;
 
     AbstractTypeSafeBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
-                                     Builder builderAnnotation, TypeElement targetFactoryClass, Name targetFactoryMethod,
-                                     Elements elements, Filer filer) {
+            Builder builderAnnotation, BuilderInterfaces builderInterfaces, TypeElement targetFactoryClass,
+            Name targetFactoryMethod, Elements elements, Filer filer) {
         super(targetClass, attributes, builderAnnotation, targetFactoryClass, targetFactoryMethod, elements, filer);
-        outerInterfacesName = targetClassType().getSimpleName() + "Builders";
+        this.outerInterfacesName = initOuterInterfacesName(builderInterfaces);
     }
 
     @Override
@@ -67,5 +68,14 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
     protected final VariableElement nextAttribute(int index) {
         int i = index + 1;
         return i < attributes().size() ? attributes().get(i) : null;
+    }
+
+    private String initOuterInterfacesName(BuilderInterfaces builderInterfaces) {
+        String nameFromAnnotation = builderInterfaces == null
+                ? ""
+                : builderInterfaces.outerName();
+        return nameFromAnnotation.isEmpty()
+                ? targetClassType().getSimpleName() + "Builders"
+                : nameFromAnnotation;
     }
 }

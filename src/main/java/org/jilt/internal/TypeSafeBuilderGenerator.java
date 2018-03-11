@@ -5,6 +5,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.jilt.Builder;
+import org.jilt.BuilderInterfaces;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Modifier;
@@ -18,9 +19,10 @@ final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
     private final String optionalsInterfaceName;
 
     TypeSafeBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
-                             Builder builderAnnotation, TypeElement targetFactoryClass, Name targetFactoryMethod,
-                             Elements elements, Filer filer) {
-        super(targetClass, attributes, builderAnnotation, targetFactoryClass, targetFactoryMethod, elements, filer);
+            Builder builderAnnotation, BuilderInterfaces builderInterfaces, TypeElement targetFactoryClass,
+            Name targetFactoryMethod, Elements elements, Filer filer) {
+        super(targetClass, attributes, builderAnnotation, builderInterfaces, targetFactoryClass, targetFactoryMethod,
+                elements, filer);
         this.optionalsInterfaceName = "Optionals";
     }
 

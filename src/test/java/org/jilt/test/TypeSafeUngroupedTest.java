@@ -1,8 +1,8 @@
 package org.jilt.test;
 
 import org.jilt.test.data.typesafe_ungrouped.TypeSafeValue;
-import org.jilt.test.data.typesafe_ungrouped.custom.TypeSafeValueBuilders;
 import org.jilt.test.data.typesafe_ungrouped.custom.TypeSafeValueCreator;
+import org.jilt.test.data.typesafe_ungrouped.custom.TypeSafeValueCreators;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TypeSafeUngroupedTest {
     @Test
     public void test_type_safe_builder() throws Exception {
-        TypeSafeValueBuilders.Name firstInterface = TypeSafeValueCreator.creator();
+        TypeSafeValueCreators.Name firstInterface = TypeSafeValueCreator.creator();
         TypeSafeValue value = firstInterface
                 .withName("some name")
                 .withAge(23)
