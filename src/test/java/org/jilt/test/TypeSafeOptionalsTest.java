@@ -2,6 +2,7 @@ package org.jilt.test;
 
 import org.jilt.test.data.typesafe.optional.TypeSafeOptionalsValue;
 import org.jilt.test.data.typesafe.optional.TypeSafeOptionalsValueBuilder;
+import org.jilt.test.data.typesafe.optional.TypeSafeOptionalsValueBuilders;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -9,7 +10,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TypeSafeOptionalsTest {
     @Test
     public void test_type_safe_builder_with_optional_values() throws Exception {
-        TypeSafeOptionalsValue optionalsValue = TypeSafeOptionalsValueBuilder.typeSafeOptionalsValue()
+        TypeSafeOptionalsValueBuilders.Req1 firstInterface = TypeSafeOptionalsValueBuilder.typeSafeOptionalsValue();
+        TypeSafeOptionalsValue optionalsValue = firstInterface
                 .req1(3.14)
                 .req2("req2")
                 .opt4(2.71F)
