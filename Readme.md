@@ -230,7 +230,7 @@ public class DateFactoryTest {
 
 All of the Builders shown so far were "regular" Builders.
 Using the `@Builder`'s `style` attribute, you can instead generate a
-Type-Safe (also called Staged, or Telescopic) Builder by setting
+Type-Safe (also called Staged, or Telescopic, or Step) Builder by setting
 `style` to `BuilderStyle.TYPE_SAFE`.
 
 A Type-Safe Builder generates interfaces for each property of the Builder,
