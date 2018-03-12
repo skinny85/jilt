@@ -13,7 +13,8 @@ import org.jilt.BuilderStyle;
         buildMethod = "create"
 )
 @BuilderInterfaces(
-        outerName = "TypeSafeValueCreators"
+        outerName = "TypeSafeValueCreators",
+        packageName = "org.jilt.test.data.typesafe_ungrouped.custom.customer"
 )
 public class TypeSafeValue {
     private final String name;
