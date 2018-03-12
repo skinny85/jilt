@@ -16,13 +16,13 @@ import javax.lang.model.util.Elements;
 import java.util.List;
 
 abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator {
-    private final String outerInterfacesName;
+    private final BuilderInterfaces builderInterfaces;
 
     AbstractTypeSafeBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
             Builder builderAnnotation, BuilderInterfaces builderInterfaces, TypeElement targetFactoryClass,
             Name targetFactoryMethod, Elements elements, Filer filer) {
         super(targetClass, attributes, builderAnnotation, targetFactoryClass, targetFactoryMethod, elements, filer);
-        this.outerInterfacesName = initOuterInterfacesName(builderInterfaces);
+        this.builderInterfaces = builderInterfaces;
     }
 
     @Override
@@ -38,7 +38,12 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
     protected abstract void addSuperInterfaces(TypeSpec.Builder builderClassBuilder);
 
     protected final String outerInterfacesName() {
-        return outerInterfacesName;
+        String nameFromAnnotation = builderInterfaces == null
+                ? ""
+                : builderInterfaces.outerName();
+        return nameFromAnnotation.isEmpty()
+                ? targetClassType().getSimpleName() + "Builders"
+                : nameFromAnnotation;
     }
 
     protected final String outerInterfacesPackage() {
@@ -68,14 +73,5 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
     protected final VariableElement nextAttribute(int index) {
         int i = index + 1;
         return i < attributes().size() ? attributes().get(i) : null;
-    }
-
-    private String initOuterInterfacesName(BuilderInterfaces builderInterfaces) {
-        String nameFromAnnotation = builderInterfaces == null
-                ? ""
-                : builderInterfaces.outerName();
-        return nameFromAnnotation.isEmpty()
-                ? targetClassType().getSimpleName() + "Builders"
-                : nameFromAnnotation;
     }
 }
