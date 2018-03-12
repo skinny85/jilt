@@ -19,6 +19,7 @@ import java.lang.annotation.Target;
  *
  * @since 1.1
  * @see #outerName
+ * @see #packageName
  * @see Builder#style
  * @see BuilderStyle
  */
@@ -32,8 +33,17 @@ public @interface BuilderInterfaces {
      * will be generated as inner interfaces of this outer interface,
      * in order not to pollute the global namespace.
      * <p>
-     * This is an optional property, the default name is <code>&lt;TargetClass&gt;Builders</code>
+     * This is an optional attribute, the default name is <code>&lt;TargetClass&gt;Builders</code>
      * (so, if we're building a <code>Person</code> class, the name will be <code>PersonBuilders</code>).
      */
     String outerName() default "";
+
+    /**
+     * Allows you to set the Java package that the generated interfaces will reside in.
+     * This is an optional attribute -
+     * the default is for the interfaces to reside in the same package as the Builder class.
+     *
+     * @see Builder#packageName
+     */
+    String packageName() default "";
 }

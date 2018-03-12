@@ -47,7 +47,12 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
     }
 
     protected final String outerInterfacesPackage() {
-        return builderClassPackage();
+        String packageFromAnnotation = builderInterfaces == null
+                ? ""
+                : builderInterfaces.packageName();
+        return packageFromAnnotation.isEmpty()
+                ? builderClassPackage()
+                : packageFromAnnotation;
     }
 
     protected final String interfaceNameForAttribute(VariableElement attribute) {
