@@ -56,7 +56,15 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
     }
 
     protected final String interfaceNameForAttribute(VariableElement attribute) {
-        return Utils.capitalize(attributeSimpleName(attribute));
+        String capAttrName = Utils.capitalize(attributeSimpleName(attribute));
+
+        String namesPattern = builderInterfaces == null
+                ? ""
+                : builderInterfaces.innerNames();
+
+        return namesPattern.isEmpty()
+                ? capAttrName
+                : namesPattern.replaceAll("\\*", capAttrName);
     }
 
     protected final void addBuildMethodToInterface(TypeSpec.Builder interfaceBuilder) {
