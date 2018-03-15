@@ -37,6 +37,8 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
 
     protected abstract void addSuperInterfaces(TypeSpec.Builder builderClassBuilder);
 
+    protected abstract String defaultLastInterfaceName();
+
     protected final String outerInterfacesName() {
         String nameFromAnnotation = builderInterfaces == null
                 ? ""
@@ -65,6 +67,10 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
         return namesPattern.isEmpty()
                 ? capAttrName
                 : namesPattern.replaceAll("\\*", capAttrName);
+    }
+
+    protected final String lastInterfaceName() {
+        return defaultLastInterfaceName();
     }
 
     protected final void addBuildMethodToInterface(TypeSpec.Builder interfaceBuilder) {
