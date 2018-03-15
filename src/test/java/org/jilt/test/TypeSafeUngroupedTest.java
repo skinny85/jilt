@@ -11,7 +11,7 @@ public class TypeSafeUngroupedTest {
     @Test
     public void test_type_safe_builder() throws Exception {
         TypeSafeValueCreators.Step_Name firstInterface = TypeSafeValueCreator.creator();
-        TypeSafeValueCreators.Build lastInterface = firstInterface
+        TypeSafeValueCreators.Step_Build lastInterface = firstInterface
                 .withName("some name")
                 .withAge(23)
                 .withNick("some nickname");
