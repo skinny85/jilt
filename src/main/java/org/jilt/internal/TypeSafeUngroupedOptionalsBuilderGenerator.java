@@ -17,14 +17,11 @@ import javax.lang.model.util.Elements;
 import java.util.List;
 
 final class TypeSafeUngroupedOptionalsBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
-    private final String finalInterfaceName;
-
     TypeSafeUngroupedOptionalsBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
             Builder builderAnnotation, BuilderInterfaces builderInterfaces, TypeElement targetFactoryClass,
             Name targetFactoryMethod, Elements elements, Filer filer) {
         super(targetClass, attributes, builderAnnotation, builderInterfaces, targetFactoryClass, targetFactoryMethod,
                 elements, filer);
-        finalInterfaceName = "Build";
     }
 
     @Override
@@ -61,7 +58,7 @@ final class TypeSafeUngroupedOptionalsBuilderGenerator extends AbstractTypeSafeB
         }
 
         TypeSpec.Builder finalInterfaceBuilder = TypeSpec
-                .interfaceBuilder(finalInterfaceName)
+                .interfaceBuilder(lastInterfaceName())
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         addBuildMethodToInterface(finalInterfaceBuilder);
         outerInterfacesBuilder.addType(finalInterfaceBuilder.build());
@@ -81,7 +78,7 @@ final class TypeSafeUngroupedOptionalsBuilderGenerator extends AbstractTypeSafeB
     protected TypeName returnTypeForSetterFor(VariableElement attribute) {
         VariableElement nextAttribute = nextAttribute(attribute);
         String returnTypeName = nextAttribute == null
-                ? finalInterfaceName
+                ? lastInterfaceName()
                 : interfaceNameForAttribute(nextAttribute);
         return innerInterfaceNamed(returnTypeName);
     }
@@ -98,7 +95,12 @@ final class TypeSafeUngroupedOptionalsBuilderGenerator extends AbstractTypeSafeB
 
     private TypeName firstInnerInterface() {
         return innerInterfaceNamed(attributes().isEmpty()
-                ? finalInterfaceName
+                ? lastInterfaceName()
                 : interfaceNameForAttribute(attributes().get(0)));
+    }
+
+    @Override
+    protected String defaultLastInterfaceName() {
+        return "Build";
     }
 }

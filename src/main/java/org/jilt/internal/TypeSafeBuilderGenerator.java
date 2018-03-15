@@ -16,14 +16,11 @@ import javax.lang.model.util.Elements;
 import java.util.List;
 
 final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
-    private final String optionalsInterfaceName;
-
     TypeSafeBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
             Builder builderAnnotation, BuilderInterfaces builderInterfaces, TypeElement targetFactoryClass,
             Name targetFactoryMethod, Elements elements, Filer filer) {
         super(targetClass, attributes, builderAnnotation, builderInterfaces, targetFactoryClass, targetFactoryMethod,
                 elements, filer);
-        this.optionalsInterfaceName = "Optionals";
     }
 
     @Override
@@ -32,7 +29,7 @@ final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
                 .addAnnotation(generatedAnnotation())
                 .addModifiers(Modifier.PUBLIC);
 
-        TypeSpec.Builder optionalsInterfaceBuilder = TypeSpec.interfaceBuilder(optionalsInterfaceName)
+        TypeSpec.Builder optionalsInterfaceBuilder = TypeSpec.interfaceBuilder(lastInterfaceName())
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
         for (VariableElement currentAttribute : attributes()) {
@@ -69,7 +66,7 @@ final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
     protected TypeName builderFactoryMethodReturnType() {
         VariableElement firstRequiredAttribute = firstRequiredAttribute();
         String returnTypeName = firstRequiredAttribute == null
-                ? optionalsInterfaceName
+                ? lastInterfaceName()
                 : interfaceNameForAttribute(firstRequiredAttribute);
         return innerInterfaceNamed(returnTypeName);
     }
@@ -78,11 +75,11 @@ final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
     protected TypeName returnTypeForSetterFor(VariableElement attribute) {
         String returnTypeName;
         if (isOptional(attribute)) {
-            returnTypeName = optionalsInterfaceName;
+            returnTypeName = lastInterfaceName();
         } else {
             VariableElement nextRequiredAttribute = nextRequiredAttribute(attribute);
             returnTypeName = nextRequiredAttribute == null
-                    ? optionalsInterfaceName
+                    ? lastInterfaceName()
                     : interfaceNameForAttribute(nextRequiredAttribute);
         }
         return innerInterfaceNamed(returnTypeName);
@@ -94,7 +91,7 @@ final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
             if (!isOptional(attribute))
                 builderClassBuilder.addSuperinterface(innerInterfaceNamed(interfaceNameForAttribute(attribute)));
         }
-        builderClassBuilder.addSuperinterface(innerInterfaceNamed(optionalsInterfaceName));
+        builderClassBuilder.addSuperinterface(innerInterfaceNamed(lastInterfaceName()));
     }
 
     private VariableElement firstRequiredAttribute() {
@@ -114,5 +111,10 @@ final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
         } while (ret != null && isOptional(ret));
 
         return ret;
+    }
+
+    @Override
+    protected String defaultLastInterfaceName() {
+        return "Optionals";
     }
 }
