@@ -10,12 +10,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TypeSafeUngroupedTest {
     @Test
     public void test_type_safe_builder() throws Exception {
-        TypeSafeValueCreators.Name firstInterface = TypeSafeValueCreator.creator();
-        TypeSafeValue value = firstInterface
+        TypeSafeValueCreators.Step_Name firstInterface = TypeSafeValueCreator.creator();
+        TypeSafeValueCreators.Build lastInterface = firstInterface
                 .withName("some name")
                 .withAge(23)
-                .withNick("some nickname")
-                .create();
+                .withNick("some nickname");
+        TypeSafeValue value = lastInterface.create();
 
         assertThat(value.getName()).isEqualTo("some name");
         assertThat(value.getAge()).isEqualTo(23);

@@ -46,4 +46,19 @@ public @interface BuilderInterfaces {
      * @see Builder#packageName
      */
     String packageName() default "";
+
+    /**
+     * Allows you change the names of the per-property inner interfaces that will be generated to enforce type safety.
+     * Because this one attribute is used to control the names of interfaces for every property of the built class,
+     * the value you provide can include the '*' character, which will be substituted with the
+     * (capitalized) name of the property corresponding to that interface
+     * (so, if the built class has a <code>name</code> property,
+     * and you set this attribute to <code>"Jilt*"</code>,
+     * the interface for the <code>name</code> property will be generated with the name <code>JiltName</code>).
+     * <p>
+     * This is an optional attribute -
+     * the default name for the inner interfaces is simply the capitalized name of the property
+     * (so, the same as the value <code>"*"</code>).
+     */
+    String innerNames() default "";
 }

@@ -14,7 +14,8 @@ import org.jilt.BuilderStyle;
 )
 @BuilderInterfaces(
         outerName = "TypeSafeValueCreators",
-        packageName = "org.jilt.test.data.typesafe_ungrouped.custom.customer"
+        packageName = "org.jilt.test.data.typesafe_ungrouped.custom.customer",
+        innerNames = "Step_*"
 )
 public class TypeSafeValue {
     private final String name;
