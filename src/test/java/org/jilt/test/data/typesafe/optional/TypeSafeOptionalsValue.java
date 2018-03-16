@@ -1,6 +1,7 @@
 package org.jilt.test.data.typesafe.optional;
 
 import org.jilt.Builder;
+import org.jilt.BuilderInterfaces;
 import org.jilt.BuilderStyle;
 import org.jilt.Opt;
 
@@ -14,6 +15,7 @@ public class TypeSafeOptionalsValue {
     private final String opt5;
 
     @Builder(style = BuilderStyle.TYPE_SAFE)
+    @BuilderInterfaces(lastInnerName = "LastBuild")
     public TypeSafeOptionalsValue(@Opt Integer opt1, @Opt Boolean opt2, @Opt Character opt3,
                                   double req1, String req2, @Opt Float opt4, @Opt String opt5) {
         this.opt1 = opt1;
