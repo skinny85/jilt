@@ -223,6 +223,7 @@ import java.lang.annotation.Target;
  * @see #setterPrefix
  * @see #factoryMethod
  * @see #buildMethod
+ * @see BuilderInterfaces
  */
 @Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD})
 @Retention(RetentionPolicy.SOURCE)
