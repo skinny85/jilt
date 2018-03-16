@@ -43,7 +43,7 @@ public @interface BuilderInterfaces {
     /**
      * Allows you to set the Java package that the generated interfaces will reside in.
      * This is an optional attribute -
-     * the default is for the interfaces to reside in the same package as the Builder class.
+     * the default is for the interfaces to reside in the same package as the generated Builder class.
      *
      * @see Builder#packageName
      */
