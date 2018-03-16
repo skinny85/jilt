@@ -198,6 +198,8 @@ public enum BuilderStyle {
      *         .displayName("johnnyd") // this could be 'username', or skipped
      *         .build();
      * </code></pre>
+     *
+     * @see BuilderInterfaces
      */
     TYPE_SAFE,
 
@@ -323,6 +325,8 @@ public enum BuilderStyle {
      *         .displayName("Unknown") // this line could be commented out - optional property
      *         .build();
      * </code></pre>
+     *
+     * @see BuilderInterfaces
      */
     TYPE_SAFE_UNGROUPED_OPTIONALS
 }
