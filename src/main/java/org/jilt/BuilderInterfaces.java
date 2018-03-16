@@ -20,6 +20,7 @@ import java.lang.annotation.Target;
  * @since 1.1
  * @see #outerName
  * @see #packageName
+ * @see #innerNames
  * @see Builder#style
  * @see BuilderStyle
  */
