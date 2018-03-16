@@ -11,13 +11,13 @@ public class TypeSafeOptionalsTest {
     @Test
     public void test_type_safe_builder_with_optional_values() throws Exception {
         TypeSafeOptionalsValueBuilders.Req1 firstInterface = TypeSafeOptionalsValueBuilder.typeSafeOptionalsValue();
-        TypeSafeOptionalsValue optionalsValue = firstInterface
+        TypeSafeOptionalsValueBuilders.LastBuild lastInterface = firstInterface
                 .req1(3.14)
                 .req2("req2")
                 .opt4(2.71F)
                 .opt2(true)
-                .opt3('c')
-                .build();
+                .opt3('c');
+        TypeSafeOptionalsValue optionalsValue = lastInterface.build();
 
         assertThat(optionalsValue.getOpt1()).isNull();
         assertThat(optionalsValue.getOpt2()).isTrue();

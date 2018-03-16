@@ -21,6 +21,7 @@ import java.lang.annotation.Target;
  * @see #outerName
  * @see #packageName
  * @see #innerNames
+ * @see #lastInnerName
  * @see Builder#style
  * @see BuilderStyle
  */
@@ -62,4 +63,20 @@ public @interface BuilderInterfaces {
      * (so, the same as the value <code>"*"</code>).
      */
     String innerNames() default "";
+
+    /**
+     * Allows you to set the name of the last generated inner interface -
+     * the one that contains the <code>build</code> method,
+     * which you invoke to obtain an instance of the target class after
+     * setting all of the needed properties on the Builder.
+     * <p>
+     * This is an optional attribute -
+     * by default, the name is <code>Optionals</code> for Builders generated with
+     * {@link Builder#style} set to {@link BuilderStyle#TYPE_SAFE},
+     * and <code>Build</code> for those with that attribute set to
+     * {@link BuilderStyle#TYPE_SAFE_UNGROUPED_OPTIONALS}.
+     *
+     * @see Builder#buildMethod
+     */
+    String lastInnerName() default "";
 }

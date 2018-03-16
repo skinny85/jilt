@@ -62,7 +62,13 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
     }
 
     protected final String lastInterfaceName() {
-        return interfaceNameFromBaseName(defaultLastInterfaceName());
+        String nameFromAnnotation = builderInterfaces == null
+                ? ""
+                : builderInterfaces.lastInnerName();
+
+        return nameFromAnnotation.isEmpty()
+                ? interfaceNameFromBaseName(defaultLastInterfaceName())
+                : nameFromAnnotation;
     }
 
     protected final void addBuildMethodToInterface(TypeSpec.Builder interfaceBuilder) {
