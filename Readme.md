@@ -379,6 +379,31 @@ practically all aspects of the generated Builder (all of them are optional):
 * `buildMethod` allows you to change the name of the final method invoked on the Builder to
     obtain an instance of the built class. The default name of that method is `build`.
 
+##### @BuilderInterfaces annotation
+
+When generating a Type-Safe Builder
+(so, when the `@Builder.style` attribute is set to either `BuilderStyle.TYPE_SAFE`
+or `BuilderStyle.TYPE_SAFE_UNGROUPED_OPTIONALS`),
+you can also place the `@BuilderInterfaces` annotation on the same element `@Builder` is on
+(so, a class, constructor, or static method).
+This annotation is used to customize the interfaces generated to ensure the type-safety of the resulting Builder.
+It has the following attributes (all of them are optional):
+
+* `outerName` allows you to change the name of the outer interface that the per-property interfaces
+  will be generated inside of (this is in order not to pollute the global namespace).
+  The default name is `<BuiltClass>Builders`.
+* `packageName` allows you to change the package the generated interfaces will reside in.
+  The default is for the interfaces to reside in the same package as the one the Builder will be generated in.
+* `innerNames` allows you to set the pattern that will be used for naming the per-property generated interfaces.
+  The character `*` in the pattern will be substituted with the (capitalized) name of the property.
+  The default name for the interfaces is simply the (capitalized) name of its corresponding property -
+  so, the same as the pattern `"*"`.
+* `lastInnerName` allows you to change the name of the final interface -
+  the one containing the `build` method,
+  which is invoked to obtain an instance of the target class.
+  The default name for that interface is `Optionals` for `BuilderStyle.TYPE_SAFE` Builders,
+  and `Build` for `BuilderStyle.TYPE_SAFE_UNGROUPED_OPTIONALS` ones.
+
 #### Working in an IDE
 
 Annotation processors can be a little tricky to get working correctly in an IDE.
