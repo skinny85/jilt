@@ -1,3 +1,8 @@
+Version 1.1 - 2018-03-31
+------------------------
+- `@BuilderInterfaces` annotation with `outerName`, `packageName`, `innerNames` and `lastInnerName`
+  attributes 
+
 Version 1.0 - 2017-06-01
 ------------------------
 - `@Builder` annotation that can be placed on classes, constructors and (static) methods

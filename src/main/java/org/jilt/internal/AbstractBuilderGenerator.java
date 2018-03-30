@@ -215,7 +215,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     protected final AnnotationSpec generatedAnnotation() {
         return AnnotationSpec
                 .builder(Generated.class)
-                .addMember("value", "$S", "Jilt-1.0")
+                .addMember("value", "$S", "Jilt-1.1")
                 .build();
     }
 }

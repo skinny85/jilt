@@ -90,7 +90,7 @@ Example Maven settings:
     <dependency>
         <groupId>org.jilt</groupId>
         <artifactId>jilt</artifactId>
-        <version>1.0</version>
+        <version>1.1</version>
         <scope>provided</scope> <!-- Jilt is not needed at runtime -->
     </dependency>
 </dependencies>
@@ -105,12 +105,12 @@ repositories {
 
 dependencies {
     // ...
-    compileOnly group: 'org.jilt', name: 'jilt', version: '1.0' // Jilt is not needed at runtime
+    compileOnly group: 'org.jilt', name: 'jilt', version: '1.1' // Jilt is not needed at runtime
 }
 ```
 
 If you're not using dependency managers, you can
-[download the JAR directly](https://jcenter.bintray.com/org/jilt/jilt/1.0/jilt-1.0.jar)
+[download the JAR directly](https://jcenter.bintray.com/org/jilt/jilt/1.1/jilt-1.1.jar)
 (it's distributed as a self-contained JAR, you don't need any additional dependencies for it)
 and add it to your classpath.
 
