@@ -86,7 +86,7 @@ Example Maven settings:
 
 <!-- ... -->
 
-<dependenies>
+<dependencies>
     <dependency>
         <groupId>org.jilt</groupId>
         <artifactId>jilt</artifactId>
