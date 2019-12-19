@@ -1,3 +1,5 @@
+# OracleJDK8 no longer installs on Xenial, which is the default
+dist: trusty
 language: java
 jdk:
   - oraclejdk8
