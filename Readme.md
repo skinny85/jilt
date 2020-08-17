@@ -80,7 +80,7 @@ Example Maven settings:
         </snapshots>
         <id>central</id>
         <name>bintray</name>
-        <url>http://jcenter.bintray.com</url>
+        <url>https://jcenter.bintray.com</url>
     </repository>
 </repositories>
 
