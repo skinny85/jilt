@@ -90,7 +90,7 @@ import java.lang.annotation.Target;
  *         {@literal @}Builder
  *          public Person(String firstName, String lastName, int age) {
  *              this.name = firstName + " " + lastName;
- *              this.isAdult = age > 20;
+ *              this.isAdult = age &gt; 20;
  *          }
  *      }
  *          </code></pre>
@@ -155,7 +155,7 @@ import java.lang.annotation.Target;
  *      public abstract class PersonFactory {
  *         {@literal @}Builder
  *          public static Person make(String firstName, String lastName, int age) {
- *              return new Person(firstName + " " + lastName, age > 20);
+ *              return new Person(firstName + " " + lastName, age &gt; 20);
  *          }
  *      }
  *          </code></pre>
@@ -278,7 +278,7 @@ public @interface Builder {
      * The generated Builder code always includes a static factory method.
      * This, combined with Java's static imports, allows you to write nice-looking code like:
      *
-     * <code><pre>
+     * <pre><code>
      *     // imagine Person is a class we are generating a Builder for
      *     import org.example.Person;
      *     import static org.example.PersonBuilder.person;
@@ -288,7 +288,7 @@ public @interface Builder {
      *          .name("Some name")
      *          .age(21)
      *          .build();
-     * </pre></code>
+     * </code></pre>
      *
      * This attribute allows you to change the name of the generated static factory method.
      * It must be a valid Java method name.
