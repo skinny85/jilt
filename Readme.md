@@ -1,4 +1,4 @@
-# Jilt [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Download](https://api.bintray.com/packages/skinny85/maven-repo/Jilt/images/download.svg)](https://bintray.com/skinny85/maven-repo/Jilt/_latestVersion) [![Build status](https://travis-ci.org/skinny85/jilt.svg?branch=develop)](https://travis-ci.org/skinny85/jilt)
+# Jilt [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Download](https://maven-badges.herokuapp.com/maven-central/cc.jilt/jilt/badge.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/cc.jilt/jilt) [![Build Status](https://github.com/skinny85/jilt/actions/workflows/build.yaml/badge.svg)](https://github.com/skinny85/jilt/actions/workflows/build.yaml)
 
 Jilt is a [Java annotation processor](https://docs.oracle.com/javase/8/docs/api/javax/annotation/processing/Processor.html)
 used for automatically generating classes that implement the
