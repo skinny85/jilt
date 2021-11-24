@@ -68,27 +68,14 @@ Check out the [documentation below](#customizing-the-generated-code) for ways to
 
 #### Getting Jilt
 
-Jilt is available from the [JCenter](https://bintray.com/bintray/jcenter) Maven repository.
+Jilt is available from the [Maven Central](https://search.maven.org/search?q=g:cc.jilt) repository.
 
 Example Maven settings:
 
 ```xml
-<repositories>
-    <repository>
-        <snapshots>
-            <enabled>false</enabled>
-        </snapshots>
-        <id>central</id>
-        <name>bintray</name>
-        <url>https://jcenter.bintray.com</url>
-    </repository>
-</repositories>
-
-<!-- ... -->
-
 <dependencies>
     <dependency>
-        <groupId>org.jilt</groupId>
+        <groupId>cc.jilt</groupId>
         <artifactId>jilt</artifactId>
         <version>1.1</version>
         <scope>provided</scope> <!-- Jilt is not needed at runtime -->
@@ -100,17 +87,18 @@ Example Gradle settings:
 
 ```groovy
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {
     // ...
-    compileOnly group: 'org.jilt', name: 'jilt', version: '1.1' // Jilt is not needed at runtime
+    compileOnly 'cc.jilt:jilt:1.1' // Jilt is not needed at runtime
+    annotationProcessor 'cc.jilt:jilt:1.1' // you might also need this dependency in newer Gradle versions
 }
 ```
 
 If you're not using dependency managers, you can
-[download the JAR directly](https://jcenter.bintray.com/org/jilt/jilt/1.1/jilt-1.1.jar)
+[download the JAR directly](https://repo1.maven.org/maven2/cc/jilt/jilt/1.1/jilt-1.1.jar)
 (it's distributed as a self-contained JAR, you don't need any additional dependencies for it)
 and add it to your classpath.
 
