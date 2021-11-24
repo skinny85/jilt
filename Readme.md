@@ -119,7 +119,7 @@ and add it to your classpath.
 ##### @Builder on classes
 
 When you place the `@Builder` annotation on the class itself,
-the resulting Builder will have as properties all of the instance fields of that class
+the resulting Builder will have as properties all instance fields of that class
 (you can mark a field with the `@Builder.Ignore` annotation to exclude it from being added to the Builder),
 and will build the instance of that class assuming it has a constructor taking
 all of those properties as arguments, in the same order they were declared in the class.

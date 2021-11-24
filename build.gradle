@@ -1,4 +1,4 @@
-group 'org.jilt'
+group 'cc.jilt' // we need a domain we own for Maven Central, and jilt.org is scalped
 version '1.1'
 
 buildscript {
@@ -12,14 +12,79 @@ buildscript {
 
 apply plugin: 'java'
 apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'signing'
+apply plugin: 'maven'
 
 shadowJar {
     relocate 'com.squareup', 'org.jilt.shaded.com.squareup'
+
+    classifier '' // we want the shadow JAR to be the main output JAR
+    configurations = [project.configurations.compileClasspath]
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
     from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+artifacts {
+    archives shadowJar, sourcesJar, javadocJar
+}
+
+signing {
+    useGpgCmd()
+    sign configurations.archives
+}
+
+// defaults if the value of the username and password for Maven Central is not found -
+// they are only needed when running the 'uploadArchives' task to release a new version
+def ossrhUsername = findProperty('ossrhUsername') ?: 'username'
+def ossrhPassword = findProperty('ossrhPassword') ?: 'password'
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            println(project.conf2ScopeMappings.mappings)
+
+            pom.project {
+                name 'Jilt'
+                description 'Java annotation processor for auto-generating Builder (including Type-Safe Builder) classes'
+                url 'https://github.com/skinny85/jilt'
+
+                scm {
+                    url 'https://github.com/skinny85/jilt.git'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        name 'Adam Ruka'
+                    }
+                }
+            }
+        }
+    }
 }
 
 repositories {
@@ -70,8 +135,9 @@ sourceSets {
 }
 
 dependencies {
-    compile 'com.squareup:javapoet:1.8.0'
+    compileOnly 'com.squareup:javapoet:1.8.0'
 
+    testCompileOnly 'com.squareup:javapoet:1.8.0'
     testCompile group: 'junit', name: 'junit', version: '4.11'
     testCompile group: 'org.assertj', name: 'assertj-core', version: '3.6.2'
 }
