@@ -11,7 +11,6 @@ import org.jilt.Builder;
 import org.jilt.Opt;
 import org.jilt.utils.Utils;
 
-import javax.annotation.Generated;
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
@@ -218,7 +217,12 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             // available since 9
             generatedAnnotation = Class.forName("javax.annotation.processing.Generated");
         } catch (ClassNotFoundException e) {
-            generatedAnnotation = Generated.class;
+            try {
+                generatedAnnotation = Class.forName("javax.annotation.Generated");
+            } catch (ClassNotFoundException ex) {
+                // Shouldn't be possible.
+                throw new IllegalStateException(ex);
+            }
         }
         return AnnotationSpec
                 .builder(generatedAnnotation)

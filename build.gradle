@@ -79,20 +79,8 @@ repositories {
     mavenCentral()
 }
 
-if (System.getenv('JAVA_VERSION') != null) {
-    tasks.compileJava {
-        javaCompiler.set(javaToolchains.compilerFor { languageVersion.set(JavaLanguageVersion.of(8)) })
-    }
-    tasks.compileTestJava {
-        javaCompiler.set(javaToolchains.compilerFor { languageVersion.set(JavaLanguageVersion.of(System.getenv('JAVA_VERSION').toInteger())) })
-    }
-    tasks.test {
-        javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(System.getenv('JAVA_VERSION').toInteger())) })
-    }
-} else {
-    sourceCompatibility = '1.6'
-    targetCompatibility = '1.6'
-}
+sourceCompatibility = '1.6'
+targetCompatibility = '1.6'
 
 dependencies {
     compileOnly 'com.squareup:javapoet:1.8.0'
