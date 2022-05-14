@@ -5,17 +5,16 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      # disable the demon, as it's causing some problems
-      GRADLE_OPTS: -Dorg.gradle.daemon=false
-
+    strategy:
+      matrix:
+        version: [ 8, 9, 11 ]
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up JDK 1.8
+      - name: Set up JDK version ${{ matrix.version }}
         uses: actions/setup-java@v1
         with:
-          java-version: 1.8
+          java-version: ${{ matrix.version }}
 
       - name: Cache Gradle packages
         uses: actions/cache@v2

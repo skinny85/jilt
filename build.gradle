@@ -1,19 +1,12 @@
-group 'cc.jilt' // we need a domain we own for Maven Central, and jilt.org is scalped
-version '1.1'
-
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
-    }
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'signing'
+    id 'maven'
 }
 
-apply plugin: 'java'
-apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'signing'
-apply plugin: 'maven'
+group 'cc.jilt' // we need a domain we own for Maven Central, and jilt.org is scalped
+version '1.1'
 
 shadowJar {
     relocate 'com.squareup', 'org.jilt.shaded.com.squareup'
@@ -22,14 +15,9 @@ shadowJar {
     configurations = [project.configurations.compileClasspath]
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from javadoc
+java {
+    withSourcesJar()
+    withJavadocJar()
 }
 
 artifacts {
@@ -73,7 +61,7 @@ uploadArchives {
                 licenses {
                     license {
                         name 'The Apache License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        url 'https://www.apache.org/licenses/LICENSE-2.0.txt'
                     }
                 }
 
@@ -94,50 +82,11 @@ repositories {
 sourceCompatibility = '1.6'
 targetCompatibility = '1.6'
 
-compileJava {
-    options.compilerArgs << "-s"
-    options.compilerArgs << "$projectDir/src/main/generated/java"
-
-    doFirst {
-        // make sure that directory exists
-        file(new File(projectDir, "/src/main/generated/java")).mkdirs()
-    }
-}
-
-compileTestJava {
-    options.compilerArgs << "-s"
-    options.compilerArgs << "$projectDir/src/test/generated/java"
-
-    doFirst {
-        // make sure that directory exists
-        file(new File(projectDir, "/src/test/generated/java")).mkdirs()
-    }
-}
-
-clean.doLast {
-    // clean-up directory when necessary
-    file(new File(projectDir, "/src/main/generated/java")).deleteDir()
-    file(new File(projectDir, "/src/test/generated/java")).deleteDir()
-}
-
-sourceSets {
-    main {
-        java {
-            srcDir "$projectDir/src/main/generated/java"
-        }
-    }
-
-    test {
-        java {
-            srcDir "$projectDir/src/test/generated/java"
-        }
-    }
-}
-
 dependencies {
     compileOnly 'com.squareup:javapoet:1.8.0'
 
-    testCompileOnly 'com.squareup:javapoet:1.8.0'
-    testCompile group: 'junit', name: 'junit', version: '4.11'
-    testCompile group: 'org.assertj', name: 'assertj-core', version: '3.6.2'
+    testCompile 'junit:junit:4.13.2'
+    testCompile 'org.assertj:assertj-core:3.6.2'
+    testAnnotationProcessor project
+    testAnnotationProcessor 'com.squareup:javapoet:1.8.0'
 }
