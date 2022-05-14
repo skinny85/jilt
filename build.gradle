@@ -8,20 +8,6 @@ plugins {
 group 'cc.jilt' // we need a domain we own for Maven Central, and jilt.org is scalped
 version '1.1'
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
-    }
-}
-
-apply plugin: 'java'
-apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'signing'
-apply plugin: 'maven'
-
 shadowJar {
     relocate 'com.squareup', 'org.jilt.shaded.com.squareup'
 
@@ -104,17 +90,15 @@ if (System.getenv('JAVA_VERSION') != null) {
         javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(System.getenv('JAVA_VERSION').toInteger())) })
     }
 } else {
-    java {
-        sourceCompatibility = '1.6'
-        targetCompatibility = '1.6'
-    }
+    sourceCompatibility = '1.6'
+    targetCompatibility = '1.6'
 }
 
 dependencies {
     compileOnly 'com.squareup:javapoet:1.8.0'
 
     testCompileOnly 'com.squareup:javapoet:1.8.0'
-    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile group: 'junit', name: 'junit', version: '4.13.2'
     testCompile group: 'org.assertj', name: 'assertj-core', version: '3.6.2'
     testAnnotationProcessor(getProject())
     testAnnotationProcessor('com.squareup:javapoet:1.8.0')
