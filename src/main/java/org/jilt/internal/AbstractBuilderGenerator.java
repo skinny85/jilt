@@ -211,22 +211,20 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 : annotationBuildMethod;
     }
 
-    protected final AnnotationSpec generatedAnnotation() {
-        Class<?> generatedAnnotation;
-        try {
-            // available since 9
-            generatedAnnotation = Class.forName("javax.annotation.processing.Generated");
-        } catch (ClassNotFoundException e) {
-            try {
-                generatedAnnotation = Class.forName("javax.annotation.Generated");
-            } catch (ClassNotFoundException ex) {
-                // Shouldn't be possible.
-                throw new IllegalStateException(ex);
-            }
-        }
+    protected final AnnotationSpec generatedAnnotation() throws Exception {
+        Class<?> generatedAnnotationClass = determineGeneratedAnnotationClass();
         return AnnotationSpec
-                .builder(generatedAnnotation)
+                .builder(generatedAnnotationClass)
                 .addMember("value", "$S", "Jilt-1.1")
                 .build();
+    }
+
+    private Class<?> determineGeneratedAnnotationClass() throws Exception {
+        try {
+            // available since 9
+            return Class.forName("javax.annotation.processing.Generated");
+        } catch (ClassNotFoundException e) {
+            return Class.forName("javax.annotation.Generated");
+        }
     }
 }
