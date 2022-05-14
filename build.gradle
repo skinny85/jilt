@@ -85,9 +85,8 @@ targetCompatibility = '1.6'
 dependencies {
     compileOnly 'com.squareup:javapoet:1.8.0'
 
-    testCompileOnly 'com.squareup:javapoet:1.8.0'
     testCompile 'junit:junit:4.13.2'
-    testCompile group: 'org.assertj', name: 'assertj-core', version: '3.6.2'
-    testAnnotationProcessor getProject()
+    testCompile 'org.assertj:assertj-core:3.6.2'
+    testAnnotationProcessor project
     testAnnotationProcessor 'com.squareup:javapoet:1.8.0'
 }
