@@ -142,9 +142,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         String annotationBuilderPackageName = builderAnnotation.packageName();
         if (annotationBuilderPackageName.isEmpty()) {
             PackageElement targetClassPackage = elements.getPackageOf(targetClassType);
-            return targetClassPackage.isUnnamed()
-                    ? ""
-                    : targetClassPackage.toString();
+            return targetClassPackage.getQualifiedName().toString();
         } else {
             return annotationBuilderPackageName;
         }
