@@ -47,8 +47,6 @@ uploadArchives {
                 authentication(userName: ossrhUsername, password: ossrhPassword)
             }
 
-            println(project.conf2ScopeMappings.mappings)
-
             pom.project {
                 name 'Jilt'
                 description 'Java annotation processor for auto-generating Builder (including Type-Safe Builder) classes'
