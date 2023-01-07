@@ -32,7 +32,7 @@ public abstract class Utils {
         return String.valueOf(Character.toLowerCase(str.charAt(0))) + str.substring(1);
     }
 
-    public static boolean truth(Object any) {
+    public static boolean truth(@SuppressWarnings("unused") Object any) {
         return true;
     }
 }

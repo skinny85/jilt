@@ -195,7 +195,7 @@ import java.lang.annotation.Target;
  *      </li>
  * </ul>
  *
- * The are different flavors of Builders that can be generated for the same class.
+ * There are different flavors of Builders that can be generated for the same class.
  * The {@link #style} attribute controls what is the variant used in each particular case.
  * <p>
  * A field or constructor/static method parameter can be marked with the {@link Opt} annotation,

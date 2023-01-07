@@ -89,7 +89,7 @@ public enum BuilderStyle {
      * A Type-Safe (also called Staged, or Telescopic) Builder pattern variant.
      * <p>
      * This variant is most often used for Builders with many properties.
-     * It leverages the type system to make sure all of the required
+     * It leverages the type system to make sure all required
      * properties are set before constructing an instance of the target class.
      * <p>
      * It generates a separate interface for each setter corresponding
@@ -121,7 +121,7 @@ public enum BuilderStyle {
      * }
      * </code></pre>
      *
-     * ...Jilt will generate all of the following code:
+     * ...Jilt will generate the following code:
      *
      * <pre><code>
      * public interface UserBuilders {
@@ -241,7 +241,7 @@ public enum BuilderStyle {
      * }
      * </code></pre>
      *
-     * ...Jilt will generate all of the following code:
+     * ...Jilt will generate the following code:
      *
      * <pre><code>
      * public interface UserBuilders {

@@ -50,7 +50,7 @@ public @interface BuilderInterfaces {
     String packageName() default "";
 
     /**
-     * Allows you change the names of the per-property inner interfaces that will be generated to enforce type safety.
+     * Allows you to change the names of the per-property inner interfaces that will be generated to enforce type safety.
      * Because this one attribute is used to control the names of interfaces for every property of the built class,
      * the value you provide can include the '*' character, which will be substituted with the
      * (capitalized) name of the property corresponding to that interface
@@ -68,7 +68,7 @@ public @interface BuilderInterfaces {
      * Allows you to set the name of the last generated inner interface -
      * the one that contains the <code>build</code> method,
      * which you invoke to obtain an instance of the target class after
-     * setting all of the needed properties on the Builder.
+     * setting all the needed properties on the Builder.
      * <p>
      * This is an optional attribute -
      * by default, the name is <code>Optionals</code> for Builders generated with
