@@ -28,6 +28,11 @@ signing {
     useGpgCmd()
     sign configurations.archives
 }
+// turn off signing unless we're uploading archives to Maven Central,
+// as it will fail if a valid PGP key is not set
+tasks.withType(Sign).configureEach {
+    onlyIf { gradle.taskGraph.hasTask("uploadArchives") }
+}
 
 // defaults if the value of the username and password for Maven Central is not found -
 // they are only needed when running the 'uploadArchives' task to release a new version
