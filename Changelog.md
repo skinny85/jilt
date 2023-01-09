@@ -1,7 +1,12 @@
+Version 1.2 - 2023-01-08
+------------------------
+- Allow using Jilt with Java 9+ ([Pull Request #7](https://github.com/skinny85/jilt/pull/7))
+- Fix wrong package name when compiling with Eclipse JDT ([Pull Request #8](https://github.com/skinny85/jilt/pull/8))
+
 Version 1.1 - 2018-03-31
 ------------------------
 - `@BuilderInterfaces` annotation with `outerName`, `packageName`, `innerNames` and `lastInnerName`
-  attributes 
+  attributes
 
 Version 1.0 - 2017-06-01
 ------------------------
