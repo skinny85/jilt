@@ -68,7 +68,7 @@ publishing {
     }
     repositories {
         maven {
-            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            url = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
             credentials {
                 username = ossrhUsername
                 password = ossrhPassword
@@ -97,7 +97,6 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.assertj:assertj-core:3.6.2'
     testAnnotationProcessor project
-    testAnnotationProcessor 'com.squareup:javapoet:1.8.0'
 }
 // required in Gradle 8, since the above line 'testAnnotationProcessor project'
 // creates an implicit dependency on shadowJar from compileTestJava
