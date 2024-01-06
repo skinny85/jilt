@@ -82,8 +82,14 @@ repositories {
     mavenCentral()
 }
 
-sourceCompatibility = '1.6'
-targetCompatibility = '1.6'
+if (JavaVersion.current() <= JavaVersion.VERSION_11) {
+    sourceCompatibility = JavaVersion.VERSION_1_6
+    targetCompatibility = JavaVersion.VERSION_1_6
+} else {
+    // later Java versions don't support Java 6 anymore
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    targetCompatibility = JavaVersion.VERSION_1_7
+}
 
 dependencies {
     compileOnly 'com.squareup:javapoet:1.8.0'
