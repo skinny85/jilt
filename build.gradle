@@ -1,8 +1,8 @@
 plugins {
-    id 'java'
-    id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'java-library'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'signing'
-    id 'maven'
+    id 'maven-publish'
 }
 
 group 'cc.jilt' // we need a domain we own for Maven Central, and jilt.org is scalped
@@ -11,7 +11,7 @@ version '1.2'
 shadowJar {
     relocate 'com.squareup', 'org.jilt.shaded.com.squareup'
 
-    classifier '' // we want the shadow JAR to be the main output JAR
+    archiveClassifier = '' // we want the shadow JAR to be the main output JAR
     configurations = [project.configurations.compileClasspath]
 }
 
@@ -39,41 +39,41 @@ tasks.withType(Sign).configureEach {
 def ossrhUsername = findProperty('ossrhUsername') ?: 'username'
 def ossrhPassword = findProperty('ossrhPassword') ?: 'password'
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-            repository(url: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
-            }
-
-            snapshotRepository(url: "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
-            }
-
-            pom.project {
-                name 'Jilt'
-                description 'Java annotation processor for auto-generating Builder (including Type-Safe Builder) classes'
-                url 'https://github.com/skinny85/jilt'
+publishing {
+    publications {
+        shadow(MavenPublication) {
+            pom {
+                name = 'Jilt'
+                description = 'Java annotation processor for auto-generating Builder (including Type-Safe Builder) classes'
+                url = 'https://github.com/skinny85/jilt'
 
                 scm {
-                    url 'https://github.com/skinny85/jilt.git'
+                    url = 'https://github.com/skinny85/jilt.git'
                 }
 
                 licenses {
                     license {
-                        name 'The Apache License, Version 2.0'
-                        url 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                        name = 'The Apache License, Version 2.0'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
                     }
                 }
 
                 developers {
                     developer {
-                        name 'Adam Ruka'
+                        name = 'Adam Ruka'
                     }
                 }
             }
+        }
+    }
+    repositories {
+        maven {
+            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = ossrhUsername
+                password = ossrhPassword
+            }
+            name = 'MavenCentral'
         }
     }
 }
@@ -94,8 +94,13 @@ if (JavaVersion.current() <= JavaVersion.VERSION_11) {
 dependencies {
     compileOnly 'com.squareup:javapoet:1.8.0'
 
-    testCompile 'junit:junit:4.13.2'
-    testCompile 'org.assertj:assertj-core:3.6.2'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.assertj:assertj-core:3.6.2'
     testAnnotationProcessor project
     testAnnotationProcessor 'com.squareup:javapoet:1.8.0'
+}
+// required in Gradle 8, since the above line 'testAnnotationProcessor project'
+// creates an implicit dependency on shadowJar from compileTestJava
+tasks.named('compileTestJava').configure {
+    it.dependsOn(tasks.named('shadowJar'))
 }
