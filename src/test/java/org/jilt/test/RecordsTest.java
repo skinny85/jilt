@@ -1,5 +1,7 @@
 package org.jilt.test;
 
+import org.jilt.test.data.record.RecordNoWorkaround;
+import org.jilt.test.data.record.RecordNoWorkaroundBuilder;
 import org.jilt.test.data.record.RecordWithWorkaround;
 import org.jilt.test.data.record.RecordWithWorkaroundBuilder;
 import org.junit.Test;
@@ -16,5 +18,15 @@ public class RecordsTest {
 
         assertThat(record.name()).isEqualTo("some name");
         assertThat(record.age()).isEqualTo(23);
+    }
+
+    @Test
+    public void builder_for_record_without_workaround_works() {
+        RecordNoWorkaround record = RecordNoWorkaroundBuilder.recordNoWorkaround()
+                .age(-1)
+                .build();
+
+        assertThat(record.name()).isNull();
+        assertThat(record.age()).isEqualTo(-1);
     }
 }

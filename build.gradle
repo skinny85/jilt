@@ -86,9 +86,8 @@ if (JavaVersion.current() <= JavaVersion.VERSION_11) {
     sourceCompatibility = JavaVersion.VERSION_1_6
     targetCompatibility = JavaVersion.VERSION_1_6
 } else {
-    // later Java versions don't support Java 6 anymore
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.current()
+    targetCompatibility = JavaVersion.current()
 }
 
 dependencies {
