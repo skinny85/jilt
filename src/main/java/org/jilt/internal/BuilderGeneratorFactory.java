@@ -21,7 +21,7 @@ import java.util.Set;
 public final class BuilderGeneratorFactory {
     private static final Set<String> ALLOWED_TYPE_KINDS;
     static {
-        ALLOWED_TYPE_KINDS = new HashSet<>(2);
+        ALLOWED_TYPE_KINDS = new HashSet<String>(2);
         ALLOWED_TYPE_KINDS.add(ElementKind.CLASS.name());
         // we don't want to use ElementKind.RECORD because it is not available in Java versions before 16
         ALLOWED_TYPE_KINDS.add("RECORD");
