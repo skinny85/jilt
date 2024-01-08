@@ -89,6 +89,9 @@ if (JavaVersion.current() <= JavaVersion.VERSION_11) {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
 }
+if (JavaVersion.current() < JavaVersion.VERSION_16) {
+    sourceSets.test.java.exclude '**/Record*.java'
+}
 
 dependencies {
     compileOnly 'com.squareup:javapoet:1.8.0'
