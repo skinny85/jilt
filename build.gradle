@@ -24,16 +24,6 @@ artifacts {
     archives shadowJar, sourcesJar, javadocJar
 }
 
-signing {
-    useGpgCmd()
-    sign configurations.archives
-}
-// turn off signing unless we're uploading archives to Maven Central,
-// as it will fail if a valid PGP key is not set
-tasks.withType(Sign).configureEach {
-    onlyIf { project.hasProperty('publishToMavenCentral') }
-}
-
 // defaults if the value of the username and password for Maven Central is not found -
 // they are only needed when running the 'uploadArchives' task to release a new version
 def ossrhUsername = findProperty('ossrhUsername') ?: 'username'
@@ -42,6 +32,8 @@ def ossrhPassword = findProperty('ossrhPassword') ?: 'password'
 publishing {
     publications {
         shadow(MavenPublication) {
+            from components.java
+
             pom {
                 name = 'Jilt'
                 description = 'Java annotation processor for auto-generating Builder (including Type-Safe Builder) classes'
@@ -76,6 +68,16 @@ publishing {
             name = 'MavenCentral'
         }
     }
+}
+
+signing {
+    useGpgCmd()
+    sign publishing.publications.shadow
+}
+// turn off signing unless we're uploading archives to Maven Central,
+// as it will fail if a valid PGP key is not set
+tasks.withType(Sign).configureEach {
+    onlyIf { project.hasProperty('publishToMavenCentral') }
 }
 
 repositories {
