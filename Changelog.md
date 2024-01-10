@@ -1,3 +1,7 @@
+Version 1.3 - 2024-01-09
+------------------------
+- Allow placing `@Builder` on Java 16+ `record` declarations ([Issue #9](https://github.com/skinny85/jilt/issues/9))
+
 Version 1.2 - 2023-01-08
 ------------------------
 - Allow using Jilt with Java 9+ ([Pull Request #7](https://github.com/skinny85/jilt/pull/7))
