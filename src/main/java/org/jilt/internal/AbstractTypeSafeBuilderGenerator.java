@@ -2,7 +2,10 @@ package org.jilt.internal;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterizedTypeName;
+import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.TypeVariableName;
 import org.jilt.Builder;
 import org.jilt.BuilderInterfaces;
 import org.jilt.utils.Utils;
@@ -79,8 +82,13 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
                 .build());
     }
 
-    protected final ClassName innerInterfaceNamed(String interfaceName) {
-        return ClassName.get(outerInterfacesPackage(), outerInterfacesName(), interfaceName);
+    protected final TypeName innerInterfaceNamed(String interfaceName) {
+        List<TypeVariableName> typeVariableNames = this.builderClassTypeParameters();
+        ClassName innerInterfaceClassName = ClassName.get(outerInterfacesPackage(), outerInterfacesName(), interfaceName);
+        return typeVariableNames.isEmpty()
+                ? innerInterfaceClassName
+                : ParameterizedTypeName.get(innerInterfaceClassName,
+                    typeVariableNames.toArray(new TypeVariableName[0]));
     }
 
     protected final VariableElement nextAttribute(VariableElement attribute) {

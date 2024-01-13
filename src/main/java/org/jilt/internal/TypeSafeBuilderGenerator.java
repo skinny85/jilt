@@ -30,7 +30,8 @@ final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
                 .addModifiers(Modifier.PUBLIC);
 
         TypeSpec.Builder optionalsInterfaceBuilder = TypeSpec.interfaceBuilder(lastInterfaceName())
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addTypeVariables(this.builderClassTypeParameters());
 
         for (VariableElement currentAttribute : attributes()) {
             MethodSpec setterMethod = MethodSpec
@@ -45,7 +46,8 @@ final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
             } else {
                 TypeSpec.Builder innerInterfaceBuilder = TypeSpec
                         .interfaceBuilder(interfaceNameForAttribute(currentAttribute))
-                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                        .addTypeVariables(this.builderClassTypeParameters());
 
                 innerInterfaceBuilder.addMethod(setterMethod);
 

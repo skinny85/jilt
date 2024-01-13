@@ -193,7 +193,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                     typeVariableNames.toArray(new TypeVariableName[0]));
     }
 
-    private List<TypeVariableName> builderClassTypeParameters() {
+    protected List<TypeVariableName> builderClassTypeParameters() {
         List<TypeVariableName> ret = new ArrayList<TypeVariableName>(
                 this.targetClassType.getTypeParameters().size());
         for (TypeParameterElement typeParameterEl : this.targetClassType.getTypeParameters()) {
