@@ -5,8 +5,10 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.TypeVariableName;
 import org.jilt.Builder;
 import org.jilt.Opt;
 import org.jilt.utils.Utils;
@@ -16,6 +18,7 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 import java.util.ArrayList;
@@ -35,11 +38,11 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private final Name targetFactoryMethod;
 
     private final String builderClassPackage;
-    private final ClassName builderClassTypeName;
+    private final ClassName builderClassClassName;
 
     AbstractBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
-                             Builder builderAnnotation, TypeElement targetFactoryClass, Name targetFactoryMethod,
-                             Elements elements, Filer filer) {
+            Builder builderAnnotation, TypeElement targetFactoryClass, Name targetFactoryMethod,
+            Elements elements, Filer filer) {
         this.elements = elements;
         this.filer = filer;
 
@@ -50,25 +53,28 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         this.targetFactoryClass = targetFactoryClass;
         this.targetFactoryMethod = targetFactoryMethod;
 
-        builderClassPackage = initBuilderClassPackage();
-        builderClassTypeName = ClassName.get(builderClassPackage(), builderClassStringName());
+        this.builderClassPackage = this.initBuilderClassPackage();
+        this.builderClassClassName = ClassName.get(this.builderClassPackage(),
+                this.builderClassStringName());
     }
 
     @Override
     public final void generateBuilderClass() throws Exception {
-        generateClassesNeededByBuilder();
+        this.generateClassesNeededByBuilder();
 
         // builder class
-        TypeSpec.Builder builderClassBuilder = TypeSpec.classBuilder(builderClassTypeName())
-                .addAnnotation(generatedAnnotation())
-                .addModifiers(Modifier.PUBLIC);
+        TypeSpec.Builder builderClassBuilder = TypeSpec.classBuilder(this.builderClassClassName)
+                .addAnnotation(this.generatedAnnotation())
+                .addModifiers(Modifier.PUBLIC)
+                .addTypeVariables(this.builderClassTypeParameters());
 
         // add a static factory method to the builder class
         builderClassBuilder.addMethod(MethodSpec
-                .methodBuilder(builderFactoryMethodName())
+                .methodBuilder(this.builderFactoryMethodName())
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addTypeVariables(this.builderClassTypeParameters())
                 .returns(builderFactoryMethodReturnType())
-                .addStatement("return new $T()", builderClassTypeName())
+                .addStatement("return new $T()", this.builderClassTypeName())
                 .build());
 
         for (VariableElement attribute : attributes) {
@@ -179,8 +185,21 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return builderClassPackage;
     }
 
-    protected final ClassName builderClassTypeName() {
-        return builderClassTypeName;
+    protected final TypeName builderClassTypeName() {
+        List<TypeVariableName> typeVariableNames = this.builderClassTypeParameters();
+        return typeVariableNames.isEmpty()
+                ? this.builderClassClassName
+                : ParameterizedTypeName.get(this.builderClassClassName,
+                    typeVariableNames.toArray(new TypeVariableName[0]));
+    }
+
+    private List<TypeVariableName> builderClassTypeParameters() {
+        List<TypeVariableName> ret = new ArrayList<TypeVariableName>(
+                this.targetClassType.getTypeParameters().size());
+        for (TypeParameterElement typeParameterEl : this.targetClassType.getTypeParameters()) {
+            ret.add(TypeVariableName.get(typeParameterEl));
+        }
+        return ret;
     }
 
     protected final String attributeSimpleName(VariableElement attribute) {
