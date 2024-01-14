@@ -10,22 +10,22 @@ import org.jilt.Builder;
 import org.jilt.BuilderInterfaces;
 import org.jilt.utils.Utils;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.processing.Filer;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
-import java.util.ArrayList;
-import java.util.List;
 
 abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator {
     private final BuilderInterfaces builderInterfaces;
 
     AbstractTypeSafeBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
-            Builder builderAnnotation, BuilderInterfaces builderInterfaces, TypeElement targetFactoryClass,
-            Name targetFactoryMethod, Elements elements, Filer filer) {
-        super(targetClass, attributes, builderAnnotation, targetFactoryClass, targetFactoryMethod, elements, filer);
+            Builder builderAnnotation, BuilderInterfaces builderInterfaces,
+            ExecutableElement targetFactoryMethod, Elements elements, Filer filer) {
+        super(targetClass, attributes, builderAnnotation, targetFactoryMethod, elements, filer);
         this.builderInterfaces = builderInterfaces;
     }
 

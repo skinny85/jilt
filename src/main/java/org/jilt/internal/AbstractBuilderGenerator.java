@@ -14,8 +14,8 @@ import org.jilt.Opt;
 import org.jilt.utils.Utils;
 
 import javax.annotation.processing.Filer;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.Name;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
@@ -34,14 +34,13 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private final List<? extends VariableElement> attributes;
     private final Set<VariableElement> optionalAttributes;
     private final Builder builderAnnotation;
-    private final TypeElement targetFactoryClass;
-    private final Name targetFactoryMethod;
+    private final ExecutableElement targetFactoryMethod;
 
     private final String builderClassPackage;
     private final ClassName builderClassClassName;
 
     AbstractBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
-            Builder builderAnnotation, TypeElement targetFactoryClass, Name targetFactoryMethod,
+            Builder builderAnnotation, ExecutableElement targetFactoryMethod,
             Elements elements, Filer filer) {
         this.elements = elements;
         this.filer = filer;
@@ -50,7 +49,6 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         this.attributes = attributes;
         this.optionalAttributes = initOptionalAttributes();
         this.builderAnnotation = builderAnnotation;
-        this.targetFactoryClass = targetFactoryClass;
         this.targetFactoryMethod = targetFactoryMethod;
 
         this.builderClassPackage = this.initBuilderClassPackage();
@@ -104,12 +102,13 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 .addModifiers(Modifier.PUBLIC)
                 .returns(targetClassTypeName());
         String attributes = Utils.join(attributeNames());
-        if (targetFactoryClass == null) {
+        if (this.targetFactoryMethod == null) {
             buildMethod.addStatement("return new $T($L)", targetClassTypeName(), attributes);
         } else {
-            // using ClassName gets rid of any type parameters the class might have
-            buildMethod.addStatement("return $T.$L($L)", ClassName.get(this.targetFactoryClass),
-                    this.targetFactoryMethod, attributes);
+            buildMethod.addStatement("return $T.$L($L)",
+                    // using ClassName gets rid of any type parameters the class might have
+                    ClassName.get((TypeElement) this.targetFactoryMethod.getEnclosingElement()),
+                    this.targetFactoryMethod.getSimpleName(), attributes);
         }
         builderClassBuilder.addMethod(buildMethod.build());
 

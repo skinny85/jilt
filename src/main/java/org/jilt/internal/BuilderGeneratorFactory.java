@@ -8,7 +8,6 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
@@ -38,8 +37,7 @@ public final class BuilderGeneratorFactory {
     public BuilderGenerator forElement(Element annotatedElement) throws Exception {
         TypeElement targetClass;
         List<? extends VariableElement> attributes;
-        TypeElement targetFactoryClass = null;
-        Name targetFactoryMethod = null;
+        ExecutableElement targetFactoryMethod = null;
 
         ElementKind kind = annotatedElement.getKind();
         if (this.kindIsClassOrRecord(kind)) {
@@ -62,8 +60,7 @@ public final class BuilderGeneratorFactory {
             ExecutableElement method = (ExecutableElement) annotatedElement;
             targetClass = (TypeElement) ((DeclaredType) method.getReturnType()).asElement();
             attributes = method.getParameters();
-            targetFactoryClass = (TypeElement) method.getEnclosingElement();
-            targetFactoryMethod = method.getSimpleName();
+            targetFactoryMethod = method;
         } else {
             throw new IllegalArgumentException(
                     "@Builder can only be placed on classes/records, constructors or static methods");
@@ -74,14 +71,14 @@ public final class BuilderGeneratorFactory {
         switch (builderAnnotation.style()) {
             case TYPE_SAFE:
                 return new TypeSafeBuilderGenerator(targetClass, attributes, builderAnnotation,
-                        builderInterfaces, targetFactoryClass, targetFactoryMethod, elements, filer);
+                        builderInterfaces, targetFactoryMethod, elements, filer);
             case TYPE_SAFE_UNGROUPED_OPTIONALS:
                 return new TypeSafeUngroupedOptionalsBuilderGenerator(targetClass, attributes, builderAnnotation,
-                        builderInterfaces, targetFactoryClass, targetFactoryMethod, elements, filer);
+                        builderInterfaces, targetFactoryMethod, elements, filer);
             case CLASSIC:
             default:
                 return new ClassicBuilderGenerator(targetClass, attributes, builderAnnotation,
-                        targetFactoryClass, targetFactoryMethod, elements, filer);
+                        targetFactoryMethod, elements, filer);
         }
     }
 
