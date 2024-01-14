@@ -6,6 +6,8 @@ import org.jilt.test.data.generic.Generic2TypeParams;
 import org.jilt.test.data.generic.Generic2TypeParamsBuilder;
 import org.jilt.test.data.generic.Generic3TypeParams;
 import org.jilt.test.data.generic.Generic3TypeParamsBuilder;
+import org.jilt.test.data.generic.Generic4TypeParams;
+import org.jilt.test.data.generic.Generic4TypeParamsBuilder;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,5 +44,18 @@ public class GenericTest {
         assertThat(value.a).isEqualTo('3');
         assertThat(value.b).isEqualTo(3.14);
         assertThat(value.c).isEqualTo("41");
+    }
+
+    @Test
+    public void four_type_parameters_generic_class_with_static_factory_method_and_subset_of_type_parameters_works() {
+        Generic4TypeParams<Boolean, String, Boolean, Long> value = Generic4TypeParamsBuilder.<Boolean, Boolean>generic4TypeParams()
+                .a(true)
+                .c(null)
+                .build();
+
+        assertThat(value.a).isTrue();
+        assertThat(value.b).isNull();
+        assertThat(value.c).isNull();
+        assertThat(value.d).isNull();
     }
 }

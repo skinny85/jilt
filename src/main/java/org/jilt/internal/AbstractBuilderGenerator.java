@@ -175,7 +175,9 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     }
 
     protected final TypeName targetClassTypeName() {
-        return TypeName.get(targetClassType.asType());
+        return this.targetFactoryMethod == null
+                ? TypeName.get(this.targetClassType.asType())
+                : TypeName.get(this.targetFactoryMethod.getReturnType());
     }
 
     protected final List<? extends VariableElement> attributes() {
@@ -199,9 +201,12 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     }
 
     protected List<TypeVariableName> builderClassTypeParameters() {
+        List<? extends TypeParameterElement> typeParameterElements = this.targetFactoryMethod == null
+                ? this.targetClassType.getTypeParameters()
+                : this.targetFactoryMethod.getTypeParameters();
         List<TypeVariableName> ret = new ArrayList<TypeVariableName>(
-                this.targetClassType.getTypeParameters().size());
-        for (TypeParameterElement typeParameterEl : this.targetClassType.getTypeParameters()) {
+                typeParameterElements.size());
+        for (TypeParameterElement typeParameterEl : typeParameterElements) {
             ret.add(TypeVariableName.get(typeParameterEl));
         }
         return ret;

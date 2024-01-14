@@ -34,14 +34,16 @@ final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
                 .addTypeVariables(this.builderClassTypeParameters());
 
         for (VariableElement currentAttribute : attributes()) {
+            boolean attributeIsOptional = this.isOptional(currentAttribute);
+
             MethodSpec setterMethod = MethodSpec
                     .methodBuilder(builderSetterMethodName(currentAttribute))
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                    .returns(this.returnTypeForSetterFor(currentAttribute, true))
+                    .returns(this.returnTypeForSetterFor(currentAttribute, !attributeIsOptional))
                     .addParameter(this.attributeType(currentAttribute), this.attributeSimpleName(currentAttribute))
                     .build();
 
-            if (isOptional(currentAttribute)) {
+            if (attributeIsOptional) {
                 optionalsInterfaceBuilder.addMethod(setterMethod);
             } else {
                 TypeSpec.Builder innerInterfaceBuilder = TypeSpec
