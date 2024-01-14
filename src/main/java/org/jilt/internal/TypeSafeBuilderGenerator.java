@@ -4,6 +4,7 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.TypeVariableName;
 import org.jilt.Builder;
 import org.jilt.BuilderInterfaces;
 
@@ -37,8 +38,8 @@ final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
             MethodSpec setterMethod = MethodSpec
                     .methodBuilder(builderSetterMethodName(currentAttribute))
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                    .returns(returnTypeForSetterFor(currentAttribute))
-                    .addParameter(TypeName.get(currentAttribute.asType()), attributeSimpleName(currentAttribute))
+                    .returns(this.returnTypeForSetterFor(currentAttribute, true))
+                    .addParameter(this.attributeType(currentAttribute), this.attributeSimpleName(currentAttribute))
                     .build();
 
             if (isOptional(currentAttribute)) {
@@ -47,7 +48,7 @@ final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
                 TypeSpec.Builder innerInterfaceBuilder = TypeSpec
                         .interfaceBuilder(interfaceNameForAttribute(currentAttribute))
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .addTypeVariables(this.builderClassTypeParameters());
+                        .addTypeVariables(this.mangledBuilderClassTypeParameters());
 
                 innerInterfaceBuilder.addMethod(setterMethod);
 
@@ -74,7 +75,7 @@ final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
     }
 
     @Override
-    protected TypeName returnTypeForSetterFor(VariableElement attribute) {
+    protected TypeName returnTypeForSetterFor(VariableElement attribute, boolean withMangledTypeParameters) {
         String returnTypeName;
         if (isOptional(attribute)) {
             returnTypeName = lastInterfaceName();
@@ -84,7 +85,7 @@ final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
                     ? lastInterfaceName()
                     : interfaceNameForAttribute(nextRequiredAttribute);
         }
-        return innerInterfaceNamed(returnTypeName);
+        return this.innerInterfaceNamed(returnTypeName, withMangledTypeParameters);
     }
 
     @Override
@@ -94,6 +95,16 @@ final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
                 builderClassBuilder.addSuperinterface(innerInterfaceNamed(interfaceNameForAttribute(attribute)));
         }
         builderClassBuilder.addSuperinterface(innerInterfaceNamed(lastInterfaceName()));
+    }
+
+    private TypeName attributeType(VariableElement currentAttribute) {
+        TypeName ret = TypeName.get(currentAttribute.asType());
+        if (ret instanceof TypeVariableName) {
+            // if this is a type variable, we need to mangle it
+            TypeVariableName typeVariableName = (TypeVariableName) ret;
+            return this.mangleTypeParameter(typeVariableName);
+        }
+        return ret;
     }
 
     private VariableElement firstRequiredAttribute() {

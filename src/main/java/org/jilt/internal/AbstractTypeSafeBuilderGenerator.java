@@ -16,6 +16,7 @@ import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
+import java.util.ArrayList;
 import java.util.List;
 
 abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator {
@@ -83,12 +84,37 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
     }
 
     protected final TypeName innerInterfaceNamed(String interfaceName) {
-        List<TypeVariableName> typeVariableNames = this.builderClassTypeParameters();
+        return this.innerInterfaceNamed(interfaceName, false);
+    }
+
+    protected final TypeName innerInterfaceNamed(String interfaceName, boolean withMangledTypeParameters) {
+        List<TypeVariableName> typeVariableNames = withMangledTypeParameters
+                ? this.mangledBuilderClassTypeParameters()
+                : this.builderClassTypeParameters();
         ClassName innerInterfaceClassName = ClassName.get(outerInterfacesPackage(), outerInterfacesName(), interfaceName);
         return typeVariableNames.isEmpty()
                 ? innerInterfaceClassName
                 : ParameterizedTypeName.get(innerInterfaceClassName,
                     typeVariableNames.toArray(new TypeVariableName[0]));
+    }
+
+    protected List<TypeVariableName> mangledBuilderClassTypeParameters() {
+        // There's an interesting edge case. If the name of the property is the same as the type parameter
+        // (so, class MyClass<T1, T2> { T1 t1; T2 t2; }), the name of the inner interface for that property will be the same as the name of the type parameter.
+        // This will cause a conflict when the setter method's return type is simply T2,
+        // because the T2 type variable shadows the T2 inner interface in that context,
+        // and there's no way to force JavaPoet to output the T2 return type as qualified with the outer interface.
+        // So, add an underscore suffix to the names of the type variables in the inner interfaces to resolve this conflict.
+        List<TypeVariableName> typeVariableNames = this.builderClassTypeParameters();
+        List<TypeVariableName> ret = new ArrayList<TypeVariableName>(typeVariableNames.size());
+        for (TypeVariableName typeVariableName : typeVariableNames) {
+            ret.add(this.mangleTypeParameter(typeVariableName));
+        }
+        return ret;
+    }
+
+    protected TypeVariableName mangleTypeParameter(TypeVariableName typeVariableName) {
+        return TypeVariableName.get(typeVariableName.name + "_");
     }
 
     protected final VariableElement nextAttribute(VariableElement attribute) {

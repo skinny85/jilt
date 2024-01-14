@@ -28,7 +28,7 @@ final class ClassicBuilderGenerator extends AbstractBuilderGenerator {
     }
 
     @Override
-    protected TypeName returnTypeForSetterFor(VariableElement attribute) {
+    protected TypeName returnTypeForSetterFor(VariableElement attribute, boolean withMangledTypeParameters) {
         return builderClassTypeName();
     }
 

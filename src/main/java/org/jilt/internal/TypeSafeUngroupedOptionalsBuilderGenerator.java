@@ -42,7 +42,7 @@ final class TypeSafeUngroupedOptionalsBuilderGenerator extends AbstractTypeSafeB
                 innerInterfaceBuilder.addMethod(MethodSpec
                         .methodBuilder(builderSetterMethodName(currentAttribute))
                         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                        .returns(returnTypeForSetterFor(currentAttribute))
+                        .returns(this.returnTypeForSetterFor(currentAttribute, false))
                         .addParameter(TypeName.get(currentAttribute.asType()), attributeSimpleName(currentAttribute))
                         .build());
 
@@ -75,12 +75,12 @@ final class TypeSafeUngroupedOptionalsBuilderGenerator extends AbstractTypeSafeB
     }
 
     @Override
-    protected TypeName returnTypeForSetterFor(VariableElement attribute) {
+    protected TypeName returnTypeForSetterFor(VariableElement attribute, boolean withMangledTypeParameters) {
         VariableElement nextAttribute = nextAttribute(attribute);
         String returnTypeName = nextAttribute == null
                 ? lastInterfaceName()
                 : interfaceNameForAttribute(nextAttribute);
-        return innerInterfaceNamed(returnTypeName);
+        return this.innerInterfaceNamed(returnTypeName, withMangledTypeParameters);
     }
 
     @Override
@@ -89,7 +89,7 @@ final class TypeSafeUngroupedOptionalsBuilderGenerator extends AbstractTypeSafeB
 
         builderClassBuilder.addSuperinterface(firstInnerInterface);
         for (VariableElement attribute : attributes()) {
-            builderClassBuilder.addSuperinterface(returnTypeForSetterFor(attribute));
+            builderClassBuilder.addSuperinterface(this.returnTypeForSetterFor(attribute, false));
         }
     }
 

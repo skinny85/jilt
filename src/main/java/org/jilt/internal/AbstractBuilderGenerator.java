@@ -131,9 +131,13 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     protected abstract TypeName builderFactoryMethodReturnType();
 
-    protected abstract TypeName returnTypeForSetterFor(VariableElement attribute);
+    protected abstract TypeName returnTypeForSetterFor(VariableElement attribute, boolean withMangledTypeParameters);
 
     protected abstract void enhance(TypeSpec.Builder builderClassBuilder);
+
+    private TypeName returnTypeForSetterFor(VariableElement attribute) {
+        return this.returnTypeForSetterFor(attribute, false);
+    }
 
     private Set<VariableElement> initOptionalAttributes() {
         Set<VariableElement> ret = new HashSet<VariableElement>();
