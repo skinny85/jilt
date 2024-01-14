@@ -4,7 +4,6 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import com.squareup.javapoet.TypeVariableName;
 import org.jilt.Builder;
 import org.jilt.BuilderInterfaces;
 
@@ -95,16 +94,6 @@ final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
                 builderClassBuilder.addSuperinterface(innerInterfaceNamed(interfaceNameForAttribute(attribute)));
         }
         builderClassBuilder.addSuperinterface(innerInterfaceNamed(lastInterfaceName()));
-    }
-
-    private TypeName attributeType(VariableElement currentAttribute) {
-        TypeName ret = TypeName.get(currentAttribute.asType());
-        if (ret instanceof TypeVariableName) {
-            // if this is a type variable, we need to mangle it
-            TypeVariableName typeVariableName = (TypeVariableName) ret;
-            return this.mangleTypeParameter(typeVariableName);
-        }
-        return ret;
     }
 
     private VariableElement firstRequiredAttribute() {

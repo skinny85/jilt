@@ -107,7 +107,9 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         if (targetFactoryClass == null) {
             buildMethod.addStatement("return new $T($L)", targetClassTypeName(), attributes);
         } else {
-            buildMethod.addStatement("return $T.$L($L)", targetFactoryClass, targetFactoryMethod, attributes);
+            // using ClassName gets rid of any type parameters the class might have
+            buildMethod.addStatement("return $T.$L($L)", ClassName.get(this.targetFactoryClass),
+                    this.targetFactoryMethod, attributes);
         }
         builderClassBuilder.addMethod(buildMethod.build());
 

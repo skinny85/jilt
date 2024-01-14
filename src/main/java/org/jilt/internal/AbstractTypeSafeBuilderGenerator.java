@@ -65,6 +65,16 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
         return interfaceNameFromBaseName(Utils.capitalize(attributeSimpleName(attribute)));
     }
 
+    protected final TypeName attributeType(VariableElement attribute) {
+        TypeName ret = TypeName.get(attribute.asType());
+        if (ret instanceof TypeVariableName) {
+            // if this is a type variable, we need to mangle it
+            TypeVariableName typeVariableName = (TypeVariableName) ret;
+            return this.mangleTypeParameter(typeVariableName);
+        }
+        return ret;
+    }
+
     protected final String lastInterfaceName() {
         String nameFromAnnotation = builderInterfaces == null
                 ? ""

@@ -36,14 +36,15 @@ final class TypeSafeUngroupedOptionalsBuilderGenerator extends AbstractTypeSafeB
 
             TypeSpec.Builder innerInterfaceBuilder = TypeSpec
                     .interfaceBuilder(interfaceNameForAttribute(currentAttribute))
-                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                    .addTypeVariables(this.mangledBuilderClassTypeParameters());
 
             do {
                 innerInterfaceBuilder.addMethod(MethodSpec
                         .methodBuilder(builderSetterMethodName(currentAttribute))
                         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                        .returns(this.returnTypeForSetterFor(currentAttribute, false))
-                        .addParameter(TypeName.get(currentAttribute.asType()), attributeSimpleName(currentAttribute))
+                        .returns(this.returnTypeForSetterFor(currentAttribute, true))
+                        .addParameter(this.attributeType(currentAttribute), this.attributeSimpleName(currentAttribute))
                         .build());
 
                 if (nextAttribute == null && isOptional(currentAttribute)) {
@@ -59,7 +60,8 @@ final class TypeSafeUngroupedOptionalsBuilderGenerator extends AbstractTypeSafeB
 
         TypeSpec.Builder finalInterfaceBuilder = TypeSpec
                 .interfaceBuilder(lastInterfaceName())
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addTypeVariables(this.builderClassTypeParameters());
         addBuildMethodToInterface(finalInterfaceBuilder);
         outerInterfacesBuilder.addType(finalInterfaceBuilder.build());
 
