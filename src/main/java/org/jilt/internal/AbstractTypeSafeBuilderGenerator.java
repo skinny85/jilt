@@ -10,14 +10,14 @@ import org.jilt.Builder;
 import org.jilt.BuilderInterfaces;
 import org.jilt.utils.Utils;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
+import java.util.ArrayList;
+import java.util.List;
 
 abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator {
     private final BuilderInterfaces builderInterfaces;
