@@ -48,7 +48,7 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
                 ? ""
                 : builderInterfaces.outerName();
         return nameFromAnnotation.isEmpty()
-                ? targetClassType().getSimpleName() + "Builders"
+                ? this.targetClassSimpleName() + "Builders"
                 : nameFromAnnotation;
     }
 

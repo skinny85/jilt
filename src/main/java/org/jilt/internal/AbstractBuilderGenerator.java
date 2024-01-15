@@ -16,6 +16,7 @@ import org.jilt.utils.Utils;
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.Name;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
@@ -162,7 +163,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private String builderClassStringName() {
         String annotationBuilderClassName = builderAnnotation.className();
         return annotationBuilderClassName.isEmpty()
-                ? targetClassType.getSimpleName() + "Builder"
+                ? this.targetClassSimpleName() + "Builder"
                 : annotationBuilderClassName;
     }
 
@@ -170,8 +171,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return filer;
     }
 
-    protected final TypeElement targetClassType() {
-        return targetClassType;
+    protected final Name targetClassSimpleName() {
+        return this.targetClassType.getSimpleName();
     }
 
     protected final TypeName targetClassTypeName() {
@@ -227,7 +228,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     protected final String builderFactoryMethodName() {
         String annotationFactoryMethod = builderAnnotation.factoryMethod();
         return annotationFactoryMethod.isEmpty()
-                ? Utils.deCapitalize(targetClassType().getSimpleName().toString())
+                ? Utils.deCapitalize(this.targetClassSimpleName().toString())
                 : annotationFactoryMethod;
     }
 
