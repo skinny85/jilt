@@ -3,7 +3,9 @@ package org.jilt.test.data.generic;
 import org.jilt.Builder;
 import org.jilt.BuilderStyle;
 
-public final class Generic2TypeParams<T1, T2> {
+import java.io.Serializable;
+
+public final class Generic2TypeParams<T1 extends Number & Serializable, T2> {
     public final T1 t1;
     public final T2 t2;
 

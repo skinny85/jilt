@@ -6,8 +6,8 @@ import org.jilt.Opt;
 
 public final class Generic4TypeParams<A, B, C, D> {
     @Builder(style = BuilderStyle.TYPE_SAFE)
-    public static <A, C> Generic4TypeParams<A, String, C, Long> make(A a, @Opt String str, C c, @Opt Long lng) {
-        return new Generic4TypeParams<A, String, C, Long>(a, str, c, lng);
+    public static <AA, CC> Generic4TypeParams<AA, String, CC, Long> make(AA a, @Opt String str, CC c, @Opt Long lng) {
+        return new Generic4TypeParams<AA, String, CC, Long>(a, str, c, lng);
     }
 
     public final A a;

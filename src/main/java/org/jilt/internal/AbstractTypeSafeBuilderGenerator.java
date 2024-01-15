@@ -124,7 +124,9 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
     }
 
     protected TypeVariableName mangleTypeParameter(TypeVariableName typeVariableName) {
-        return TypeVariableName.get(typeVariableName.name + "_");
+        return TypeVariableName.get(typeVariableName.name + "_",
+                // copy over the bounds unchanged, if there are any
+                typeVariableName.bounds.toArray(new TypeName[]{}));
     }
 
     protected final VariableElement nextAttribute(VariableElement attribute) {
