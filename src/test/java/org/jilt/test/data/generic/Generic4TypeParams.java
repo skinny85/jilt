@@ -4,9 +4,11 @@ import org.jilt.Builder;
 import org.jilt.BuilderStyle;
 import org.jilt.Opt;
 
+import java.io.Serializable;
+
 public final class Generic4TypeParams<A, B, C, D> {
     @Builder(style = BuilderStyle.TYPE_SAFE)
-    public static <AA, CC> Generic4TypeParams<AA, String, CC, Long> make(AA a, @Opt String str, CC c, @Opt Long lng) {
+    public static <AA, CC> Generic4TypeParams<AA, ? extends Serializable, CC, Long> make(AA a, @Opt String str, CC c, @Opt Long lng) {
         return new Generic4TypeParams<AA, String, CC, Long>(a, str, c, lng);
     }
 

@@ -6,8 +6,8 @@ import org.jilt.Opt;
 
 public final class Generic3TypeParams<A, B, C> {
     @Builder(style = BuilderStyle.TYPE_SAFE_UNGROUPED_OPTIONALS)
-    public static <A, B, C> Generic3TypeParams<A, B, C> make(A a, @Opt B b, C c) {
-        return new Generic3TypeParams<A, B, C>(a, b, c);
+    public static <B, C> Generic3TypeParams<?, B, C> make(Character a, @Opt B b, C c) {
+        return new Generic3TypeParams<Character, B, C>(a, b, c);
     }
 
     public final A a;

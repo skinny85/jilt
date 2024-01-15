@@ -35,7 +35,7 @@ public class GenericTest {
 
     @Test
     public void three_type_parameters_generic_class_with_type_safe_ungrouped_optionals_builder_works() {
-        Generic3TypeParams<Character, Double, String> value = Generic3TypeParamsBuilder.<Character, Double, String>generic3TypeParams()
+        Generic3TypeParams<?, Double, String> value = Generic3TypeParamsBuilder.<Double, String>generic3TypeParams()
                 .a('3')
                 .b(3.14)
                 .c("41")
@@ -48,13 +48,14 @@ public class GenericTest {
 
     @Test
     public void four_type_parameters_generic_class_with_static_factory_method_and_subset_of_type_parameters_works() {
-        Generic4TypeParams<Boolean, String, Boolean, Long> value = Generic4TypeParamsBuilder.<Boolean, Boolean>generic4TypeParams()
+        Generic4TypeParams<Boolean, ?, Boolean, Long> value = Generic4TypeParamsBuilder.<Boolean, Boolean>generic4TypeParams()
                 .a(true)
                 .c(null)
+                .str("str")
                 .build();
 
         assertThat(value.a).isTrue();
-        assertThat(value.b).isNull();
+        assertThat(value.b).isEqualTo("str");
         assertThat(value.c).isNull();
         assertThat(value.d).isNull();
     }
