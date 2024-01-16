@@ -14,6 +14,7 @@ import org.jilt.Opt;
 import org.jilt.utils.Utils;
 
 import javax.annotation.processing.Filer;
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
@@ -144,10 +145,27 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private Set<VariableElement> initOptionalAttributes() {
         Set<VariableElement> ret = new HashSet<VariableElement>();
         for (VariableElement attribute : attributes) {
-            if (attribute.getAnnotation(Opt.class) != null)
+            if (this.determineIfAttributeIsOptional(attribute)) {
                 ret.add(attribute);
+            }
         }
         return ret;
+    }
+
+    private boolean determineIfAttributeIsOptional(VariableElement attribute) {
+        if (attribute.getAnnotation(Opt.class) != null) {
+            return true;
+        }
+        for (AnnotationMirror annotation : attribute.getAnnotationMirrors()) {
+            if (annotationIsCalledNullable(annotation)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean annotationIsCalledNullable(AnnotationMirror annotation) {
+        return "Nullable".equals(annotation.getAnnotationType().asElement().getSimpleName().toString());
     }
 
     private String initBuilderClassPackage() {
