@@ -5,6 +5,7 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
@@ -92,7 +93,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                     .methodBuilder(builderSetterMethodName(attribute))
                     .addModifiers(Modifier.PUBLIC)
                     .returns(returnTypeForSetterFor(attribute))
-                    .addParameter(fieldType, fieldName)
+                    .addParameter(this.setterParameterInBuilder(attribute))
                     .addStatement("this.$1L = $1L", fieldName)
                     .addStatement("return this")
                     .build());
@@ -120,6 +121,20 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 .builder(builderClassPackage(), builderClassBuilder.build())
                 .build();
         javaFile.writeTo(filer);
+    }
+
+    private ParameterSpec setterParameterInBuilder(VariableElement attribute) {
+        return this.setterParameter(attribute, TypeName.get(attribute.asType()));
+    }
+
+    protected final ParameterSpec setterParameter(VariableElement attribute, TypeName parameterType) {
+        ParameterSpec.Builder ret = ParameterSpec.builder(parameterType,
+                this.attributeSimpleName(attribute));
+        AnnotationMirror nullableAnnotation = this.firstAnnotationCalledNullable(attribute);
+        if (nullableAnnotation!= null) {
+            ret.addAnnotation(AnnotationSpec.get(nullableAnnotation));
+        }
+        return ret.build();
     }
 
     private List<String> attributeNames() {
@@ -156,12 +171,19 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         if (attribute.getAnnotation(Opt.class) != null) {
             return true;
         }
-        for (AnnotationMirror annotation : attribute.getAnnotationMirrors()) {
-            if (annotationIsCalledNullable(annotation)) {
-                return true;
-            }
+        if (this.firstAnnotationCalledNullable(attribute) != null) {
+            return true;
         }
         return false;
+    }
+
+    private AnnotationMirror firstAnnotationCalledNullable(VariableElement attribute) {
+        for (AnnotationMirror annotation : attribute.getAnnotationMirrors()) {
+            if (annotationIsCalledNullable(annotation)) {
+                return annotation;
+            }
+        }
+        return null;
     }
 
     private static boolean annotationIsCalledNullable(AnnotationMirror annotation) {

@@ -2,6 +2,7 @@ package org.jilt.internal;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
@@ -63,6 +64,10 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
 
     protected final String interfaceNameForAttribute(VariableElement attribute) {
         return interfaceNameFromBaseName(Utils.capitalize(attributeSimpleName(attribute)));
+    }
+
+    protected final ParameterSpec setterParameterInInterface(VariableElement attribute) {
+        return this.setterParameter(attribute, this.attributeType(attribute));
     }
 
     protected final TypeName attributeType(VariableElement attribute) {

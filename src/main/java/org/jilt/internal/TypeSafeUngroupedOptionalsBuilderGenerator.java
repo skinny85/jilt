@@ -44,7 +44,7 @@ final class TypeSafeUngroupedOptionalsBuilderGenerator extends AbstractTypeSafeB
                         .methodBuilder(builderSetterMethodName(currentAttribute))
                         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                         .returns(this.returnTypeForSetterFor(currentAttribute, true))
-                        .addParameter(this.attributeType(currentAttribute), this.attributeSimpleName(currentAttribute))
+                        .addParameter(this.setterParameterInInterface(currentAttribute))
                         .build());
 
                 if (nextAttribute == null && isOptional(currentAttribute)) {

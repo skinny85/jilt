@@ -40,7 +40,7 @@ final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
                     .methodBuilder(builderSetterMethodName(currentAttribute))
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                     .returns(this.returnTypeForSetterFor(currentAttribute, !attributeIsOptional))
-                    .addParameter(this.attributeType(currentAttribute), this.attributeSimpleName(currentAttribute))
+                    .addParameter(this.setterParameterInInterface(currentAttribute))
                     .build();
 
             if (attributeIsOptional) {
