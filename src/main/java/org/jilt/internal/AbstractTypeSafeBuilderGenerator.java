@@ -77,6 +77,26 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
             TypeVariableName typeVariableName = (TypeVariableName) ret;
             return this.mangleTypeParameter(typeVariableName);
         }
+        // if this is an entire parameterized type, we need to mangle it
+        if (ret instanceof ParameterizedTypeName) {
+            ParameterizedTypeName parameterizedTypeName = (ParameterizedTypeName) ret;
+            return ParameterizedTypeName.get(parameterizedTypeName.rawType,
+                    this.mangleTypeNameParameters(parameterizedTypeName.typeArguments).toArray(new TypeName[]{}));
+        }
+        return ret;
+    }
+
+    private List<TypeName> mangleTypeNameParameters(List<TypeName> typeArguments) {
+        List<TypeName> ret = new ArrayList<TypeName>(typeArguments.size());
+        for (TypeName typeName : typeArguments) {
+            if (typeName instanceof TypeVariableName) {
+                // if this is a type variable, we need to mangle it
+                TypeVariableName typeVariableName = (TypeVariableName) typeName;
+                ret.add(this.mangleTypeParameter(typeVariableName));
+            } else {
+                ret.add(typeName);
+            }
+        }
         return ret;
     }
 
