@@ -23,7 +23,7 @@ public class GenericTest {
     }
 
     @Test
-    public void two_type_parameters_generic_class_with_type_safe_builder_works() {
+    public void two_type_parameters_generic_class_with_staged_builder_works() {
         Generic2TypeParams<Integer, Boolean> value = Generic2TypeParamsBuilder.<Integer, Boolean>generic2TypeParams()
                 .t1(33)
                 .t2(true)
@@ -34,7 +34,7 @@ public class GenericTest {
     }
 
     @Test
-    public void three_type_parameters_generic_class_with_type_safe_ungrouped_optionals_builder_works() {
+    public void three_type_parameters_generic_class_with_staged_preserving_order_builder_works() {
         Generic3TypeParams<?, Double, String> value = Generic3TypeParamsBuilder.<Double, String>generic3TypeParams()
                 .a('3')
                 .b(3.14)

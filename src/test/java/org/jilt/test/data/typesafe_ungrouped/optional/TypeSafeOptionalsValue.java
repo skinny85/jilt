@@ -4,7 +4,7 @@ import org.jilt.Builder;
 import org.jilt.BuilderStyle;
 import org.jilt.Opt;
 
-@Builder(style = BuilderStyle.TYPE_SAFE_UNGROUPED_OPTIONALS)
+@Builder(style = BuilderStyle.STAGED_PRESERVING_ORDER)
 public class TypeSafeOptionalsValue {
     @Opt private final Integer opt1;
     @Opt private final Boolean opt2;

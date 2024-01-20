@@ -5,7 +5,7 @@ import org.jilt.BuilderStyle;
 import org.jilt.test.data.method.StaticFactoryValue;
 
 public class OtherClass {
-    @Builder(style = BuilderStyle.TYPE_SAFE_UNGROUPED_OPTIONALS)
+    @Builder(style = BuilderStyle.STAGED_PRESERVING_ORDER)
     public static StaticFactoryValue create(int arg2, boolean arg4, String arg1, String arg3) {
         return new StaticFactoryValue(arg1, arg2, arg3, arg4);
     }

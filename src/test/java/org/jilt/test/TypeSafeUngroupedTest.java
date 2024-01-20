@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TypeSafeUngroupedTest {
     @Test
-    public void test_type_safe_builder() throws Exception {
+    public void test_type_safe_ungrouped_optionals_builder() {
         TypeSafeValueCreators.Step_Name firstInterface = TypeSafeValueCreator.creator();
         TypeSafeValueCreators.Step_Build lastInterface = firstInterface
                 .withName("some name")

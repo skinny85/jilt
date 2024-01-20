@@ -5,9 +5,9 @@ used for automatically generating classes that implement the
 [Builder design pattern](https://en.wikipedia.org/wiki/Builder_pattern#Java).
 
 Jilt's "killer features" compared to other tools in this same space are:
-* Support for the Type-Safe (sometimes also called Staged, or
-    Telescopic, or Step) variant of the Builder pattern.
-    For more information on the Type-Safe Builder pattern, check out my
+* Support for the Staged (sometimes also called Type-Safe, or
+    Step, or Telescopic) variant of the Builder pattern.
+    For more information on the Staged Builder pattern, check out my
     [blog article on the subject](http://endoflineblog.com/type-safe-builder-pattern-in-java-and-the-jilt-library).
 * The capability to generate Builders for any class,
     and without requiring any modifications to the target classes'
@@ -152,13 +152,14 @@ public final class Person {
 
 Finally, you can also place the `@Builder` annotation on a (static) method.
 In that case, the built class will be the return type of the method,
-and the Builder properties will be all of the method parameters,
+and the Builder properties will be the method parameters,
 in the same order as they were declared in the method.
 The instance will be created by making a call to the annotated method.
 
 This is the most flexible way of generating Builders in Jilt -
 you have full control of the code constructing the final instance,
 which allows you to do things like:
+
 * Generate Builders for classes without modifying their source code,
     or for classes that you don't control (from libraries, for example).
 * Generate Builders for classes with non-standard ways to construct them
@@ -201,7 +202,7 @@ import java.util.Date;
 
 public class DateFactoryTest {
     @Test
-    public void use_date_builder() throws Exception {
+    public void use_date_builder() {
         Date date = DateBuilder.date()
                 .month(12)
                 .year(23)
@@ -214,18 +215,18 @@ public class DateFactoryTest {
 }
 ```
 
-##### Type-Safe Builders
+##### Staged Builders
 
-All of the Builders shown so far were "regular" Builders.
+All Builders shown so far were "regular" Builders.
 Using the `@Builder`'s `style` attribute, you can instead generate a
-Type-Safe (also called Staged, or Telescopic, or Step) Builder by setting
-`style` to `BuilderStyle.TYPE_SAFE`.
+Staged (also called Type-Safe, or Step, or Telescopic) Builder by setting
+`style` to `BuilderStyle.STAGED`.
 
-A Type-Safe Builder generates interfaces for each property of the Builder,
+A Staged Builder generates interfaces for each property of the Builder,
 and enforces that they have to be initialized before constructing the final instance.
 The order of construction will be exactly as the order of the properties in the Builder.
 
-For a longer and more in-depth introduction to the Type-Safe Builder pattern variant, check out my
+For a longer and more in-depth introduction to the Staged Builder pattern variant, check out my
 [blog article on the subject](http://endoflineblog.com/type-safe-builder-pattern-in-java-and-the-jilt-library).
 
 So, this slightly modified code from above:
@@ -234,7 +235,7 @@ So, this slightly modified code from above:
 import org.jilt.Builder;
 import org.jilt.BuilderStyle;
 
-@Builder(style = BuilderStyle.TYPE_SAFE)
+@Builder(style = BuilderStyle.STAGED)
 public final class Person {
     public final String name;
     public final boolean isAdult;
@@ -257,17 +258,17 @@ Person person = PersonBuilder.person()
 
 ##### Optional properties
 
-When using Type-Safe Builders, there are often properties that the client can,
+When using Staged Builders, there are often properties that the client can,
 but doesn't have to, provide in order to construct a valid instance of the target class -
 the property could be optional, it could have some default, etc.
 
-When using the `TYPE_SAFE` Builder style, you can mark a field or constructor/static method parameter
+When using the `STAGED` Builder style, you can mark a field or constructor/static method parameter
 (depending on where you placed the `@Builder` annotation) optional by annotating it with the
 `@Opt` annotation. All optional Builder properties will be grouped into a single interface
 (the same containing the `build` method), which means the client can (but doesn't have to)
-provide them, after all of the required properties have been set.
+provide them, after all the required properties have been set.
 If a value for an optional property is not set, Jilt will construct the instance with
-the 0-value for that property's type (`0` for `int` and other numeric types,`null` for reference types, etc.)
+the zero-value for that property's type (`0` for `int` and other numeric types,`null` for reference types, etc.)
 as the value of the property.
 
 For example, a Builder for this class:
@@ -280,9 +281,9 @@ import org.jilt.Opt;
 public final class User {
     public final String email, username, firstName, lastName, displayName;
 
-    @Builder(style = BuilderStyle.TYPE_SAFE)
+    @Builder(style = BuilderStyle.STAGED)
     public User(String email, @Opt String username, String firstName,
-                String lastName, @Opt String displayName) {
+            String lastName, @Opt String displayName) {
         this.email = email;
         this.username = username == null ? email : username;
         this.firstName = firstName;
@@ -301,20 +302,44 @@ User user = UserBuilder.user()
     .email("email@example.com") // this has to be 'email' to compile
     .firstName("John") // this is not 'username', because that is an optional property
     .lastName("Doe") // this has to be 'lastName' to compile
-    .displayName("johnnyd") // this could be 'username', or skipped
+    .displayName("Johnny D") // this could be 'username', or skipped
     .build();
 ```
 
-##### Type-Safe with ungrouped optionals style
+##### 'Staged, but preserving order' Builder style
 
-There is one more Builder style - `TYPE_SAFE_UNGROUPED_OPTIONALS`.
-It's very similar to `TYPE_SAFE` - it only differs in the treatment of optional properties.
-Instead of bundling them together at the end of the build process like `TYPE_SAFE`,
+The Staged Builder style has one downside:
+when evolving your API, you cannot change a required property to be optional
+(with the small exception of the last required property)
+without breaking existing code that uses the Builder generated for the required property,
+even though, purely from an API perspective, that should not be a breaking change for the clients of your classes.
+
+For example, if we take the above `User` class, but with `username` being required,
+the client code using the Builder will look as follows:
+
+```java
+User user = UserBuilder.user()
+    .email("email@example.com")
+    .username("johhnyd") // username() has to be called here, as it's not optional
+    .firstName("John")
+    .lastName("Doe")
+    .build();
+```
+
+However, if we change `username` to be optional by annotating it with `@Opt`,
+the above code will stop compiling,
+because the `username()` call can no longer happen after the call to `email()`,
+but must instead be moved to after the call to `lastName()`.
+
+For this reason, there is one more Builder style - `STAGED_PRESERVING_ORDER`.
+It's very similar to `STAGED` - it only differs in the treatment of optional properties.
+Instead of bunching them all together at the end of the build process like `STAGED`,
 this style retains the original order of the properties, but allows you to 'skip' setting
 those that are optional, bypassing them and moving to the next required property.
-This is mostly useful in cases where a class has a lot of properties, but very few optional ones.
+This means that changing a required property to optional maintains backwards-compatibility
+with any existing code that used the previously generated Builder.
 
-For example, for the same code as the above `TYPE_SAFE` example:
+For example, for the same code as the above `STAGED` example:
 
 ```java
 import org.jilt.Builder;
@@ -324,9 +349,9 @@ import org.jilt.Opt;
 public final class User {
     public final String email, username, firstName, lastName, displayName;
 
-    @Builder(style = BuilderStyle.TYPE_SAFE_UNGROUPED_OPTIONALS)
+    @Builder(style = BuilderStyle.STAGED_PRESERVING_ORDER)
     public User(String email, @Opt String username, String firstName,
-                String lastName, @Opt String displayName) {
+            String lastName, @Opt String displayName) {
         this.email = email;
         this.username = username == null ? email : username;
         this.firstName = firstName;
@@ -338,17 +363,25 @@ public final class User {
 }
 ```
 
-...the generated `TYPE_SAFE_UNGROUPED_OPTIONALS` Builder can be used as follows:
+...the generated Builder can be used like this:
 
 ```java
 User user = UserBuilder.user()
     .email("email@example.com") // this has to be 'email' to compile - required property
-    .username("johnnyd") // this line could be commented out - optional property
+    .username("johnnyd") // this will always be where username is set, regardless whether it's required or optional
     .firstName("John") // this has to be 'firstName' to compile - required property
     .lastName("Doe") // this has to be 'lastName' to compile - required property
-    .displayName("Unknown") // this line could be commented out - optional property
+    .displayName("Johnny D") // this will always be where displayName is set, regardless whether it's required or optional
     .build();
 ```
+
+Note that this style works best if either the class being built has a small number of properties,
+or if there is a natural order to those properties, like in the `User` example above.
+The reason why is that there is only a single spot where a given optional property can be set
+(for example, `username()` above can only be called right after calling `email()`).
+That is different from the `STAGED` style,
+where all optional properties can be set right before calling `build()`,
+and they can be set in any order, which makes them easier to find.
 
 ##### Other @Builder attributes
 
@@ -369,9 +402,9 @@ practically all aspects of the generated Builder (all of them are optional):
 
 ##### @BuilderInterfaces annotation
 
-When generating a Type-Safe Builder
-(so, when the `@Builder.style` attribute is set to either `BuilderStyle.TYPE_SAFE`
-or `BuilderStyle.TYPE_SAFE_UNGROUPED_OPTIONALS`),
+When generating a Staged Builder
+(so, when the `@Builder.style` attribute is set to either `BuilderStyle.STAGED`
+or `BuilderStyle.STAGED_PRESERVING_ORDER`),
 you can also place the `@BuilderInterfaces` annotation on the same element `@Builder` is on
 (so, a class, constructor, or static method).
 This annotation is used to customize the interfaces generated to ensure the type-safety of the resulting Builder.
@@ -389,8 +422,8 @@ It has the following attributes (all of them are optional):
 * `lastInnerName` allows you to change the name of the final interface -
   the one containing the `build` method,
   which is invoked to obtain an instance of the target class.
-  The default name for that interface is `Optionals` for `BuilderStyle.TYPE_SAFE` Builders,
-  and `Build` for `BuilderStyle.TYPE_SAFE_UNGROUPED_OPTIONALS` ones.
+  The default name for that interface is `Optionals` for `BuilderStyle.STAGED` Builders,
+  and `Build` for `BuilderStyle.STAGED_PRESERVING_ORDER` ones.
 
 #### Working in an IDE
 

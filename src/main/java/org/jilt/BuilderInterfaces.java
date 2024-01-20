@@ -6,14 +6,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Customize the generated interfaces for Type-Safe Builder styles.
+ * Customize the generated interfaces for Staged Builder styles.
  * <p>
  * This annotation can be used alongside {@link Builder}.
- * If {@link Builder#style} is {@link BuilderStyle#TYPE_SAFE} or
- * {@link BuilderStyle#TYPE_SAFE_UNGROUPED_OPTIONALS},
+ * If {@link Builder#style} is {@link BuilderStyle#STAGED} or
+ * {@link BuilderStyle#STAGED_PRESERVING_ORDER},
  * you can use this annotation to customize the interfaces
  * generated for each property that ensure the Builder is type-safe.
- * If {@link Builder#style} is not a type-safe Builder style
+ * If {@link Builder#style} is not a Staged Builder style
  * (i.e., if it is {@link BuilderStyle#CLASSIC}),
  * this annotation has no effect.
  *
@@ -72,9 +72,9 @@ public @interface BuilderInterfaces {
      * <p>
      * This is an optional attribute -
      * by default, the name is <code>Optionals</code> for Builders generated with
-     * {@link Builder#style} set to {@link BuilderStyle#TYPE_SAFE},
+     * {@link Builder#style} set to {@link BuilderStyle#STAGED},
      * and <code>Build</code> for those with that attribute set to
-     * {@link BuilderStyle#TYPE_SAFE_UNGROUPED_OPTIONALS}.
+     * {@link BuilderStyle#STAGED_PRESERVING_ORDER}.
      *
      * @see Builder#buildMethod
      */

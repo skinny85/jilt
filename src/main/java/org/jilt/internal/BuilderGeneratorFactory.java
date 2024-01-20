@@ -69,9 +69,11 @@ public final class BuilderGeneratorFactory {
         Builder builderAnnotation = annotatedElement.getAnnotation(Builder.class);
         BuilderInterfaces builderInterfaces = annotatedElement.getAnnotation(BuilderInterfaces.class);
         switch (builderAnnotation.style()) {
+            case STAGED:
             case TYPE_SAFE:
                 return new TypeSafeBuilderGenerator(targetClass, attributes, builderAnnotation,
                         builderInterfaces, targetFactoryMethod, elements, filer);
+            case STAGED_PRESERVING_ORDER:
             case TYPE_SAFE_UNGROUPED_OPTIONALS:
                 return new TypeSafeUngroupedOptionalsBuilderGenerator(targetClass, attributes, builderAnnotation,
                         builderInterfaces, targetFactoryMethod, elements, filer);

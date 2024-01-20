@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TypeSafeUngroupedOptionalsTest {
     @Test
-    public void test_type_safe_builder_with_optional_values() throws Exception {
+    public void test_staged_preserving_order_builder_with_optional_values() {
         TypeSafeOptionalsValue optionalsValue = TypeSafeOptionalsValueBuilder.typeSafeOptionalsValue()
                 .opt2(true) // we skip opt1
                 .opt3('c')

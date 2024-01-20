@@ -16,8 +16,8 @@ public class FullNameTest {
     public void nullable_annotation_makes_attribute_optional() {
         FullName value = fullName()
                 .firstName("First")
-                .lastName(null)
                 // middleName is implicitly optional, because of @Nullable
+                .lastName(null)
                 .build();
 
         assertThat(value.firstName).isEqualTo("First");
@@ -34,7 +34,7 @@ public class FullNameTest {
 
     @Test
     public void setter_in_type_safe_interface_propagates_nullable_annotation() throws Exception {
-        Method middleNameSetter = FullNameBuilders.Optionals.class.getMethod("middleName", String.class);
+        Method middleNameSetter = FullNameBuilders.MiddleName.class.getMethod("middleName", String.class);
 
         assertThat(middleNameSetter.getParameters()[0].getAnnotation(Nullable.class)).isNotNull();
     }

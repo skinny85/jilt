@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 public final class FullName {
     public final String firstName, middleName, lastName;
 
-    @Builder(style = BuilderStyle.TYPE_SAFE)
+    @Builder(style = BuilderStyle.STAGED_PRESERVING_ORDER)
     public FullName(String firstName, @Nullable String middleName, String lastName) {
         this.firstName = firstName;
         this.middleName = middleName;

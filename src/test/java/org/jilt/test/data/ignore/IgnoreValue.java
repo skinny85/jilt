@@ -3,7 +3,7 @@ package org.jilt.test.data.ignore;
 import org.jilt.Builder;
 import org.jilt.BuilderStyle;
 
-@Builder(style = BuilderStyle.TYPE_SAFE_UNGROUPED_OPTIONALS)
+@Builder(style = BuilderStyle.STAGED_PRESERVING_ORDER)
 public class IgnoreValue {
     public final String str;
 

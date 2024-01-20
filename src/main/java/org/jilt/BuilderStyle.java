@@ -8,22 +8,22 @@ package org.jilt;
  * There are 3 variants to choose from:
  * <ul>
  *     <li>{@link #CLASSIC}</li>
- *     <li>{@link #TYPE_SAFE}</li>
- *     <li>{@link #TYPE_SAFE_UNGROUPED_OPTIONALS}</li>
+ *     <li>{@link #STAGED}</li>
+ *     <li>{@link #STAGED_PRESERVING_ORDER}</li>
  * </ul>
  *
  * @since 1.0
  * @see Builder
  * @see Builder#style
  * @see #CLASSIC
- * @see #TYPE_SAFE
- * @see #TYPE_SAFE_UNGROUPED_OPTIONALS
+ * @see #STAGED
+ * @see #STAGED_PRESERVING_ORDER
  */
 public enum BuilderStyle {
     /**
      * The "standard" Builder variant. It will generate one class,
      * which will have a setter for each property that will return
-     * <code>this</code> (a fluent interface), and a <code>build</code> method
+     * <code>this</code> (a fluent interface), and a <code>build()</code> method
      * that can be used at the end of the build process to obtain an
      * instance of the target class (how exactly is the instance
      * obtained depends on where was the {@link Builder} annotation placed).
@@ -86,7 +86,29 @@ public enum BuilderStyle {
     CLASSIC,
 
     /**
-     * A Type-Safe (also called Staged, or Telescopic) Builder pattern variant.
+     * Synonym for {@link #STAGED}.
+     * Historically, Jilt used to refer to this style of Builder classes as "Type-Safe".
+     * However, in the time since the initial version of this library was released,
+     * the community seems to have agreed on the name "Staged" for this concept instead.
+     * <p>
+     * This constant has been kept purely for backwards-compatibility reasons;
+     * however, it is recommended to use {@link #STAGED} instead.
+     */
+    TYPE_SAFE,
+
+    /**
+     * Synonym for {@link #STAGED_PRESERVING_ORDER}.
+     * Historically, Jilt used to refer to this style of Builder classes as "Type-Safe".
+     * However, in the time since the initial version of this library was released,
+     * the community seems to have agreed on the name "Staged" for this concept instead.
+     * <p>
+     * This constant has been kept purely for backwards-compatibility reasons;
+     * however, it is recommended to use {@link #STAGED_PRESERVING_ORDER} instead.
+     */
+    TYPE_SAFE_UNGROUPED_OPTIONALS,
+
+    /**
+     * A Staged (also called Type-Safe, or Step, or Telescopic) Builder pattern variant.
      * <p>
      * This variant is most often used for Builders with many properties.
      * It leverages the type system to make sure all required
@@ -95,19 +117,19 @@ public enum BuilderStyle {
      * It generates a separate interface for each setter corresponding
      * to a required property, which returns the next properties'
      * interface, and so on, forming a chain of calls.
-     * Optional properties are grouped into one interface that also
-     * includes the <code>build</code> method, allowing the client to make
-     * a decision whether to set them or not. The generated Builder
-     * class implements all of those interfaces.
+     * Optional (that is, those annotated with the {@link Opt} annotation)
+     * properties are grouped into one interface at the end of the chain that also
+     * includes the <code>build()</code> method, allowing the client to make
+     * a decision whether to set them or not.
+     * The generated Builder class implements all of those interfaces.
      * <p>
-     * This is quite hard to describe, but easy to demonstrate with an
-     * example. Given this class:
+     * For example, given this class:
      *
      * <pre><code>
      * public final class User {
      *     public final String email, username, firstName, lastName, displayName;
      *
-     *    {@literal @}Builder(style = BuilderStyle.TYPE_SAFE)
+     *    {@literal @}Builder(style = BuilderStyle.STAGED)
      *     public User(String email, @Opt String username, String firstName,
      *                 String lastName, @Opt String displayName) {
      *         this.email = email;
@@ -195,138 +217,112 @@ public enum BuilderStyle {
      *         .email("email@example.com") // this has to be 'email' to compile
      *         .firstName("John") // this is not 'username', because that is an optional property
      *         .lastName("Doe") // this has to be 'lastName' to compile
-     *         .displayName("johnnyd") // this could be 'username', or skipped
+     *         .displayName("Johnny D") // this line could be commented out - optional property
+     *         .username("johnnyd") // this line could be commented out - optional property
      *         .build();
      * </code></pre>
      *
      * @see BuilderInterfaces
+     * @since 1.4
      */
-    TYPE_SAFE,
+    STAGED,
 
     /**
-     * A slightly modified version of the {@link #TYPE_SAFE} Builder pattern variant.
-     * It's mostly useful in cases where the class has only a small number of optional properties.
+     * A slightly modified version of the {@link #STAGED} Builder pattern variant.
+     * It only differs from {@link #STAGED} in the treatment of optional properties
+     * (those coming from fields or constructor/static method parameters annotated with {@link Opt}).
      * <p>
-     * The only difference between this variant and {@link #TYPE_SAFE} is the treatment
-     * of optional properties (those originating from fields or parameters annotated with {@link Opt}) -
-     * in other words, for Builders with only required properties,
-     * both will generate equivalent code. While the {@link #TYPE_SAFE} variant groups
-     * all optional properties into one interface that is obtained at the end of the build
-     * process, this style maintains the same order of properties as they were declared in
-     * (through the instance fields of a class or constructor/static methods parameters,
-     * depending on where was the {@link Builder} annotation placed).
-     * The way properties are made optional is that they can be 'skipped' when building
-     * the target instance. This is achieved by the interfaces for each optional property having
-     * more than one method - they include also all setters for consecutive properties
-     * up to the first required one.
+     * While the {@link #STAGED} variant groups all optional properties into one
+     * interface that is obtained at the end of the build process
+     * (after all the required properties have been set),
+     * this style maintains the same order of properties as they were declared in
+     * either the class as fields, or in a constructor/static method as parameters
+     * (depending on where was the {@link Builder} annotation placed).
+     * The way properties are made optional is that they can be 'skipped' when building the target instance.
+     * This is achieved by the interfaces for each optional property having more than one method -
+     * they include also all setters for consecutive properties up to (and including) the first next required one.
      * <p>
-     * This is easier explained with an example. Given this code (same target class as for the
-     * {@link #TYPE_SAFE} variant):
+     * The advantage of this style over {@link #STAGED} is that it allows making a previously required property optional,
+     * but still maintain backwards compatibility with existing code that already used the previously generated builder.
+     * Because the {@link #STAGED} variant groups all optional properties into a single interface,
+     * using it means only the last required property can be made optional without breaking backwards compatibility.
+     * However, this style allows changing any required property to optional, not just the last one,
+     * and that change won't affect any existing code written against the previously generated builder.
+     * <p>
+     * For example, given this code:
      *
      * <pre><code>
-     * public final class User {
-     *     public final String email, username, firstName, lastName, displayName;
+     * public final class FullName {
+     *     public final String firstName, middleName, lastName;
      *
-     *    {@literal @}Builder(style = BuilderStyle.TYPE_SAFE_UNGROUPED_OPTIONALS)
-     *     public User(String email, @Opt String username, String firstName,
-     *                 String lastName, @Opt String displayName) {
-     *         this.email = email;
-     *         this.username = username == null ? email : username;
+     *    {@literal @}Builder(style = BuilderStyle.STAGED)
+     *     public FullName(String firstName, String middleName, String lastName) {
      *         this.firstName = firstName;
+     *         this.middleName = middleName;
      *         this.lastName = lastName;
-     *         this.displayName = displayName == null
-     *             ? firstName + " " + lastName
-     *             : displayName;
      *     }
      * }
      * </code></pre>
      *
-     * ...Jilt will generate the following code:
+     * If later we decide to make {@code middleName} optional,
+     * that change would break the following code:
      *
      * <pre><code>
-     * public interface UserBuilders {
-     *     interface Email {
-     *         Username email(String email);
-     *     }
-     *
-     *     interface Username {
-     *         FirstName username(String username);
-     *         LastName firstName(String firstName);
-     *     }
-     *
-     *     interface FirstName {
-     *         LastName firstName(String firstName);
-     *     }
-     *
-     *     interface LastName {
-     *         DisplayName lastName(String lastName);
-     *     }
-     *
-     *     interface DisplayName {
-     *         Build displayName(String displayName);
-     *         User build();
-     *     }
-     *
-     *     interface Build {
-     *         User build();
-     *     }
-     * }
-     *
-     * public class UserBuilder implements UserBuilders.Email, UserBuilders.Username, UserBuilders.FirstName,
-     *         UserBuilders.LastName, UserBuilders.DisplayName, UserBuilders.Build {
-     *     public static UserBuilders.Email user() {
-     *         return new UserBuilder();
-     *     }
-     *
-     *     private String email, username, firstName, lastName, displayName;
-     *
-     *     private UserBuilder() {
-     *     }
-     *
-     *     public UserBuilders.Username email(String email) {
-     *         this.email = email;
-     *         return this;
-     *     }
-     *
-     *     public UserBuilders.FirstName username(String username) {
-     *         this.username = username;
-     *         return this;
-     *     }
-     *
-     *     public UserBuilders.LastName firstName(String firstName) {
-     *         this.firstName = firstName;
-     *         return this;
-     *     }
-     *
-     *     public UserBuilders.DisplayName lastName(String lastName) {
-     *         this.lastName = lastName;
-     *         return this;
-     *     }
-     *
-     *     public UserBuilders.Build displayName(String displayName) {
-     *         this.displayName = displayName;
-     *         return this;
-     *     }
-     *
-     *     public User build() {
-     *         return new User(email, username, firstName, lastName, displayName);
-     *     }
-     * }
-     * </code></pre>
-     *
-     * ...which can be used as follows:
-     *
-     * <pre><code>
-     *     User user = UserBuilder.user()
-     *         .email("email@example.com") // this has to be 'email' to compile - required property
-     *         .username("johnnyd") // this line could be commented out - optional property
-     *         .firstName("John") // this has to be 'firstName' to compile - required property
-     *         .lastName("Doe") // this has to be 'lastName' to compile - required property
-     *         .displayName("Unknown") // this line could be commented out - optional property
+     *     FullName fullName = FullNameBuilder.fullName()
+     *         .firstName("William")
+     *         .middleName("H")
+     *         .lastName("Macy")
      *         .build();
      * </code></pre>
      *
+     * Since {@code middleName()} would now have to be called after {@code lastName()}, not before it.
+     * <p>
+     * However, if we use the {@code STAGED_PRESERVING_ORDER} style instead:
+     *
+     * <pre><code>
+     * public final class FullName {
+     *     public final String firstName, middleName, lastName;
+     *
+     *    {@literal @}Builder(style = BuilderStyle.STAGED_PRESERVING_ORDER)
+     *     public FullName(String firstName, @Opt String middleName, String lastName) {
+     *         this.firstName = firstName;
+     *         this.middleName = middleName;
+     *         this.lastName = lastName;
+     *     }
+     * }
+     * </code></pre>
+     *
+     * This code would still work:
+     *
+     * <pre><code>
+     *     FullName fullName = FullNameBuilder.fullName()
+     *         .firstName("William")
+     *         .middleName("H")
+     *         .lastName("Macy")
+     *         .build();
+     * </code></pre>
+     *
+     * And the following code would also work:
+     *
+     * <pre><code>
+     *     FullName fullName = FullNameBuilder.fullName()
+     *         .firstName("William")
+     *         // no middleName() call here - optional property
+     *         .lastName("Macy")
+     *         .build();
+     * </code></pre>
+     *
+     * Note that this style works best if either the built class has a small number of properties,
+     * or if there is a natural order to those properties,
+     * like in the {@code FullName} example above.
+     * The reason why is that there is only a single spot where a given optional property can be set
+     * (for example, {@code middleName()} above can only be called right after calling {@code firstName()}).
+     * That is different from the {@link #STAGED} style,
+     * where all optional properties can be set right before calling {@code build()},
+     * and they can be set in any order, which makes them easier to find.
+     *
      * @see BuilderInterfaces
+     * @since 1.4
      */
-    TYPE_SAFE_UNGROUPED_OPTIONALS
+    STAGED_PRESERVING_ORDER
 }
