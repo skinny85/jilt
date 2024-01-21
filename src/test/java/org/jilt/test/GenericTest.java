@@ -50,8 +50,8 @@ public class GenericTest {
     public void four_type_parameters_generic_class_with_static_factory_method_and_subset_of_type_parameters_works() {
         Generic4TypeParams<Boolean, ?, Boolean, Long> value = Generic4TypeParamsBuilder.<Boolean, Boolean>generic4TypeParams()
                 .a(true)
-                .c(null)
                 .str("str")
+                .c(null)
                 .build();
 
         assertThat(value.a).isTrue();

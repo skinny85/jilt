@@ -57,7 +57,7 @@ final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
             }
         }
 
-        addBuildMethodToInterface(optionalsInterfaceBuilder);
+        this.addBuildMethodToInterface(optionalsInterfaceBuilder, /* withMangledTypeParameters */ false);
         outerInterfacesBuilder.addType(optionalsInterfaceBuilder.build());
 
         JavaFile javaFile = JavaFile

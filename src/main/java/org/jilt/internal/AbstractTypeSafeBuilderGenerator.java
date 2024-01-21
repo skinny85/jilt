@@ -72,6 +72,33 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
 
     protected final TypeName attributeType(VariableElement attribute) {
         TypeName ret = TypeName.get(attribute.asType());
+        return this.mangleTypeName(ret);
+    }
+
+    protected final String lastInterfaceName() {
+        String nameFromAnnotation = builderInterfaces == null
+                ? ""
+                : builderInterfaces.lastInnerName();
+
+        return nameFromAnnotation.isEmpty()
+                ? interfaceNameFromBaseName(defaultLastInterfaceName())
+                : nameFromAnnotation;
+    }
+
+    protected final void addBuildMethodToInterface(TypeSpec.Builder interfaceBuilder,
+            boolean withMangledTypeParameters) {
+        TypeName targetClassTypeName = this.targetClassTypeName();
+        TypeName buildReturnType = withMangledTypeParameters
+                ? this.mangleTypeName(targetClassTypeName)
+                : targetClassTypeName;
+        interfaceBuilder.addMethod(MethodSpec
+                .methodBuilder(this.buildMethodName())
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .returns(buildReturnType)
+                .build());
+    }
+
+    private TypeName mangleTypeName(TypeName ret) {
         if (ret instanceof TypeVariableName) {
             // if this is a type variable, we need to mangle it
             TypeVariableName typeVariableName = (TypeVariableName) ret;
@@ -98,24 +125,6 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
             }
         }
         return ret;
-    }
-
-    protected final String lastInterfaceName() {
-        String nameFromAnnotation = builderInterfaces == null
-                ? ""
-                : builderInterfaces.lastInnerName();
-
-        return nameFromAnnotation.isEmpty()
-                ? interfaceNameFromBaseName(defaultLastInterfaceName())
-                : nameFromAnnotation;
-    }
-
-    protected final void addBuildMethodToInterface(TypeSpec.Builder interfaceBuilder) {
-        interfaceBuilder.addMethod(MethodSpec
-                .methodBuilder(buildMethodName())
-                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                .returns(targetClassTypeName())
-                .build());
     }
 
     protected final TypeName innerInterfaceNamed(String interfaceName) {
