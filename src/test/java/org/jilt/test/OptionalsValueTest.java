@@ -12,8 +12,8 @@ public class OptionalsValueTest {
     @Test
     public void optional_property_is_always_optional() {
         OptionalsValue<String, Integer> value = OptionalsValueBuilder.<String, Integer>optionalsValue()
-                .optional(Optional.of("abc"))
                 .t2(33)
+                .optional(Optional.of("abc"))
                 .build();
 
         assertThat(value.optional).contains("abc");

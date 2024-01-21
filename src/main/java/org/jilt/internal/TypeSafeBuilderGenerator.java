@@ -36,11 +36,12 @@ final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
         for (VariableElement currentAttribute : attributes()) {
             boolean attributeIsOptional = this.isOptional(currentAttribute);
 
+            boolean mangleTypeParameters = !attributeIsOptional;
             MethodSpec setterMethod = MethodSpec
                     .methodBuilder(builderSetterMethodName(currentAttribute))
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                    .returns(this.returnTypeForSetterFor(currentAttribute, !attributeIsOptional))
-                    .addParameter(this.setterParameterInInterface(currentAttribute))
+                    .returns(this.returnTypeForSetterFor(currentAttribute, mangleTypeParameters))
+                    .addParameter(this.setterParameterInInterface(currentAttribute, mangleTypeParameters))
                     .build();
 
             if (attributeIsOptional) {
@@ -57,7 +58,8 @@ final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
             }
         }
 
-        this.addBuildMethodToInterface(optionalsInterfaceBuilder, /* withMangledTypeParameters */ false);
+        this.addBuildMethodToInterface(optionalsInterfaceBuilder,
+                /* withMangledTypeParameters */ false);
         outerInterfacesBuilder.addType(optionalsInterfaceBuilder.build());
 
         JavaFile javaFile = JavaFile

@@ -174,6 +174,12 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         if (this.firstAnnotationCalledNullable(attribute) != null) {
             return true;
         }
+        TypeName attributeType = ClassName.get(attribute.asType());
+        // Optional most likely has a type parameter, so use toString() and startsWith()
+        // for comparison, disregarding the type parameter
+        if (attributeType.toString().startsWith("java.util.Optional")) {
+            return true;
+        }
         return false;
     }
 

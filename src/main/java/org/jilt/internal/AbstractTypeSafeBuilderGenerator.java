@@ -66,13 +66,15 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
         return interfaceNameFromBaseName(Utils.capitalize(attributeSimpleName(attribute)));
     }
 
-    protected final ParameterSpec setterParameterInInterface(VariableElement attribute) {
-        return this.setterParameter(attribute, this.attributeType(attribute));
+    protected final ParameterSpec setterParameterInInterface(VariableElement attribute,
+            boolean withMangledTypeParameters) {
+        return this.setterParameter(attribute, this.attributeType(attribute, withMangledTypeParameters));
     }
 
-    protected final TypeName attributeType(VariableElement attribute) {
+    protected final TypeName attributeType(VariableElement attribute,
+            boolean withMangledTypeParameters) {
         TypeName ret = TypeName.get(attribute.asType());
-        return this.mangleTypeName(ret);
+        return withMangledTypeParameters ? this.mangleTypeName(ret) : ret;
     }
 
     protected final String lastInterfaceName() {

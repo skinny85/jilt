@@ -43,12 +43,15 @@ final class TypeSafeUngroupedOptionalsBuilderGenerator extends AbstractTypeSafeB
                 innerInterfaceBuilder.addMethod(MethodSpec
                         .methodBuilder(builderSetterMethodName(currentAttribute))
                         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                        .returns(this.returnTypeForSetterFor(currentAttribute, true))
-                        .addParameter(this.setterParameterInInterface(currentAttribute))
+                        .returns(this.returnTypeForSetterFor(currentAttribute,
+                                /* withMangledTypeParameters */ true))
+                        .addParameter(this.setterParameterInInterface(currentAttribute,
+                                /* withMangledTypeParameters */ true))
                         .build());
 
                 if (nextAttribute == null && isOptional(currentAttribute)) {
-                    this.addBuildMethodToInterface(innerInterfaceBuilder, /* withMangledTypeParameters */ true);
+                    this.addBuildMethodToInterface(innerInterfaceBuilder,
+                            /* withMangledTypeParameters */ true);
                 }
             } while (nextAttribute != null
                     && isOptional(currentAttribute)
@@ -62,7 +65,8 @@ final class TypeSafeUngroupedOptionalsBuilderGenerator extends AbstractTypeSafeB
                 .interfaceBuilder(lastInterfaceName())
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addTypeVariables(this.builderClassTypeParameters());
-        this.addBuildMethodToInterface(finalInterfaceBuilder, /* withMangledTypeParameters */ false);
+        this.addBuildMethodToInterface(finalInterfaceBuilder,
+                /* withMangledTypeParameters */ false);
         outerInterfacesBuilder.addType(finalInterfaceBuilder.build());
 
         JavaFile javaFile = JavaFile
