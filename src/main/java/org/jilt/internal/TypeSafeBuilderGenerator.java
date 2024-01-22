@@ -35,24 +35,20 @@ final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
 
         for (VariableElement currentAttribute : attributes()) {
             boolean attributeIsOptional = this.isOptional(currentAttribute);
-
-            boolean mangleTypeParameters = !attributeIsOptional;
-            MethodSpec setterMethod = MethodSpec
-                    .methodBuilder(builderSetterMethodName(currentAttribute))
-                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                    .returns(this.returnTypeForSetterFor(currentAttribute, mangleTypeParameters))
-                    .addParameter(this.setterParameterInInterface(currentAttribute, mangleTypeParameters))
-                    .build();
-
+            List<MethodSpec> setterMethods = this.generateInterfaceSetterMethods(currentAttribute, !attributeIsOptional);
             if (attributeIsOptional) {
-                optionalsInterfaceBuilder.addMethod(setterMethod);
+                for (MethodSpec setterMethod : setterMethods) {
+                    optionalsInterfaceBuilder.addMethod(setterMethod);
+                }
             } else {
                 TypeSpec.Builder innerInterfaceBuilder = TypeSpec
                         .interfaceBuilder(interfaceNameForAttribute(currentAttribute))
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .addTypeVariables(this.mangledBuilderClassTypeParameters());
 
-                innerInterfaceBuilder.addMethod(setterMethod);
+                for (MethodSpec setterMethod : setterMethods) {
+                    innerInterfaceBuilder.addMethod(setterMethod);
+                }
 
                 outerInterfacesBuilder.addType(innerInterfaceBuilder.build());
             }

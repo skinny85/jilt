@@ -25,6 +25,7 @@ import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -89,14 +90,10 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                             Modifier.PRIVATE)
                     .build());
 
-            builderClassBuilder.addMethod(MethodSpec
-                    .methodBuilder(builderSetterMethodName(attribute))
-                    .addModifiers(Modifier.PUBLIC)
-                    .returns(returnTypeForSetterFor(attribute))
-                    .addParameter(this.setterParameterInBuilder(attribute))
-                    .addStatement("this.$1L = $1L", fieldName)
-                    .addStatement("return this")
-                    .build());
+            List<MethodSpec> builderSetterMethods = this.generateBuilderSetterMethods(attribute);
+            for (MethodSpec setterMethod : builderSetterMethods) {
+                builderClassBuilder.addMethod(setterMethod);
+            }
         }
 
         // add the 'build' method
@@ -123,20 +120,6 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         javaFile.writeTo(filer);
     }
 
-    private ParameterSpec setterParameterInBuilder(VariableElement attribute) {
-        return this.setterParameter(attribute, TypeName.get(attribute.asType()));
-    }
-
-    protected final ParameterSpec setterParameter(VariableElement attribute, TypeName parameterType) {
-        ParameterSpec.Builder ret = ParameterSpec.builder(parameterType,
-                this.attributeSimpleName(attribute));
-        AnnotationMirror nullableAnnotation = this.firstAnnotationCalledNullable(attribute);
-        if (nullableAnnotation!= null) {
-            ret.addAnnotation(AnnotationSpec.get(nullableAnnotation));
-        }
-        return ret.build();
-    }
-
     private List<String> attributeNames() {
         List<String> ret = new ArrayList<String>(attributes.size());
         for (VariableElement attribute : attributes) {
@@ -149,12 +132,83 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     protected abstract TypeName builderFactoryMethodReturnType();
 
-    protected abstract TypeName returnTypeForSetterFor(VariableElement attribute, boolean withMangledTypeParameters);
-
     protected abstract void enhance(TypeSpec.Builder builderClassBuilder);
 
-    private TypeName returnTypeForSetterFor(VariableElement attribute) {
-        return this.returnTypeForSetterFor(attribute, false);
+    private List<MethodSpec> generateBuilderSetterMethods(VariableElement attribute) {
+        return this.generateSetterMethods(attribute, /* mangleTypeParameters */ false,
+                /* abstractMethod */ false);
+    }
+
+    protected List<MethodSpec> generateSetterMethods(VariableElement attribute, boolean mangleTypeParameters,
+            boolean abstractMethod) {
+        TypeName parameterType = this.attributeType(attribute, mangleTypeParameters);
+        MethodSpec.Builder method = MethodSpec
+                .methodBuilder(this.setterMethodName(attribute))
+                .addModifiers(Modifier.PUBLIC)
+                .returns(this.returnTypeForSetterFor(attribute, mangleTypeParameters))
+                .addParameter(this.setterParameterSpec(attribute, parameterType));
+        if (abstractMethod) {
+            method.addModifiers(Modifier.ABSTRACT);
+        } else {
+            String fieldName = this.attributeSimpleName(attribute);
+            method.addStatement("this.$1L = $1L", fieldName)
+                    .addStatement("return this");
+        }
+
+        return Collections.singletonList(method.build());
+    }
+
+    protected abstract TypeName returnTypeForSetterFor(VariableElement attribute, boolean withMangledTypeParameters);
+
+    private TypeName attributeType(VariableElement attribute,
+            boolean withMangledTypeParameters) {
+        TypeName ret = TypeName.get(attribute.asType());
+        return withMangledTypeParameters ? this.mangleTypeName(ret) : ret;
+    }
+
+    protected final TypeName mangleTypeName(TypeName ret) {
+        if (ret instanceof TypeVariableName) {
+            // if this is a type variable, we need to mangle it
+            TypeVariableName typeVariableName = (TypeVariableName) ret;
+            return this.mangleTypeParameter(typeVariableName);
+        }
+        // if this is an entire parameterized type, we need to mangle it
+        if (ret instanceof ParameterizedTypeName) {
+            ParameterizedTypeName parameterizedTypeName = (ParameterizedTypeName) ret;
+            return ParameterizedTypeName.get(parameterizedTypeName.rawType,
+                    this.mangleTypeNameParameters(parameterizedTypeName.typeArguments).toArray(new TypeName[]{}));
+        }
+        return ret;
+    }
+
+    private List<TypeName> mangleTypeNameParameters(List<TypeName> typeArguments) {
+        List<TypeName> ret = new ArrayList<TypeName>(typeArguments.size());
+        for (TypeName typeName : typeArguments) {
+            if (typeName instanceof TypeVariableName) {
+                // if this is a type variable, we need to mangle it
+                TypeVariableName typeVariableName = (TypeVariableName) typeName;
+                ret.add(this.mangleTypeParameter(typeVariableName));
+            } else {
+                ret.add(typeName);
+            }
+        }
+        return ret;
+    }
+
+    protected final TypeVariableName mangleTypeParameter(TypeVariableName typeVariableName) {
+        return TypeVariableName.get(typeVariableName.name + "_",
+                // copy over the bounds unchanged, if there are any
+                typeVariableName.bounds.toArray(new TypeName[]{}));
+    }
+
+    private ParameterSpec setterParameterSpec(VariableElement attribute, TypeName parameterType) {
+        ParameterSpec.Builder ret = ParameterSpec.builder(parameterType,
+                this.attributeSimpleName(attribute));
+        AnnotationMirror nullableAnnotation = this.firstAnnotationCalledNullable(attribute);
+        if (nullableAnnotation!= null) {
+            ret.addAnnotation(AnnotationSpec.get(nullableAnnotation));
+        }
+        return ret.build();
     }
 
     private Set<VariableElement> initOptionalAttributes() {
@@ -174,13 +228,16 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         if (this.firstAnnotationCalledNullable(attribute) != null) {
             return true;
         }
-        TypeName attributeType = ClassName.get(attribute.asType());
-        // Optional most likely has a type parameter, so use toString() and startsWith()
-        // for comparison, disregarding the type parameter
-        if (attributeType.toString().startsWith("java.util.Optional")) {
+        if (this.typeIsJavaUtilOptional(ClassName.get(attribute.asType()))) {
             return true;
         }
         return false;
+    }
+
+    private boolean typeIsJavaUtilOptional(TypeName attributeType) {
+        // Optional most likely has a type parameter, so use toString() and startsWith()
+        // for comparison, disregarding the type parameter
+        return attributeType.toString().startsWith("java.util.Optional");
     }
 
     private AnnotationMirror firstAnnotationCalledNullable(VariableElement attribute) {
@@ -259,16 +316,16 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return ret;
     }
 
-    protected final String attributeSimpleName(VariableElement attribute) {
-        return attribute.getSimpleName().toString();
-    }
-
-    protected final String builderSetterMethodName(VariableElement attribute) {
+    protected final String setterMethodName(VariableElement attribute) {
         String annotationSetterPrefix = builderAnnotation.setterPrefix();
         String attributeSimpleName = attributeSimpleName(attribute);
         return annotationSetterPrefix.isEmpty()
                 ? attributeSimpleName
                 : annotationSetterPrefix + Utils.capitalize(attributeSimpleName);
+    }
+
+    protected final String attributeSimpleName(VariableElement attribute) {
+        return attribute.getSimpleName().toString();
     }
 
     protected final String builderFactoryMethodName() {

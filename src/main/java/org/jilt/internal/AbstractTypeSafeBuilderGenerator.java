@@ -66,15 +66,10 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
         return interfaceNameFromBaseName(Utils.capitalize(attributeSimpleName(attribute)));
     }
 
-    protected final ParameterSpec setterParameterInInterface(VariableElement attribute,
-            boolean withMangledTypeParameters) {
-        return this.setterParameter(attribute, this.attributeType(attribute, withMangledTypeParameters));
-    }
-
-    protected final TypeName attributeType(VariableElement attribute,
-            boolean withMangledTypeParameters) {
-        TypeName ret = TypeName.get(attribute.asType());
-        return withMangledTypeParameters ? this.mangleTypeName(ret) : ret;
+    protected final List<MethodSpec> generateInterfaceSetterMethods(VariableElement attribute,
+            boolean mangleTypeParameters) {
+        return this.generateSetterMethods(attribute, mangleTypeParameters,
+                /* abstractMethod */ true);
     }
 
     protected final String lastInterfaceName() {
@@ -98,35 +93,6 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .returns(buildReturnType)
                 .build());
-    }
-
-    private TypeName mangleTypeName(TypeName ret) {
-        if (ret instanceof TypeVariableName) {
-            // if this is a type variable, we need to mangle it
-            TypeVariableName typeVariableName = (TypeVariableName) ret;
-            return this.mangleTypeParameter(typeVariableName);
-        }
-        // if this is an entire parameterized type, we need to mangle it
-        if (ret instanceof ParameterizedTypeName) {
-            ParameterizedTypeName parameterizedTypeName = (ParameterizedTypeName) ret;
-            return ParameterizedTypeName.get(parameterizedTypeName.rawType,
-                    this.mangleTypeNameParameters(parameterizedTypeName.typeArguments).toArray(new TypeName[]{}));
-        }
-        return ret;
-    }
-
-    private List<TypeName> mangleTypeNameParameters(List<TypeName> typeArguments) {
-        List<TypeName> ret = new ArrayList<TypeName>(typeArguments.size());
-        for (TypeName typeName : typeArguments) {
-            if (typeName instanceof TypeVariableName) {
-                // if this is a type variable, we need to mangle it
-                TypeVariableName typeVariableName = (TypeVariableName) typeName;
-                ret.add(this.mangleTypeParameter(typeVariableName));
-            } else {
-                ret.add(typeName);
-            }
-        }
-        return ret;
     }
 
     protected final TypeName innerInterfaceNamed(String interfaceName) {
@@ -157,12 +123,6 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
             ret.add(this.mangleTypeParameter(typeVariableName));
         }
         return ret;
-    }
-
-    protected TypeVariableName mangleTypeParameter(TypeVariableName typeVariableName) {
-        return TypeVariableName.get(typeVariableName.name + "_",
-                // copy over the bounds unchanged, if there are any
-                typeVariableName.bounds.toArray(new TypeName[]{}));
     }
 
     protected final VariableElement nextAttribute(VariableElement attribute) {
