@@ -284,7 +284,10 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private boolean typeIsJavaUtilOptional(TypeName attributeType) {
         // Optional most likely has a type parameter, so use toString() and startsWith()
         // for comparison, disregarding the type parameter
-        return attributeType.toString().startsWith("java.util.Optional");
+        String attributeTypeString = attributeType.toString();
+        return attributeTypeString.startsWith("java.util.Optional<")
+                // Optional can be used as a raw type
+                || "java.util.Optional".equals(attributeTypeString);
     }
 
     private AnnotationMirror firstAnnotationCalledNullable(VariableElement attribute) {
