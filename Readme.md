@@ -29,7 +29,7 @@ import org.jilt.Builder;
 public final class Person {
     public final String name;
     public final boolean isAdult;
-    
+
     public Person(String name, boolean isAdult) {
         this.name = name;
         this.isAdult = isAdult;
@@ -52,12 +52,12 @@ public class PersonBuilder {
         this.name = name;
         return this;
     }
-    
+
     public PersonBuilder isAdult(boolean isAdult) {
         this.isAdult = isAdult;
         return this;
     }
-    
+
     public Person build() {
         return new Person(name, isAdult);
     }
@@ -192,7 +192,7 @@ public abstract class DateFactory {
 }
 ```
 
-And you can use the Builder like so:
+And you can use the generated Builder like so:
 
 ```java
 import com.example.DateBuilder;
@@ -259,8 +259,8 @@ Person person = PersonBuilder.person()
 
 ##### Optional properties
 
-When using Staged Builders, there are often properties that the client can,
-but doesn't have to, provide in order to construct a valid instance of the target class -
+When using Staged Builders, there are often properties that don't have to be provided
+in order to construct a valid instance of the target class -
 the property could be optional, it could have some default, etc.
 
 When using the `STAGED` Builder style, you can mark a field or constructor/static method parameter
@@ -307,13 +307,23 @@ User user = UserBuilder.user()
     .build();
 ```
 
+In addition to the `@Opt` annotation,
+a property will always be considered optional if:
+
+* The field or parameter it represents is annotated with a `@Nullable` annotation.
+  All types of `@Nullable` annotations are supported,
+  including `javax.annotation.Nullable` from [JSR-305](https://mvnrepository.com/artifact/com.google.code.findbugs/jsr305),
+  `org.jetbrains.annotations.Nullable` from [JetBrains annotations](https://mvnrepository.com/artifact/org.jetbrains/annotations),
+  and others.
+* The field or parameter is of the type `java.util.Optional` introduced in [Java 8](https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html).
+
 ##### 'Staged, but preserving order' Builder style
 
 The Staged Builder style has one downside:
 when evolving your API, you cannot change a required property to be optional
 (with the small exception of the last required property)
 without breaking existing code that uses the Builder generated when the property was required -
-even though, purely from an API perspective, that should not be a breaking change for the clients of your classes.
+even though, purely from an API perspective, that should not be a breaking change for the clients of your class.
 
 For example, if we take the above `User` class, but with `username` being required,
 the client code using that Builder looks something like this:
