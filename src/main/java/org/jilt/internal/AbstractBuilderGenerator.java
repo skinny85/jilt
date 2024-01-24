@@ -219,6 +219,22 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 // if this is a type variable, we need to mangle it
                 TypeVariableName typeVariableName = (TypeVariableName) typeParameter;
                 ret.add(this.mangleTypeParameter(typeVariableName));
+            } else if (typeParameter instanceof WildcardTypeName) {
+                WildcardTypeName wildcardTypeName = (WildcardTypeName) typeParameter;
+                List<TypeName> lowerBounds = this.mangleTypeParameters(wildcardTypeName.lowerBounds);
+                List<TypeName> upperBounds = this.mangleTypeParameters(wildcardTypeName.upperBounds);
+                if (!lowerBounds.isEmpty()) {
+                    ret.add(WildcardTypeName.supertypeOf(lowerBounds.get(0)));
+                } else if (!upperBounds.isEmpty()) {
+                    ret.add(WildcardTypeName.subtypeOf(upperBounds.get(0)));
+                } else {
+                    ret.add(typeParameter);
+                }
+            } else if (typeParameter instanceof ParameterizedTypeName) {
+                // if this is an entire parameterized type, we need to mangle it recursively
+                ParameterizedTypeName parameterizedTypeName = (ParameterizedTypeName) typeParameter;
+                ret.add(ParameterizedTypeName.get(parameterizedTypeName.rawType,
+                    this.mangleTypeParameters(parameterizedTypeName.typeArguments).toArray(new TypeName[]{})));
             } else {
                 ret.add(typeParameter);
             }
@@ -228,8 +244,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     protected final TypeVariableName mangleTypeParameter(TypeVariableName typeVariableName) {
         return TypeVariableName.get(typeVariableName.name + "_",
-                // copy over the bounds unchanged, if there are any
-                typeVariableName.bounds.toArray(new TypeName[]{}));
+                // copy over the bounds, if there are any, recursively mangling them too
+                this.mangleTypeParameters(typeVariableName.bounds).toArray(new TypeName[]{}));
     }
 
     private ParameterSpec setterParameterSpec(VariableElement attribute, TypeName parameterType) {
