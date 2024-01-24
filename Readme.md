@@ -125,6 +125,7 @@ public final class Person {
     private final boolean isAdult;
 }
 ```
+
 ##### @Builder on constructors
 
 You can also place the annotation on a constructor;
@@ -204,9 +205,9 @@ public class DateFactoryTest {
     @Test
     public void use_date_builder() {
         Date date = DateBuilder.date()
-                .month(12)
-                .year(23)
-                .build();
+            .month(12)
+            .year(23)
+            .build();
 
         Assert.assertEquals(11, date.getMonth());
         Assert.assertEquals(1, date.getDay());
@@ -289,9 +290,9 @@ public final class User {
         this.firstName = firstName;
         this.lastName = lastName;
         this.displayName = displayName == null
-           ? firstName + " " + lastName
-           : displayName;
-   }
+            ? firstName + " " + lastName
+            : displayName;
+    }
 }
 ```
 
@@ -311,11 +312,11 @@ User user = UserBuilder.user()
 The Staged Builder style has one downside:
 when evolving your API, you cannot change a required property to be optional
 (with the small exception of the last required property)
-without breaking existing code that uses the Builder generated for the required property,
+without breaking existing code that uses the Builder generated when the property was required -
 even though, purely from an API perspective, that should not be a breaking change for the clients of your classes.
 
 For example, if we take the above `User` class, but with `username` being required,
-the client code using the Builder will look as follows:
+the client code using that Builder looks something like this:
 
 ```java
 User user = UserBuilder.user()
@@ -326,7 +327,7 @@ User user = UserBuilder.user()
     .build();
 ```
 
-However, if we change `username` to be optional by annotating it with `@Opt`,
+However, if we then change `username` to be optional by annotating it with `@Opt`,
 the above code will stop compiling,
 because the `username()` call can no longer happen after the call to `email()`,
 but must instead be moved to after the call to `lastName()`.
@@ -357,9 +358,9 @@ public final class User {
         this.firstName = firstName;
         this.lastName = lastName;
         this.displayName = displayName == null
-           ? firstName + " " + lastName
-           : displayName;
-   }
+            ? firstName + " " + lastName
+            : displayName;
+    }
 }
 ```
 
@@ -378,10 +379,11 @@ User user = UserBuilder.user()
 Note that this style works best if either the class being built has a small number of properties,
 or if there is a natural order to those properties, like in the `User` example above.
 The reason why is that there is only a single spot where a given optional property can be set
-(for example, `username()` above can only be called right after calling `email()`).
-That is different from the `STAGED` style,
+(for example, `username()` above can only be called right after calling `email()`),
+which might make it difficult to find if the class has a large amount of properties without an obvious order to them.
+This is different from the `STAGED` style,
 where all optional properties can be set right before calling `build()`,
-and they can be set in any order, which makes them easier to find.
+and they can be set in any order, which makes them more easily discoverable.
 
 ##### Other @Builder attributes
 

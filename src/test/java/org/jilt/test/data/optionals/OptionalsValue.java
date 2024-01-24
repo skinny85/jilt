@@ -6,12 +6,12 @@ import org.jilt.BuilderStyle;
 import java.util.Optional;
 
 @Builder(style = BuilderStyle.STAGED)
-public final class OptionalsValue<T1, T2> {
-    public final Optional<T1> optional;
-    public final T2 t2;
+public final class OptionalsValue<T> {
+    public final Optional<T> optional;
+    public final Void v;
 
-    public OptionalsValue(Optional<T1> optional, T2 t2) {
+    public OptionalsValue(Optional<T> optional, Void v) {
         this.optional = optional;
-        this.t2 = t2;
+        this.v = v;
     }
 }

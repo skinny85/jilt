@@ -10,6 +10,7 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
+import com.squareup.javapoet.WildcardTypeName;
 import org.jilt.Builder;
 import org.jilt.Opt;
 import org.jilt.utils.Utils;
@@ -25,7 +26,6 @@ import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -139,23 +139,54 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 /* abstractMethod */ false);
     }
 
-    protected List<MethodSpec> generateSetterMethods(VariableElement attribute, boolean mangleTypeParameters,
+    protected final List<MethodSpec> generateSetterMethods(VariableElement attribute, boolean mangleTypeParameters,
             boolean abstractMethod) {
+        List<MethodSpec> ret = new ArrayList<MethodSpec>(2);
+
+        String fieldName = this.attributeSimpleName(attribute);
         TypeName parameterType = this.attributeType(attribute, mangleTypeParameters);
-        MethodSpec.Builder method = MethodSpec
+        MethodSpec.Builder setter = MethodSpec
                 .methodBuilder(this.setterMethodName(attribute))
                 .addModifiers(Modifier.PUBLIC)
                 .returns(this.returnTypeForSetterFor(attribute, mangleTypeParameters))
                 .addParameter(this.setterParameterSpec(attribute, parameterType));
         if (abstractMethod) {
-            method.addModifiers(Modifier.ABSTRACT);
+            setter.addModifiers(Modifier.ABSTRACT);
         } else {
-            String fieldName = this.attributeSimpleName(attribute);
-            method.addStatement("this.$1L = $1L", fieldName)
+            setter.addStatement("this.$1L = $1L", fieldName)
                     .addStatement("return this");
         }
+        ret.add(setter.build());
 
-        return Collections.singletonList(method.build());
+        if (this.typeIsJavaUtilOptional(parameterType)) {
+            TypeName optionalValueType;
+            if (parameterType instanceof ParameterizedTypeName) {
+                ParameterizedTypeName parameterizedTypeName = (ParameterizedTypeName) parameterType;
+                optionalValueType = parameterizedTypeName.typeArguments.get(0);
+                if (optionalValueType instanceof WildcardTypeName) {
+                    // for wildcards, we use java.lang.Object too
+                    optionalValueType = ClassName.OBJECT;
+                }
+            } else {
+                // if Optional is used as a raw type, use java.lang.Object as the type argument
+                optionalValueType = ClassName.OBJECT;
+            }
+            MethodSpec.Builder optionSetter = MethodSpec
+                    .methodBuilder(this.setterMethodName(attribute))
+                    .addModifiers(Modifier.PUBLIC)
+                    .returns(this.returnTypeForSetterFor(attribute, mangleTypeParameters))
+                    .addParameter(this.setterParameterSpec(attribute, optionalValueType));
+            if (abstractMethod) {
+                optionSetter.addModifiers(Modifier.ABSTRACT);
+            } else {
+                optionSetter.addStatement("this.$1L = $2T.ofNullable($1L)",
+                                fieldName, ClassName.get("java.util", "Optional"))
+                        .addStatement("return this");
+            }
+            ret.add(optionSetter.build());
+        }
+
+        return ret;
     }
 
     protected abstract TypeName returnTypeForSetterFor(VariableElement attribute, boolean withMangledTypeParameters);
@@ -176,20 +207,20 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         if (ret instanceof ParameterizedTypeName) {
             ParameterizedTypeName parameterizedTypeName = (ParameterizedTypeName) ret;
             return ParameterizedTypeName.get(parameterizedTypeName.rawType,
-                    this.mangleTypeNameParameters(parameterizedTypeName.typeArguments).toArray(new TypeName[]{}));
+                    this.mangleTypeParameters(parameterizedTypeName.typeArguments).toArray(new TypeName[]{}));
         }
         return ret;
     }
 
-    private List<TypeName> mangleTypeNameParameters(List<TypeName> typeArguments) {
-        List<TypeName> ret = new ArrayList<TypeName>(typeArguments.size());
-        for (TypeName typeName : typeArguments) {
-            if (typeName instanceof TypeVariableName) {
+    private List<TypeName> mangleTypeParameters(List<TypeName> typeParameters) {
+        List<TypeName> ret = new ArrayList<TypeName>(typeParameters.size());
+        for (TypeName typeParameter : typeParameters) {
+            if (typeParameter instanceof TypeVariableName) {
                 // if this is a type variable, we need to mangle it
-                TypeVariableName typeVariableName = (TypeVariableName) typeName;
+                TypeVariableName typeVariableName = (TypeVariableName) typeParameter;
                 ret.add(this.mangleTypeParameter(typeVariableName));
             } else {
-                ret.add(typeName);
+                ret.add(typeParameter);
             }
         }
         return ret;
@@ -205,7 +236,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         ParameterSpec.Builder ret = ParameterSpec.builder(parameterType,
                 this.attributeSimpleName(attribute));
         AnnotationMirror nullableAnnotation = this.firstAnnotationCalledNullable(attribute);
-        if (nullableAnnotation!= null) {
+        if (nullableAnnotation != null) {
             ret.addAnnotation(AnnotationSpec.get(nullableAnnotation));
         }
         return ret.build();
