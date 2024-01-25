@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  * for the given optional property when constructing an instance of the target class.
  * <p>
  * In addition to using this annotation,
- * a property will also be considered optional if:
+ * a property will also be considered optional if either:
  * <ul>
  *     <li>
  *         The field or parameter it represents is annotated with a {@code @Nullable} annotation.
@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
  *         and others.
  *     </li>
  *     <li>
- *         The field or parameter is of type {@code java.util.Optional}.
+ *         Or, the field or parameter is of the type {@code java.util.Optional}.
  *     </li>
  * </ul>
  * How exactly does the API for skipping optional properties look like for the consumers of the generated Builder class

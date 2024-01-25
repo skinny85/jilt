@@ -308,14 +308,15 @@ User user = UserBuilder.user()
 ```
 
 In addition to the `@Opt` annotation,
-a property will always be considered optional if:
+a property will always be considered optional if either:
 
 * The field or parameter it represents is annotated with a `@Nullable` annotation.
   All types of `@Nullable` annotations are supported,
   including `javax.annotation.Nullable` from [JSR-305](https://mvnrepository.com/artifact/com.google.code.findbugs/jsr305),
   `org.jetbrains.annotations.Nullable` from [JetBrains annotations](https://mvnrepository.com/artifact/org.jetbrains/annotations),
   and others.
-* The field or parameter is of the type `java.util.Optional` introduced in [Java 8](https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html).
+* Or, the field or parameter is of the type `java.util.Optional`,
+  introduced in [Java 8](https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html).
 
 ##### 'Staged, but preserving order' Builder style
 

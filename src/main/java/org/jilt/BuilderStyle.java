@@ -316,10 +316,11 @@ public enum BuilderStyle {
      * or if there is a natural order to those properties,
      * like in the {@code FullName} example above.
      * The reason why is that there is only a single spot where a given optional property can be set
-     * (for example, {@code middleName()} above can only be called right after calling {@code firstName()}).
-     * That is different from the {@link #STAGED} style,
+     * (for example, {@code middleName()} above can only be called right after calling {@code firstName()}),
+     * which might make it difficult to find if the class has a large amount of properties without an obvious order to them.
+     * This is different from the {@link #STAGED} style,
      * where all optional properties can be set right before calling {@code build()},
-     * and they can be set in any order, which makes them easier to find.
+     * and they can be set in any order, which makes them more easily discoverable.
      *
      * @see BuilderInterfaces
      * @since 1.4

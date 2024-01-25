@@ -10,7 +10,7 @@ import org.jilt.test.data.optionals.OptionalsWithOrderValue;
 import org.jilt.test.data.optionals.OptionalsWithOrderValueBuilder;
 import org.junit.Test;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,12 +60,13 @@ public class OptionalsValueTest {
     }
 
     @Test
-    public void preserving_order_optional_works() {
+    public void null_can_be_passed_to_optional_unwrapped_setter() {
+        List<String> nullList = null;
         OptionalsWithOrderValue<CharSequence> value = OptionalsWithOrderValueBuilder.<CharSequence>optionalsWithOrderValue()
-                .optional(Arrays.asList("a", "b"))
+                .optional(nullList)
                 .v(null)
                 .build();
 
-        assertThat(value.optional).contains(Arrays.asList("a", "b"));
+        assertThat(value.optional).isEmpty();
     }
 }
