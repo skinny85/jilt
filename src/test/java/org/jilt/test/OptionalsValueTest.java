@@ -17,10 +17,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class OptionalsValueTest {
     @Test
-    public void optional_type_property_is_implicitly_optional() {
+    public void optional_type_property_is_not_implicitly_optional() {
         OptionalsValue<String> value = OptionalsValueBuilder.<String>optionalsValue()
-                .v(null)
                 .optional(Optional.of("abc"))
+                .v(null)
                 .build();
 
         assertThat(value.optional).contains("abc");
@@ -28,21 +28,10 @@ public class OptionalsValueTest {
     }
 
     @Test
-    public void optional_property_has_unwrapped_setter() {
-        OptionalsValue<Integer> value = OptionalsValueBuilder.<Integer>optionalsValue()
-                .v(null)
-                .optional(33)
-                .build();
-
-        assertThat(value.optional).contains(33);
-        assertThat(value.v).isNull();
-    }
-
-    @Test
-    public void raw_optional_uses_java_lang_object_in_unwrapped_setter() {
+    public void raw_optional_uses_java_lang_object_in_setter() {
         Object someObject = new Object();
         OptionalsRawValue value = OptionalsRawValueBuilder.optionalsRawValue()
-                .rawOptional(someObject)
+                .rawOptional(Optional.of(someObject))
                 .build();
 
         //noinspection unchecked
@@ -50,23 +39,23 @@ public class OptionalsValueTest {
     }
 
     @Test
-    public void wildcard_optional_uses_java_lang_object_in_unwrapped_setter() {
+    public void wildcard_optional_uses_java_lang_object_in_setter() {
         Object someObject = new Object();
         OptionalsWildcardValue value = OptionalsWildcardValueBuilder.optionalsWildcardValue()
-                .wildcardOptional(someObject)
+                .wildcardOptional(Optional.of(someObject))
                 .build();
 
         assertThat(value.wildcardOptional).isEqualTo(Optional.of(someObject));
     }
 
     @Test
-    public void null_can_be_passed_to_optional_unwrapped_setter() {
-        List<String> nullList = null;
-        OptionalsWithOrderValue<CharSequence> value = OptionalsWithOrderValueBuilder.<CharSequence>optionalsWithOrderValue()
+    public void null_can_be_passed_to_optional_setter() {
+        Optional<List<CharSequence>> nullList = null;
+        OptionalsWithOrderValue<String> value = OptionalsWithOrderValueBuilder.<String>optionalsWithOrderValue()
                 .optional(nullList)
                 .v(null)
                 .build();
 
-        assertThat(value.optional).isEmpty();
+        assertThat(value.optional).isNull();
     }
 }

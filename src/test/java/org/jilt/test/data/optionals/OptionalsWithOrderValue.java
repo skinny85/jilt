@@ -8,10 +8,10 @@ import java.util.Optional;
 
 @Builder(style = BuilderStyle.STAGED_PRESERVING_ORDER)
 public final class OptionalsWithOrderValue<T> {
-    public final Optional<List<? extends T>> optional;
+    public final Optional<? extends List<? super T>> optional;
     public final Void v;
 
-    public OptionalsWithOrderValue(Optional<List<? extends T>> optional, Void v) {
+    public OptionalsWithOrderValue(Optional<? extends List<? super T>> optional, Void v) {
         this.optional = optional;
         this.v = v;
     }

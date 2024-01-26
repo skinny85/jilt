@@ -26,6 +26,7 @@ import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -141,8 +142,6 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     protected final List<MethodSpec> generateSetterMethods(VariableElement attribute, boolean mangleTypeParameters,
             boolean abstractMethod) {
-        List<MethodSpec> ret = new ArrayList<MethodSpec>(2);
-
         String fieldName = this.attributeSimpleName(attribute);
         TypeName parameterType = this.attributeType(attribute, mangleTypeParameters);
         MethodSpec.Builder setter = MethodSpec
@@ -156,37 +155,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             setter.addStatement("this.$1L = $1L", fieldName)
                     .addStatement("return this");
         }
-        ret.add(setter.build());
 
-        if (this.typeIsJavaUtilOptional(parameterType)) {
-            TypeName optionalValueType;
-            if (parameterType instanceof ParameterizedTypeName) {
-                ParameterizedTypeName parameterizedTypeName = (ParameterizedTypeName) parameterType;
-                optionalValueType = parameterizedTypeName.typeArguments.get(0);
-                if (optionalValueType instanceof WildcardTypeName) {
-                    // for wildcards, we use java.lang.Object too
-                    optionalValueType = ClassName.OBJECT;
-                }
-            } else {
-                // if Optional is used as a raw type, use java.lang.Object as the type argument
-                optionalValueType = ClassName.OBJECT;
-            }
-            MethodSpec.Builder optionSetter = MethodSpec
-                    .methodBuilder(this.setterMethodName(attribute))
-                    .addModifiers(Modifier.PUBLIC)
-                    .returns(this.returnTypeForSetterFor(attribute, mangleTypeParameters))
-                    .addParameter(this.setterParameterSpec(attribute, optionalValueType));
-            if (abstractMethod) {
-                optionSetter.addModifiers(Modifier.ABSTRACT);
-            } else {
-                optionSetter.addStatement("this.$1L = $2T.ofNullable($1L)",
-                                fieldName, ClassName.get("java.util", "Optional"))
-                        .addStatement("return this");
-            }
-            ret.add(optionSetter.build());
-        }
-
-        return ret;
+        return Collections.singletonList(setter.build());
     }
 
     protected abstract TypeName returnTypeForSetterFor(VariableElement attribute, boolean withMangledTypeParameters);
@@ -275,19 +245,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         if (this.firstAnnotationCalledNullable(attribute) != null) {
             return true;
         }
-        if (this.typeIsJavaUtilOptional(ClassName.get(attribute.asType()))) {
-            return true;
-        }
         return false;
-    }
-
-    private boolean typeIsJavaUtilOptional(TypeName attributeType) {
-        // Optional most likely has a type parameter, so use toString() and startsWith()
-        // for comparison, disregarding the type parameter
-        String attributeTypeString = attributeType.toString();
-        return attributeTypeString.startsWith("java.util.Optional<")
-                // Optional can be used as a raw type
-                || "java.util.Optional".equals(attributeTypeString);
     }
 
     private AnnotationMirror firstAnnotationCalledNullable(VariableElement attribute) {
