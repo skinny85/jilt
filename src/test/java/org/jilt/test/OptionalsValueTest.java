@@ -1,5 +1,6 @@
 package org.jilt.test;
 
+import org.jilt.test.data.optionals.NullableOptionalsWithOrderValueBuilder;
 import org.jilt.test.data.optionals.OptionalsRawValue;
 import org.jilt.test.data.optionals.OptionalsRawValueBuilder;
 import org.jilt.test.data.optionals.OptionalsValue;
@@ -57,5 +58,15 @@ public class OptionalsValueTest {
                 .build();
 
         assertThat(value.optional).isNull();
+    }
+
+    @Test
+    public void null_can_be_passed_to_unwrapped_optional_and_sets_empty() {
+        OptionalsWithOrderValue<String> value = NullableOptionalsWithOrderValueBuilder.<String>optionalsWithOrderValue()
+                .optional(null)
+                .build();
+
+        assertThat(value.optional).isEmpty();
+        assertThat(value.v).isNull();
     }
 }

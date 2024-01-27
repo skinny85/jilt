@@ -421,7 +421,8 @@ It has the following attributes (all of them are optional):
 
 * `outerName` allows you to change the name of the outer interface that the per-property interfaces
   will be generated inside of (this is in order not to pollute the global namespace).
-  The default name is `<BuiltClass>Builders`.
+  The default name is `<BuilderClass>s` (the name of the Builder class with an "s" at the end) -
+  so, if we're building a `Person` class, the default name will be `PersonBuilders`.
 * `packageName` allows you to change the package the generated interfaces will reside in.
   The default is for the interfaces to reside in the same package as the one the Builder will be generated in.
 * `innerNames` allows you to set the pattern that will be used for naming the per-property generated interfaces.

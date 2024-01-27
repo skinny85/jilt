@@ -49,7 +49,7 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
                 ? ""
                 : builderInterfaces.outerName();
         return nameFromAnnotation.isEmpty()
-                ? this.targetClassSimpleName() + "Builders"
+                ? this.builderClassStringName() + "s"
                 : nameFromAnnotation;
     }
 

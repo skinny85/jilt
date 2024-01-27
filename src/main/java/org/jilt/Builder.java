@@ -243,7 +243,8 @@ public @interface Builder {
      * Must be a valid Java (top-level) class name.
      * <p>
      * This is an optional attribute - the default is <code>&lt;TargetClass&gt;Builder</code>
-     * (for example, <code>PersonBuilder</code>).
+     * (so, for example, if we're building an instance of a <code>Person</code> class,
+     * the default name will be <code>PersonBuilder</code>).
      */
     String className() default "";
 

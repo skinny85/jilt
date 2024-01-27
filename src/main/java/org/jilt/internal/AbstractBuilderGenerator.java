@@ -271,7 +271,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         }
     }
 
-    private String builderClassStringName() {
+    protected final String builderClassStringName() {
         String annotationBuilderClassName = builderAnnotation.className();
         return annotationBuilderClassName.isEmpty()
                 ? this.targetClassSimpleName() + "Builder"
@@ -282,7 +282,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return filer;
     }
 
-    protected final Name targetClassSimpleName() {
+    private Name targetClassSimpleName() {
         return this.targetClassType.getSimpleName();
     }
 
