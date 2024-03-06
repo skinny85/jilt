@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
  * @see Builder#style
  * @see BuilderStyle
  */
-@Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD})
+@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD})
 @Retention(RetentionPolicy.SOURCE)
 public @interface BuilderInterfaces {
     /**

@@ -1,8 +1,9 @@
 package org.jilt.internal;
 
-import org.jilt.Builder;
-import org.jilt.BuilderInterfaces;
-
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -12,10 +13,9 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.util.Elements;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import org.jilt.Builder;
+import org.jilt.BuilderInterfaces;
+import org.jilt.utils.Annotations;
 
 public final class BuilderGeneratorFactory {
     private static final Set<String> ALLOWED_TYPE_KINDS;
@@ -34,9 +34,9 @@ public final class BuilderGeneratorFactory {
         this.elements = elements;
     }
 
-    public BuilderGenerator forElement(Element annotatedElement) throws Exception {
-        TypeElement targetClass;
-        List<? extends VariableElement> attributes;
+    public BuilderGenerator forElement(final Element annotatedElement, final Annotations annotations) throws Exception {
+        final TypeElement targetClass;
+        final List<? extends VariableElement> attributes;
         ExecutableElement targetFactoryMethod = null;
 
         ElementKind kind = annotatedElement.getKind();
@@ -66,8 +66,8 @@ public final class BuilderGeneratorFactory {
                     "@Builder can only be placed on classes/records, constructors or static methods");
         }
 
-        Builder builderAnnotation = annotatedElement.getAnnotation(Builder.class);
-        BuilderInterfaces builderInterfaces = annotatedElement.getAnnotation(BuilderInterfaces.class);
+        final Builder builderAnnotation = annotations.getBuilder() == null ? annotatedElement.getAnnotation(Builder.class) : annotations.getBuilder();
+        final BuilderInterfaces builderInterfaces = annotations.getBuilderInterface() == null ? annotatedElement.getAnnotation(BuilderInterfaces.class) : annotations.getBuilderInterface();
         switch (builderAnnotation.style()) {
             case STAGED:
             case TYPE_SAFE:
