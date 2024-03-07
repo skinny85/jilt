@@ -21,7 +21,7 @@ import java.util.Set;
 public final class BuilderGeneratorFactory {
     private static final Set<String> ALLOWED_TYPE_KINDS;
     static {
-        ALLOWED_TYPE_KINDS = new HashSet<>(2);
+        ALLOWED_TYPE_KINDS = new HashSet<String>(2);
         ALLOWED_TYPE_KINDS.add(ElementKind.CLASS.name());
         // we don't want to use ElementKind.RECORD because it is not available in Java versions before 16
         ALLOWED_TYPE_KINDS.add("RECORD");
@@ -41,10 +41,10 @@ public final class BuilderGeneratorFactory {
         ExecutableElement targetFactoryMethod = null;
 
         ElementKind kind = annotatedElement.getKind();
-        if (kindIsClassOrRecord(kind)) {
+        if (this.kindIsClassOrRecord(kind)) {
             targetClass = (TypeElement) annotatedElement;
             List<? extends Element> enclosedElements = targetClass.getEnclosedElements();
-            List<VariableElement> fields = new ArrayList<>(enclosedElements.size());
+            List<VariableElement> fields = new ArrayList<VariableElement>(enclosedElements.size());
             for (Element field : enclosedElements) {
                 if (field.getKind() == ElementKind.FIELD &&
                         !field.getModifiers().contains(Modifier.STATIC) &&
