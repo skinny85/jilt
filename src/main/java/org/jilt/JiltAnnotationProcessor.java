@@ -37,13 +37,13 @@ public class JiltAnnotationProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        getAnnotatedElements(roundEnv).forEach((annotatedElement, builderAnnotations) -> {
+        for (Map.Entry<Element, Annotations> entry : getAnnotatedElements(roundEnv).entrySet()) {
             try {
-                builderGeneratorFactory.forElement(annotatedElement, builderAnnotations).generateBuilderClass();
+                builderGeneratorFactory.forElement(entry.getKey(), entry.getValue()).generateBuilderClass();
             } catch (Exception e) {
-                error(annotatedElement, e.getMessage());
+                error(entry.getKey(), e.getMessage());
             }
-        });
+        }
 
         return true;
     }
@@ -63,7 +63,7 @@ public class JiltAnnotationProcessor extends AbstractProcessor {
     }
 
     private Map<Element, Annotations> initMap(Set<? extends Element> builderElements, Builder builderAnnotation, BuilderInterfaces builderInterfaces) {
-        Map<Element, Annotations> map = new HashMap<>();
+        Map<Element, Annotations> map = new HashMap<Element, Annotations>();
         for (Element element : builderElements) {
             map.put(element, new Annotations(builderAnnotation, builderInterfaces));
         }
