@@ -40,7 +40,7 @@ public class JiltAnnotationProcessor extends AbstractProcessor {
         getAnnotatedElements(roundEnv).forEach((annotatedElement, builderAnnotations) -> {
             try {
                 builderGeneratorFactory.forElement(annotatedElement, builderAnnotations).generateBuilderClass();
-            } catch (final Exception e) {
+            } catch (Exception e) {
                 error(annotatedElement, e.getMessage());
             }
         });
