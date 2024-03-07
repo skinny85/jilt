@@ -1,9 +1,9 @@
 package org.jilt.internal;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import org.jilt.Builder;
+import org.jilt.BuilderInterfaces;
+import org.jilt.utils.Annotations;
+
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -13,14 +13,15 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.util.Elements;
-import org.jilt.Builder;
-import org.jilt.BuilderInterfaces;
-import org.jilt.utils.Annotations;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public final class BuilderGeneratorFactory {
     private static final Set<String> ALLOWED_TYPE_KINDS;
     static {
-        ALLOWED_TYPE_KINDS = new HashSet<String>(2);
+        ALLOWED_TYPE_KINDS = new HashSet<>(2);
         ALLOWED_TYPE_KINDS.add(ElementKind.CLASS.name());
         // we don't want to use ElementKind.RECORD because it is not available in Java versions before 16
         ALLOWED_TYPE_KINDS.add("RECORD");
@@ -34,16 +35,16 @@ public final class BuilderGeneratorFactory {
         this.elements = elements;
     }
 
-    public BuilderGenerator forElement(final Element annotatedElement, final Annotations annotations) throws Exception {
-        final TypeElement targetClass;
-        final List<? extends VariableElement> attributes;
+    public BuilderGenerator forElement(Element annotatedElement, Annotations annotations) throws Exception {
+        TypeElement targetClass;
+        List<? extends VariableElement> attributes;
         ExecutableElement targetFactoryMethod = null;
 
         ElementKind kind = annotatedElement.getKind();
-        if (this.kindIsClassOrRecord(kind)) {
+        if (kindIsClassOrRecord(kind)) {
             targetClass = (TypeElement) annotatedElement;
             List<? extends Element> enclosedElements = targetClass.getEnclosedElements();
-            List<VariableElement> fields = new ArrayList<VariableElement>(enclosedElements.size());
+            List<VariableElement> fields = new ArrayList<>(enclosedElements.size());
             for (Element field : enclosedElements) {
                 if (field.getKind() == ElementKind.FIELD &&
                         !field.getModifiers().contains(Modifier.STATIC) &&
@@ -66,8 +67,8 @@ public final class BuilderGeneratorFactory {
                     "@Builder can only be placed on classes/records, constructors or static methods");
         }
 
-        final Builder builderAnnotation = annotations.getBuilder() == null ? annotatedElement.getAnnotation(Builder.class) : annotations.getBuilder();
-        final BuilderInterfaces builderInterfaces = annotations.getBuilderInterface() == null ? annotatedElement.getAnnotation(BuilderInterfaces.class) : annotations.getBuilderInterface();
+        Builder builderAnnotation = annotations.getBuilder() == null ? annotatedElement.getAnnotation(Builder.class) : annotations.getBuilder();
+        BuilderInterfaces builderInterfaces = annotations.getBuilderInterface() == null ? annotatedElement.getAnnotation(BuilderInterfaces.class) : annotations.getBuilderInterface();
         switch (builderAnnotation.style()) {
             case STAGED:
             case TYPE_SAFE:

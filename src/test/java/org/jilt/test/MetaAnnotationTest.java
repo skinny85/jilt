@@ -1,16 +1,15 @@
 package org.jilt.test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import org.jilt.test.data.constructor.MetaConstuctorValue;
-import org.jilt.test.data.constructor.MetaConstuctorValueBuilder;
+import org.jilt.test.data.constructor.MetaConstructorValue;
+import org.jilt.test.data.constructor.MetaConstructorValueBuilder;
 import org.junit.Test;
 
-public class MetaAnnotationTest {
+import static org.assertj.core.api.Assertions.assertThat;
 
+public class MetaAnnotationTest {
   @Test
   public void test__meta_builder_on_constructor() {
-    final MetaConstuctorValue value = MetaConstuctorValueBuilder.builder()
+    MetaConstructorValue value = MetaConstructorValueBuilder.builder()
         .withAttr2("attr2_value")
         .withAttr4(4)
         .withAttr3(true)
@@ -21,5 +20,4 @@ public class MetaAnnotationTest {
     assertThat(value.attr3).isTrue();
     assertThat(value.attr4).isEqualTo(4);
   }
-
 }
