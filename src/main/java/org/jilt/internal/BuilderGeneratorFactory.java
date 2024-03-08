@@ -2,6 +2,7 @@ package org.jilt.internal;
 
 import org.jilt.Builder;
 import org.jilt.BuilderInterfaces;
+import org.jilt.utils.Annotations;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Element;
@@ -34,7 +35,7 @@ public final class BuilderGeneratorFactory {
         this.elements = elements;
     }
 
-    public BuilderGenerator forElement(Element annotatedElement) throws Exception {
+    public BuilderGenerator forElement(Element annotatedElement, Annotations annotations) throws Exception {
         TypeElement targetClass;
         List<? extends VariableElement> attributes;
         ExecutableElement targetFactoryMethod = null;
@@ -66,8 +67,8 @@ public final class BuilderGeneratorFactory {
                     "@Builder can only be placed on classes/records, constructors or static methods");
         }
 
-        Builder builderAnnotation = annotatedElement.getAnnotation(Builder.class);
-        BuilderInterfaces builderInterfaces = annotatedElement.getAnnotation(BuilderInterfaces.class);
+        Builder builderAnnotation = annotations.getBuilder() == null ? annotatedElement.getAnnotation(Builder.class) : annotations.getBuilder();
+        BuilderInterfaces builderInterfaces = annotations.getBuilderInterface() == null ? annotatedElement.getAnnotation(BuilderInterfaces.class) : annotations.getBuilderInterface();
         switch (builderAnnotation.style()) {
             case STAGED:
             case TYPE_SAFE:
