@@ -1,4 +1,4 @@
-package org.jilt.test.data.annotations;
+package org.jilt.test.data.meta;
 
 import org.jilt.Builder;
 import org.jilt.BuilderInterfaces;

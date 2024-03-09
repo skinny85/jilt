@@ -2,9 +2,9 @@ package org.jilt.internal;
 
 import org.jilt.Builder;
 import org.jilt.BuilderInterfaces;
-import org.jilt.utils.Annotations;
 
 import javax.annotation.processing.Filer;
+import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -35,7 +35,37 @@ public final class BuilderGeneratorFactory {
         this.elements = elements;
     }
 
-    public BuilderGenerator forElement(Element annotatedElement, Annotations annotations) throws Exception {
+    public BuilderGenerator forElement(Element annotatedElement, RoundEnvironment roundEnv) throws Exception {
+        return annotatedElement.getKind() == ElementKind.ANNOTATION_TYPE
+                ? this.new MetaAnnotationBuilderGenerator((TypeElement) annotatedElement, roundEnv)
+                : this.forNonAnnotationElement(annotatedElement, annotatedElement.getAnnotation(Builder.class),
+                     annotatedElement.getAnnotation(BuilderInterfaces.class));
+    }
+
+    private final class MetaAnnotationBuilderGenerator implements BuilderGenerator {
+        private final TypeElement metaAnnotation;
+        private final RoundEnvironment roundEnv;
+        private final Builder builderAnnotation;
+        private final BuilderInterfaces builderInterfaces;
+
+        public MetaAnnotationBuilderGenerator(TypeElement metaAnnotation, RoundEnvironment roundEnv) {
+            this.metaAnnotation = metaAnnotation;
+            this.roundEnv = roundEnv;
+            this.builderAnnotation = metaAnnotation.getAnnotation(Builder.class);
+            this.builderInterfaces = metaAnnotation.getAnnotation(BuilderInterfaces.class);
+        }
+
+        @Override
+        public void generateBuilderClass() throws Exception {
+            for (Element annotatedElement : this.roundEnv.getElementsAnnotatedWith(this.metaAnnotation)) {
+                BuilderGeneratorFactory.this.forNonAnnotationElement(annotatedElement,
+                        this.builderAnnotation, this.builderInterfaces).generateBuilderClass();
+            }
+        }
+    }
+
+    private BuilderGenerator forNonAnnotationElement(Element annotatedElement, Builder builderAnnotation,
+            BuilderInterfaces builderInterfaces) throws Exception {
         TypeElement targetClass;
         List<? extends VariableElement> attributes;
         ExecutableElement targetFactoryMethod = null;
@@ -67,8 +97,6 @@ public final class BuilderGeneratorFactory {
                     "@Builder can only be placed on classes/records, constructors or static methods");
         }
 
-        Builder builderAnnotation = annotations.getBuilder() == null ? annotatedElement.getAnnotation(Builder.class) : annotations.getBuilder();
-        BuilderInterfaces builderInterfaces = annotations.getBuilderInterface() == null ? annotatedElement.getAnnotation(BuilderInterfaces.class) : annotations.getBuilderInterface();
         switch (builderAnnotation.style()) {
             case STAGED:
             case TYPE_SAFE:

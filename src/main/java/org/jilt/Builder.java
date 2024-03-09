@@ -225,7 +225,7 @@ import java.lang.annotation.Target;
  * @see #buildMethod
  * @see BuilderInterfaces
  */
-@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD})
+@Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.SOURCE)
 public @interface Builder {
     /**
