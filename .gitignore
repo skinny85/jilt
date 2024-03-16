@@ -4,3 +4,4 @@ out/
 /build/
 src/main/generated
 src/test/generated
+.java-version
