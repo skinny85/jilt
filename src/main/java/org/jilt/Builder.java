@@ -310,6 +310,11 @@ public @interface Builder {
     String buildMethod() default "";
 
     /**
+     * ToDo add a description here. But also change it to a String
+     */
+    boolean toBuilder() default false;
+
+    /**
      * Annotation that ignores the given field of a class when generating a Builder for that class.
      * Used when {@link Builder} is placed on the class being built itself.
      *

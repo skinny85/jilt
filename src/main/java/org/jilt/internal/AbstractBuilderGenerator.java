@@ -2,6 +2,7 @@ package org.jilt.internal;
 
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -17,6 +18,8 @@ import org.jilt.utils.Utils;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
@@ -80,6 +83,9 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 .addStatement("return new $T()", this.builderClassTypeName())
                 .build());
 
+        // add a static toBuilder() method to the builder class
+        this.addToBuilderMethod(builderClassBuilder);
+
         for (VariableElement attribute : attributes) {
             String fieldName = attributeSimpleName(attribute);
             TypeName fieldType = TypeName.get(attribute.asType());
@@ -119,6 +125,63 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 .builder(builderClassPackage(), builderClassBuilder.build())
                 .build();
         javaFile.writeTo(filer);
+    }
+
+    private void addToBuilderMethod(TypeSpec.Builder builderClassBuilder) {
+        if (!this.builderAnnotation.toBuilder()) {
+            return;
+        }
+        String targetClassParam = Utils.deCapitalize(this.targetClassSimpleName().toString());
+        MethodSpec.Builder toBuilderMethod = MethodSpec
+                .methodBuilder("toBuilder")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addTypeVariables(this.builderClassTypeParameters())
+                .returns(this.builderClassTypeName())
+                .addParameter(ParameterSpec
+                        .builder(this.targetClassTypeName(), targetClassParam)
+                        .build());
+
+        CodeBlock.Builder buildStatement = CodeBlock.builder();
+        buildStatement.add("return new $T()", this.builderClassTypeName());
+        // iterate through all attributes, and add them to the build statement
+        for (VariableElement attribute : attributes) {
+            String attributeAccess = this.accessAttributeOfTargetClass(attribute);
+            buildStatement.add("\n");
+            buildStatement.indent();
+            buildStatement.add(".$L($L.$L)",
+                    this.setterMethodName(attribute),
+                    targetClassParam, attributeAccess);
+            buildStatement.unindent();
+        }
+        buildStatement.add(";\n");
+
+        builderClassBuilder.addMethod(toBuilderMethod
+                .addCode(buildStatement.build())
+                .build());
+    }
+
+    private String accessAttributeOfTargetClass(VariableElement attribute) {
+        String fieldName = this.attributeSimpleName(attribute);
+        String getterName = "get" + Utils.capitalize(fieldName);
+        for (Element member : this.elements.getAllMembers(this.targetClassType)) {
+            // if there's a getter method, use it
+            if (elementIsMethodWithoutArgumentsCalled(member, getterName)) {
+                return member.getSimpleName().toString() + "()";
+            }
+            // if there's a no-argument method with the field name,
+            // like done in Records, use that
+            if (elementIsMethodWithoutArgumentsCalled(member, fieldName)) {
+                return member.getSimpleName().toString() + "()";
+            }
+        }
+        // if we haven't found a sensible method, fall back to the field name
+        return fieldName;
+    }
+
+    private static boolean elementIsMethodWithoutArgumentsCalled(Element element, String methodName) {
+        return element.getKind() == ElementKind.METHOD &&
+                element.getSimpleName().toString().equals(methodName) &&
+                ((ExecutableElement) element).getParameters().isEmpty();
     }
 
     private List<String> attributeNames() {
