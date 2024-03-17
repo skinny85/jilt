@@ -128,12 +128,15 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     }
 
     private void addToBuilderMethod(TypeSpec.Builder builderClassBuilder) {
-        if (!this.builderAnnotation.toBuilder()) {
+        // if the @Builder annotation has an empty toBuilder attribute,
+        // don't generate this method
+        if (this.builderAnnotation.toBuilder().isEmpty()) {
             return;
         }
+
         String targetClassParam = Utils.deCapitalize(this.targetClassSimpleName().toString());
         MethodSpec.Builder toBuilderMethod = MethodSpec
-                .methodBuilder("toBuilder")
+                .methodBuilder(this.builderAnnotation.toBuilder())
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addTypeVariables(this.builderClassTypeParameters())
                 .returns(this.builderClassTypeName())
@@ -141,35 +144,35 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                         .builder(this.targetClassTypeName(), targetClassParam)
                         .build());
 
-        CodeBlock.Builder buildStatement = CodeBlock.builder();
-        buildStatement.add("return new $T()", this.builderClassTypeName());
-        // iterate through all attributes, and add them to the build statement
+        CodeBlock.Builder methodBody = CodeBlock.builder();
+        String returnVarName = Utils.deCapitalize(this.builderClassClassName.simpleName());
+        methodBody.addStatement("$T $L = new $T()", this.builderClassTypeName(),
+                returnVarName, this.builderClassTypeName());
+        // iterate through all attributes,
+        // and add a setter statement to the method body for each
         for (VariableElement attribute : attributes) {
             String attributeAccess = this.accessAttributeOfTargetClass(attribute);
-            buildStatement.add("\n");
-            buildStatement.indent();
-            buildStatement.add(".$L($L.$L)",
+            methodBody.addStatement("$L.$L($L.$L)",
+                    returnVarName,
                     this.setterMethodName(attribute),
                     targetClassParam, attributeAccess);
-            buildStatement.unindent();
         }
-        buildStatement.add(";\n");
+        methodBody.addStatement("return $L", returnVarName);
 
         builderClassBuilder.addMethod(toBuilderMethod
-                .addCode(buildStatement.build())
+                .addCode(methodBody.build())
                 .build());
     }
 
     private String accessAttributeOfTargetClass(VariableElement attribute) {
         String fieldName = this.attributeSimpleName(attribute);
-        String getterName = "get" + Utils.capitalize(fieldName);
         for (Element member : this.elements.getAllMembers(this.targetClassType)) {
             // if there's a getter method, use it
-            if (elementIsMethodWithoutArgumentsCalled(member, getterName)) {
+            if (elementIsMethodWithoutArgumentsCalled(member, "get" + Utils.capitalize(fieldName))) {
                 return member.getSimpleName().toString() + "()";
             }
             // if there's a no-argument method with the field name,
-            // like done in Records, use that
+            // like with Records, use that
             if (elementIsMethodWithoutArgumentsCalled(member, fieldName)) {
                 return member.getSimpleName().toString() + "()";
             }

@@ -310,9 +310,15 @@ public @interface Builder {
     String buildMethod() default "";
 
     /**
-     * ToDo add a description here. But also change it to a String
+     * Allows generating a static method in the Builder class that creates a new instance of it,
+     * initialized with values from a provided instance of the built class.
+     * This is useful for easily creating copies of the built class with only a few properties changed,
+     * while still keeping the original class immutable.
+     * <p>
+     * The value of this attribute is the name to use for the generated method.
+     * The default is the empty string, which means no method will be generated.
      */
-    boolean toBuilder() default false;
+    String toBuilder() default "";
 
     /**
      * Annotation that ignores the given field of a class when generating a Builder for that class.

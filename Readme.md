@@ -408,6 +408,12 @@ practically all aspects of the generated Builder (all of them are optional):
     name of the built class (for example, `person` when building a `Person` class).
 * `buildMethod` allows you to change the name of the final method invoked on the Builder to
     obtain an instance of the built class. The default name of that method is `build`.
+* `toBuilder` allows you to set the name of the static method in the Builder class that creates a new instance of it,
+    initialized with values from the provided instance of the built class.
+    This is useful for easily creating copies of the built class with only a few properties changed,
+    while still keeping the original class immutable.
+    The default value of this attribute is the empty string,
+    which means this method will not be generated.
 
 ##### @BuilderInterfaces annotation
 
