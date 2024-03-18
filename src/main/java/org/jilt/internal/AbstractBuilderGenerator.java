@@ -322,6 +322,13 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 return annotation;
             }
         }
+        // some annotations are applied to the type, instead of the attribute,
+        // like the ones from JSpecify
+        for (AnnotationMirror annotation : attribute.asType().getAnnotationMirrors()) {
+            if (annotationIsCalledNullable(annotation)) {
+                return annotation;
+            }
+        }
         return null;
     }
 
