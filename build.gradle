@@ -87,10 +87,13 @@ repositories {
 if (JavaVersion.current() <= JavaVersion.VERSION_11) {
     sourceCompatibility = JavaVersion.VERSION_1_6
     targetCompatibility = JavaVersion.VERSION_1_6
-    sourceSets.test.java.exclude '**/Optional*.java'
+    sourceSets.test.java.exclude '**/Optional*.java', '**/JSpecify*.java'
 } else {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+    dependencies {
+        testImplementation 'org.jspecify:jspecify:0.3.0'
+    }
 }
 if (JavaVersion.current() < JavaVersion.VERSION_16) {
     sourceSets.test.java.exclude '**/Record*.java'
@@ -102,7 +105,6 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.assertj:assertj-core:3.6.2'
     testImplementation 'com.google.code.findbugs:jsr305:3.0.2'
-    testImplementation 'org.jspecify:jspecify:0.3.0'
     testAnnotationProcessor project
 }
 // required in Gradle 8, since the above line 'testAnnotationProcessor project'
