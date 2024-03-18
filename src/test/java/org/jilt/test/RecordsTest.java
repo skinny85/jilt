@@ -33,7 +33,7 @@ public class RecordsTest {
     @Test
     public void to_builder_works_for_records() {
         RecordNoWorkaround original = new RecordNoWorkaround("Adam", 23);
-        RecordNoWorkaround copy = RecordNoWorkaroundBuilder.toBuilder(original)
+        RecordNoWorkaround copy = RecordNoWorkaroundBuilder.copy(original)
                 .age(-1)
                 .build();
 

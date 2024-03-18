@@ -209,7 +209,13 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         MethodSpec.Builder setter = MethodSpec
                 .methodBuilder(this.setterMethodName(attribute))
                 .addModifiers(Modifier.PUBLIC)
-                .returns(this.returnTypeForSetterFor(attribute, mangleTypeParameters))
+                .returns(abstractMethod
+                        // for setters in interfaces, we want to return a different interface type
+                        ? this.returnTypeForSetterFor(attribute, mangleTypeParameters)
+                        // for setters in the Builder class, we want to return itself
+                        // (this is useful for toBuilder() usecases,
+                        // where we chain methods of the Builder class directly)
+                        : this.builderClassTypeName())
                 .addParameter(this.setterParameterSpec(attribute, parameterType));
         if (abstractMethod) {
             setter.addModifiers(Modifier.ABSTRACT);

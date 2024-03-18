@@ -2,6 +2,7 @@ package org.jilt.test.data.tobuilder;
 
 import org.jilt.Builder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ToBuilderValue {
@@ -12,7 +13,7 @@ public class ToBuilderValue {
     @Builder(toBuilder = "toBuilder")
     public ToBuilderValue(int getterAttr, List<String> methodAttr, char fieldAttr) {
         this.getterAttr = getterAttr;
-        this.methodAttr = methodAttr;
+        this.methodAttr = new ArrayList<String>(methodAttr);
         this.fieldAttr = fieldAttr;
     }
 
