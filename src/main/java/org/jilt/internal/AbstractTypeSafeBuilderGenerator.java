@@ -2,7 +2,6 @@ package org.jilt.internal;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
@@ -66,9 +65,9 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
         return interfaceNameFromBaseName(Utils.capitalize(attributeSimpleName(attribute)));
     }
 
-    protected final List<MethodSpec> generateInterfaceSetterMethods(VariableElement attribute,
+    protected final MethodSpec generateInterfaceSetterMethod(VariableElement attribute,
             boolean mangleTypeParameters) {
-        return this.generateSetterMethods(attribute, mangleTypeParameters,
+        return this.generateSetterMethod(attribute, mangleTypeParameters,
                 /* abstractMethod */ true);
     }
 

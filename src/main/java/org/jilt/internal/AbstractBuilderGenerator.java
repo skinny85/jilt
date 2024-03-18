@@ -29,7 +29,6 @@ import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -97,10 +96,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                             Modifier.PRIVATE)
                     .build());
 
-            List<MethodSpec> builderSetterMethods = this.generateBuilderSetterMethods(attribute);
-            for (MethodSpec setterMethod : builderSetterMethods) {
-                builderClassBuilder.addMethod(setterMethod);
-            }
+            builderClassBuilder.addMethod(this.generateBuilderSetterMethod(attribute));
         }
 
         // add the 'build' method
@@ -201,12 +197,12 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     protected abstract void enhance(TypeSpec.Builder builderClassBuilder);
 
-    private List<MethodSpec> generateBuilderSetterMethods(VariableElement attribute) {
-        return this.generateSetterMethods(attribute, /* mangleTypeParameters */ false,
+    private MethodSpec generateBuilderSetterMethod(VariableElement attribute) {
+        return this.generateSetterMethod(attribute, /* mangleTypeParameters */ false,
                 /* abstractMethod */ false);
     }
 
-    protected final List<MethodSpec> generateSetterMethods(VariableElement attribute, boolean mangleTypeParameters,
+    protected final MethodSpec generateSetterMethod(VariableElement attribute, boolean mangleTypeParameters,
             boolean abstractMethod) {
         String fieldName = this.attributeSimpleName(attribute);
         TypeName parameterType = this.attributeType(attribute, mangleTypeParameters);
@@ -222,7 +218,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                     .addStatement("return this");
         }
 
-        return Collections.singletonList(setter.build());
+        return setter.build();
     }
 
     protected abstract TypeName returnTypeForSetterFor(VariableElement attribute, boolean withMangledTypeParameters);
