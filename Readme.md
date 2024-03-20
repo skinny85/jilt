@@ -404,7 +404,7 @@ practically all aspects of the generated Builder (all of them are optional):
 * `setterPrefix` allows you to add a prefix to the names of the generated setter methods.
     The default is to not have any prefix (the setter names will be the same as the property names).
 * `factoryMethod` allows you to change the name of the generated static factory method for
-    constructing Builder instances. The default is for the name to be equal to the uncapitalized
+    constructing Builder instances. The default is for the name to be equal to the un-capitalized
     name of the built class (for example, `person` when building a `Person` class).
 * `buildMethod` allows you to change the name of the final method invoked on the Builder to
     obtain an instance of the built class. The default name of that method is `build`.
@@ -440,6 +440,40 @@ It has the following attributes (all of them are optional):
   which is invoked to obtain an instance of the target class.
   The default name for that interface is `Optionals` for `BuilderStyle.STAGED` Builders,
   and `Build` for `BuilderStyle.STAGED_PRESERVING_ORDER` ones.
+
+##### Meta-annotations
+
+In some cases, you may want to re-use the same Builder configuration for multiple classes.
+For example, you might decide that every value class in your project should use a Staged Builder,
+with "set" as the prefix for setter methods, "create" as the name of the `build` method,
+and "B_" as the prefix of the per-property interface names used for the Builder stages.
+In such situations, instead of repeating the same annotations in multiple places,
+you can instead define your own annotation,
+and annotate it with `@Builder` and `@BuilderInterfaces`:
+
+```java
+import org.jilt.Builder;
+import org.jilt.BuilderInterfaces;
+import org.jilt.BuilderStyle;
+
+@Builder(style = BuilderStyle.STAGED, setterPrefix = "set", buildMethod = "create")
+@BuilderInterfaces(innerNames = "B_*")
+public @interface MyBuilder {
+}
+```
+
+And then, you can place this `MyBuilder` so-called _meta annotation_ wherever `@Builder`
+can be placed (so, a class, constructor, or static method),
+and the effect will be as if that element was annotated with the same `@Builder`
+and `@BuilderInterfaces` values as `@MyBuilder` is annotated with,
+thus avoiding any duplication in your code:
+
+```java
+@MyBuilder // uses @Builder and @BuilderInterfaces values from @MyBuilder
+public final class MyValueClass {
+    // ...
+}
+```
 
 #### Working in an IDE
 
