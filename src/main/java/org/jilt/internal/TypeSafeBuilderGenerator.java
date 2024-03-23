@@ -18,8 +18,8 @@ import java.util.List;
 final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
     TypeSafeBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
             Builder builderAnnotation, BuilderInterfaces builderInterfaces,
-            ExecutableElement targetFactoryMethod, Elements elements, Filer filer) {
-        super(targetClass, attributes, builderAnnotation, builderInterfaces, targetFactoryMethod,
+            ExecutableElement targetCreationMethod, Elements elements, Filer filer) {
+        super(targetClass, attributes, builderAnnotation, builderInterfaces, targetCreationMethod,
                 elements, filer);
     }
 

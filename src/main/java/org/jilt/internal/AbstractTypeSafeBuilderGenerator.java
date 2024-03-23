@@ -24,8 +24,8 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
 
     AbstractTypeSafeBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
             Builder builderAnnotation, BuilderInterfaces builderInterfaces,
-            ExecutableElement targetFactoryMethod, Elements elements, Filer filer) {
-        super(targetClass, attributes, builderAnnotation, targetFactoryMethod, elements, filer);
+            ExecutableElement targetCreationMethod, Elements elements, Filer filer) {
+        super(targetClass, attributes, builderAnnotation, targetCreationMethod, elements, filer);
         this.builderInterfaces = builderInterfaces;
     }
 

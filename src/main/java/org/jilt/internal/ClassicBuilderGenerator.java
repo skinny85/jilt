@@ -13,9 +13,9 @@ import java.util.List;
 
 final class ClassicBuilderGenerator extends AbstractBuilderGenerator {
     ClassicBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
-                            Builder builderAnnotation, ExecutableElement targetFactoryName,
+                            Builder builderAnnotation, ExecutableElement targetCreationMethod,
                             Elements elements, Filer filer) {
-        super(targetClass, attributes, builderAnnotation, targetFactoryName, elements, filer);
+        super(targetClass, attributes, builderAnnotation, targetCreationMethod, elements, filer);
     }
 
     @Override

@@ -475,6 +475,67 @@ public final class MyValueClass {
 }
 ```
 
+##### Supporting classes with private constructors
+
+In some cases, you might want to force customers of a class to only be able to instantiate it through its Builder,
+and not through its constructor.
+When writing the Builder code by hand,
+you would achieve this by making the constructor of the class private,
+and making Builder nested inside the main class.
+
+Unfortunately, annotation processors cannot modify hand-written classes,
+only create new ones
+(yes, Lombok manages to sidestep this limitation,
+but it does it in a way that is
+[considered a hack](https://notatube.blogspot.com/2010/11/project-lombok-trick-explained.html)),
+so Jilt cannot generate the Builder inside the main class.
+
+Because of this, if you place `@Builder` on a private constructor or static factory method,
+Jilt changes the generation behavior: the Builder class becomes abstract,
+the fields are `protected` instead of `private`, and the `build` method becomes abstract too.
+With this, you can extend the Builder class in a nested class of the main class and override the `build()`
+method to call the private constructor,
+using the fields of the parent class as values of the properties.
+You can also provide a static factory method in your class that returns the Builder instance,
+conventionally called just `builder()`,
+which allows you to make the nested class private as well.
+
+For example, if we wanted to make the constructor of the above `User` class private,
+it would look something like this:
+
+```java
+public final class User {
+    public final String email, username, firstName, lastName, displayName;
+
+    @Builder(style = BuilderStyle.STAGED)
+    private User(String email, @Opt String username, String firstName,
+            String lastName, @Opt String displayName) {
+        this.email = email;
+        this.username = username == null ? email : username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.displayName = displayName == null
+                ? firstName + " " + lastName
+                : displayName;
+    }
+
+    private static class InnerBuilder extends UserBuilder {
+        @Override
+        public User build() {
+            return new User(email, username, firstName, lastName, displayName);
+        }
+    }
+
+    public static UserBuilders.Email builder() {
+        return new InnerBuilder();
+    }
+}
+```
+
+With the above code, the only way to create an instance of `User`
+would be to use the `User.builder()` static method,
+and then instantiate it through the (Staged in this case) Builder.
+
 #### Working in an IDE
 
 Annotation processors can be a little tricky to get working correctly in an IDE.
