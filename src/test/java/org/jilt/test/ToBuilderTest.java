@@ -2,6 +2,8 @@ package org.jilt.test;
 
 import org.jilt.test.data.tobuilder.ToBuilderValue;
 import org.jilt.test.data.tobuilder.ToBuilderValueBuilder;
+import org.jilt.test.data.tobuilder.User;
+import org.jilt.test.data.tobuilder.UserBuilder;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -16,5 +18,23 @@ public class ToBuilderTest {
                 .build();
 
         assertThat(value).isEqualTo(builder);
+    }
+
+    @Test
+    public void only_a_single_required_property_can_be_set_with_to_builder_in_staged() {
+        User original = UserBuilder.user()
+                .email("email@example.com")
+                .firstName("First")
+                .lastName("Last")
+                .build();
+        User modified = UserBuilder.modifiedUser(original)
+                .firstName("_changed_")
+                .build();
+
+        assertThat(modified.email).isEqualTo("email@example.com");
+        assertThat(modified.username).isEqualTo("email@example.com");
+        assertThat(modified.firstName).isEqualTo("_changed_");
+        assertThat(modified.lastName).isEqualTo("Last");
+        assertThat(modified.displayName).isEqualTo("First Last");
     }
 }

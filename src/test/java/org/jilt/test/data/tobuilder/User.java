@@ -1,4 +1,4 @@
-package org.jilt.test.data.user;
+package org.jilt.test.data.tobuilder;
 
 import org.jilt.Builder;
 import org.jilt.BuilderStyle;
