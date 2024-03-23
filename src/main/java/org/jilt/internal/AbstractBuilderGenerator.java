@@ -23,7 +23,6 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
-import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
@@ -41,13 +40,13 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private final List<? extends VariableElement> attributes;
     private final Set<VariableElement> optionalAttributes;
     private final Builder builderAnnotation;
-    private final ExecutableElement targetFactoryMethod;
+    private final ExecutableElement targetCreationMethod;
 
     private final String builderClassPackage;
     private final ClassName builderClassClassName;
 
     AbstractBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
-            Builder builderAnnotation, ExecutableElement targetFactoryMethod,
+            Builder builderAnnotation, ExecutableElement targetCreationMethod,
             Elements elements, Filer filer) {
         this.elements = elements;
         this.filer = filer;
@@ -56,7 +55,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         this.attributes = attributes;
         this.optionalAttributes = initOptionalAttributes();
         this.builderAnnotation = builderAnnotation;
-        this.targetFactoryMethod = targetFactoryMethod;
+        this.targetCreationMethod = targetCreationMethod;
 
         this.builderClassPackage = this.initBuilderClassPackage();
         this.builderClassClassName = ClassName.get(this.builderClassPackage(),
@@ -70,50 +69,38 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         // builder class
         TypeSpec.Builder builderClassBuilder = TypeSpec.classBuilder(this.builderClassClassName)
                 .addAnnotation(this.generatedAnnotation())
-                .addModifiers(Modifier.PUBLIC)
+                .addModifiers(this.determineBuilderClassModifiers())
                 .addTypeVariables(this.builderClassTypeParameters());
 
         // add a static factory method to the builder class
-        builderClassBuilder.addMethod(MethodSpec
-                .methodBuilder(this.builderFactoryMethodName())
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addTypeVariables(this.builderClassTypeParameters())
-                .returns(builderFactoryMethodReturnType())
-                .addStatement("return new $T()", this.builderClassTypeName())
-                .build());
+        MethodSpec staticFactoryMethod = this.makeStaticFactoryMethod();
+        if (staticFactoryMethod != null) {
+            builderClassBuilder.addMethod(staticFactoryMethod);
+        }
 
         // add a static toBuilder() method to the builder class
-        this.addToBuilderMethod(builderClassBuilder);
+        MethodSpec toBuilderMethod = this.makeToBuilderMethod();
+        if (toBuilderMethod != null) {
+            builderClassBuilder.addMethod(toBuilderMethod);
+        }
 
+        // add a field and setter for each attribute of the built class
         for (VariableElement attribute : attributes) {
             String fieldName = attributeSimpleName(attribute);
             TypeName fieldType = TypeName.get(attribute.asType());
 
             builderClassBuilder.addField(FieldSpec
-                    .builder(
-                            fieldType,
-                            fieldName,
-                            Modifier.PRIVATE)
+                    .builder(fieldType, fieldName,
+                            this.builderClassNeedsToBeAbstract()
+                                ? Modifier.PROTECTED
+                                : Modifier.PRIVATE)
                     .build());
 
             builderClassBuilder.addMethod(this.generateBuilderSetterMethod(attribute));
         }
 
         // add the 'build' method
-        MethodSpec.Builder buildMethod = MethodSpec
-                .methodBuilder(buildMethodName())
-                .addModifiers(Modifier.PUBLIC)
-                .returns(targetClassTypeName());
-        String attributes = Utils.join(attributeNames());
-        if (this.targetFactoryMethod == null) {
-            buildMethod.addStatement("return new $T($L)", targetClassTypeName(), attributes);
-        } else {
-            buildMethod.addStatement("return $T.$L($L)",
-                    // using ClassName gets rid of any type parameters the class might have
-                    ClassName.get((TypeElement) this.targetFactoryMethod.getEnclosingElement()),
-                    this.targetFactoryMethod.getSimpleName(), attributes);
-        }
-        builderClassBuilder.addMethod(buildMethod.build());
+        builderClassBuilder.addMethod(this.makeBuildMethod());
 
         enhance(builderClassBuilder);
 
@@ -123,11 +110,46 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         javaFile.writeTo(filer);
     }
 
-    private void addToBuilderMethod(TypeSpec.Builder builderClassBuilder) {
+    private Modifier[] determineBuilderClassModifiers() {
+        List<Modifier> modifiers = new ArrayList<Modifier>(2);
+        if (this.builderClassNeedsToBeAbstract()) {
+            // if the creation method is private,
+            // we need to make the Builder abstract
+            modifiers.add(Modifier.ABSTRACT);
+            // if the Builder is in the same package as the target class,
+            // make it package-private (it will only be available through the target class anyway,
+            // because of the creation method being private)
+            if (!this.builderClassPackage.equals(this.determineTargetClassPackage())) {
+                modifiers.add(Modifier.PUBLIC);
+            }
+        } else {
+            modifiers.add(Modifier.PUBLIC);
+        }
+        return modifiers.toArray(new Modifier[]{});
+    }
+
+    private MethodSpec makeStaticFactoryMethod() {
+        if (this.builderClassNeedsToBeAbstract()) {
+            // if the Builder class has to be abstract,
+            // don't generate a static factory method
+            // (since you can't instantiate an abstract class)
+            return null;
+        }
+
+        return MethodSpec
+                .methodBuilder(this.builderFactoryMethodName())
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addTypeVariables(this.builderClassTypeParameters())
+                .returns(builderFactoryMethodReturnType())
+                .addStatement("return new $T()", this.builderClassTypeName())
+                .build();
+    }
+
+    private MethodSpec makeToBuilderMethod() {
         // if the @Builder annotation has an empty toBuilder attribute,
         // don't generate this method
         if (this.builderAnnotation.toBuilder().isEmpty()) {
-            return;
+            return null;
         }
 
         String targetClassParam = Utils.deCapitalize(this.targetClassSimpleName().toString());
@@ -155,9 +177,31 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         }
         methodBody.addStatement("return $L", returnVarName);
 
-        builderClassBuilder.addMethod(toBuilderMethod
+        return toBuilderMethod
                 .addCode(methodBody.build())
-                .build());
+                .build();
+    }
+
+    private MethodSpec makeBuildMethod() {
+        MethodSpec.Builder buildMethod = MethodSpec
+                .methodBuilder(this.buildMethodName())
+                .addModifiers(Modifier.PUBLIC)
+                .returns(this.targetClassTypeName());
+        if (this.builderClassNeedsToBeAbstract()) {
+            buildMethod.addModifiers(Modifier.ABSTRACT);
+        } else {
+            String attributes = Utils.join(this.attributeNames());
+            if (this.targetCreationMethodIsConstructor()) {
+                buildMethod.addStatement("return new $T($L)", this.targetClassTypeName(), attributes);
+            } else {
+                buildMethod.addStatement("return $T.$L($L)",
+                        // using ClassName gets rid of any type parameters the class might have
+                        ClassName.get((TypeElement) this.targetCreationMethod.getEnclosingElement()),
+                        this.targetCreationMethod.getSimpleName(),
+                        attributes);
+            }
+        }
+        return buildMethod.build();
     }
 
     private String accessAttributeOfTargetClass(VariableElement attribute) {
@@ -338,12 +382,9 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     private String initBuilderClassPackage() {
         String annotationBuilderPackageName = builderAnnotation.packageName();
-        if (annotationBuilderPackageName.isEmpty()) {
-            PackageElement targetClassPackage = elements.getPackageOf(targetClassType);
-            return targetClassPackage.getQualifiedName().toString();
-        } else {
-            return annotationBuilderPackageName;
-        }
+        return annotationBuilderPackageName.isEmpty()
+                ? this.determineTargetClassPackage()
+                : annotationBuilderPackageName;
     }
 
     protected final String builderClassStringName() {
@@ -362,9 +403,9 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     }
 
     protected final TypeName targetClassTypeName() {
-        return this.targetFactoryMethod == null
+        return this.targetCreationMethodIsConstructor()
                 ? TypeName.get(this.targetClassType.asType())
-                : TypeName.get(this.targetFactoryMethod.getReturnType());
+                : TypeName.get(this.targetCreationMethod.getReturnType());
     }
 
     protected final List<? extends VariableElement> attributes() {
@@ -387,16 +428,29 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                     typeVariableNames.toArray(new TypeVariableName[0]));
     }
 
-    protected List<TypeVariableName> builderClassTypeParameters() {
-        List<? extends TypeParameterElement> typeParameterElements = this.targetFactoryMethod == null
+    protected final List<TypeVariableName> builderClassTypeParameters() {
+        List<? extends TypeParameterElement> typeParameterElements = this.targetCreationMethodIsConstructor()
                 ? this.targetClassType.getTypeParameters()
-                : this.targetFactoryMethod.getTypeParameters();
+                : this.targetCreationMethod.getTypeParameters();
         List<TypeVariableName> ret = new ArrayList<TypeVariableName>(
                 typeParameterElements.size());
         for (TypeParameterElement typeParameterEl : typeParameterElements) {
             ret.add(TypeVariableName.get(typeParameterEl));
         }
         return ret;
+    }
+
+    private boolean targetCreationMethodIsConstructor() {
+        if (this.targetCreationMethod == null) {
+            // if we don't have targetCreationMethod set,
+            // that means @Builder was placed on the class itself,
+            // so we should use the implicit all-argument constructor
+            return true;
+        }
+        // but, we do save the constructor if @Builder was placed on it,
+        // so check if the creation method's simple name is "<init>",
+        // which is what constructors are called in bytecode
+        return "<init>".equals(this.targetCreationMethod.getSimpleName().toString());
     }
 
     protected final String setterMethodName(VariableElement attribute) {
@@ -411,8 +465,12 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return attribute.getSimpleName().toString();
     }
 
-    protected final String builderFactoryMethodName() {
-        String annotationFactoryMethod = builderAnnotation.factoryMethod();
+    private String determineTargetClassPackage() {
+        return this.elements.getPackageOf(this.targetClassType).getQualifiedName().toString();
+    }
+
+    private String builderFactoryMethodName() {
+        String annotationFactoryMethod = this.builderAnnotation.factoryMethod();
         return annotationFactoryMethod.isEmpty()
                 ? Utils.deCapitalize(this.targetClassSimpleName().toString())
                 : annotationFactoryMethod;
@@ -423,6 +481,14 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return annotationBuildMethod.isEmpty()
                 ? "build"
                 : annotationBuildMethod;
+    }
+
+    protected final boolean builderClassNeedsToBeAbstract() {
+        if (this.targetCreationMethod == null) {
+            // we assume the implicit constructor is public
+            return false;
+        }
+        return this.targetCreationMethod.getModifiers().contains(Modifier.PRIVATE);
     }
 
     protected final AnnotationSpec generatedAnnotation() throws Exception {

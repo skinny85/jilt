@@ -33,10 +33,15 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
     protected final void enhance(TypeSpec.Builder builderClassBuilder) {
         addSuperInterfaces(builderClassBuilder);
 
-        builderClassBuilder.addMethod(MethodSpec
-                .constructorBuilder()
-                .addModifiers(Modifier.PRIVATE)
-                .build());
+        // only generate a private constructor if the builder class is not abstract
+        // (if the constructor is private, the class wouldn't be able to be extended,
+        // which defeats the purpose of an abstract class)
+        if (!this.builderClassNeedsToBeAbstract()) {
+            builderClassBuilder.addMethod(MethodSpec
+                    .constructorBuilder()
+                    .addModifiers(Modifier.PRIVATE)
+                    .build());
+        }
     }
 
     protected abstract void addSuperInterfaces(TypeSpec.Builder builderClassBuilder);
@@ -109,7 +114,7 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
                     typeVariableNames.toArray(new TypeVariableName[0]));
     }
 
-    protected List<TypeVariableName> mangledBuilderClassTypeParameters() {
+    protected final List<TypeVariableName> mangledBuilderClassTypeParameters() {
         // There's an interesting edge case. If the name of the property is the same as the type parameter
         // (so, class MyClass<T1, T2> { T1 t1; T2 t2; }), the name of the inner interface for that property will be the same as the name of the type parameter.
         // This will cause a conflict when the setter method's return type is simply T2,

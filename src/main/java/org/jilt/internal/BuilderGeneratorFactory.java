@@ -68,7 +68,7 @@ public final class BuilderGeneratorFactory {
             BuilderInterfaces builderInterfaces) throws Exception {
         TypeElement targetClass;
         List<? extends VariableElement> attributes;
-        ExecutableElement targetFactoryMethod = null;
+        ExecutableElement targetCreationMethod;
 
         ElementKind kind = annotatedElement.getKind();
         if (this.kindIsClassOrRecord(kind)) {
@@ -82,16 +82,18 @@ public final class BuilderGeneratorFactory {
                     fields.add((VariableElement) field);
             }
             attributes = fields;
+            targetCreationMethod = null;
         } else if (kind == ElementKind.CONSTRUCTOR) {
             targetClass = (TypeElement) annotatedElement.getEnclosingElement();
             ExecutableElement constructor = (ExecutableElement) annotatedElement;
             attributes = constructor.getParameters();
+            targetCreationMethod = constructor;
         } else if (kind == ElementKind.METHOD &&
                 annotatedElement.getModifiers().contains(Modifier.STATIC)) {
             ExecutableElement method = (ExecutableElement) annotatedElement;
             targetClass = (TypeElement) ((DeclaredType) method.getReturnType()).asElement();
             attributes = method.getParameters();
-            targetFactoryMethod = method;
+            targetCreationMethod = method;
         } else {
             throw new IllegalArgumentException(
                     "@Builder can only be placed on classes/records, constructors or static methods");
@@ -101,15 +103,15 @@ public final class BuilderGeneratorFactory {
             case STAGED:
             case TYPE_SAFE:
                 return new TypeSafeBuilderGenerator(targetClass, attributes, builderAnnotation,
-                        builderInterfaces, targetFactoryMethod, elements, filer);
+                        builderInterfaces, targetCreationMethod, elements, filer);
             case STAGED_PRESERVING_ORDER:
             case TYPE_SAFE_UNGROUPED_OPTIONALS:
                 return new TypeSafeUngroupedOptionalsBuilderGenerator(targetClass, attributes, builderAnnotation,
-                        builderInterfaces, targetFactoryMethod, elements, filer);
+                        builderInterfaces, targetCreationMethod, elements, filer);
             case CLASSIC:
             default:
                 return new ClassicBuilderGenerator(targetClass, attributes, builderAnnotation,
-                        targetFactoryMethod, elements, filer);
+                        targetCreationMethod, elements, filer);
         }
     }
 
