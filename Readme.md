@@ -77,7 +77,7 @@ Example Maven settings:
     <dependency>
         <groupId>cc.jilt</groupId>
         <artifactId>jilt</artifactId>
-        <version>1.4</version>
+        <version>1.5</version>
         <scope>provided</scope> <!-- Jilt is not needed at runtime -->
     </dependency>
 </dependencies>
@@ -92,13 +92,13 @@ repositories {
 
 dependencies {
     // ...
-    compileOnly 'cc.jilt:jilt:1.4' // Jilt is not needed at runtime
-    annotationProcessor 'cc.jilt:jilt:1.4' // you might also need this dependency in newer Gradle versions
+    compileOnly 'cc.jilt:jilt:1.5' // Jilt is not needed at runtime
+    annotationProcessor 'cc.jilt:jilt:1.5' // you might also need this dependency in newer Gradle versions
 }
 ```
 
 If you're not using dependency managers, you can
-[download the JAR directly](https://repo1.maven.org/maven2/cc/jilt/jilt/1.4/jilt-1.4.jar)
+[download the JAR directly](https://repo1.maven.org/maven2/cc/jilt/jilt/1.5/jilt-1.5.jar)
 (it's distributed as a self-contained JAR, you don't need any additional dependencies for it)
 and add it to your classpath.
 

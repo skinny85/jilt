@@ -1,3 +1,13 @@
+Version 1.5 - 2024-03-23
+------------------------
+- Add capability to generate a `toBuilder()` method
+  ([Issue #16](https://github.com/skinny85/jilt/issues/16))
+- Support meta-annotations ([Issue #14](https://github.com/skinny85/jilt/issues/14))
+- Allow placing `@Builder` annotation on private constructors
+  ([Issue #13](https://github.com/skinny85/jilt/issues/13))
+- Fix a bug where JSpecify `@Nullable` annotations were not properly recognized
+  ([Issue #11](https://github.com/skinny85/jilt/issues/11#issuecomment-2002620000))
+
 Version 1.4 - 2024-01-28
 ------------------------
 - Allow using Jilt with generic classes ([Issue #5](https://github.com/skinny85/jilt/issues/5))
