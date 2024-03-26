@@ -226,7 +226,7 @@ import java.lang.annotation.Target;
  * @see BuilderInterfaces
  */
 @Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.ANNOTATION_TYPE})
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.CLASS)
 public @interface Builder {
     /**
      * Allows declaring what variant of the Builder pattern will the generated class conform to.

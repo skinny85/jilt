@@ -1,1 +1,4 @@
 rootProject.name = 'jilt'
+
+include ':meta:producer'
+include ':meta:consumer'

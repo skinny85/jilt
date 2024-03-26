@@ -1,7 +1,7 @@
 /.idea/
 out/
 /.gradle/
-/build/
+build/
 src/main/generated
 src/test/generated
 .java-version
