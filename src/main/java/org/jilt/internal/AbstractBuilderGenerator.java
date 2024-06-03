@@ -337,9 +337,11 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             ret.addAnnotation(AnnotationSpec.get(nullableAnnotation));
         }
 
-        attribute.getAnnotationMirrors().stream()
-        	.filter(annotation -> !annotation.equals(nullableAnnotation))
-        	.forEach(annotation -> ret.addAnnotation(AnnotationSpec.get(annotation)));
+        for (AnnotationMirror annotation : attribute.getAnnotationMirrors()) {
+            if (!annotation.equals(nullableAnnotation)) {
+                ret.addAnnotation(AnnotationSpec.get(annotation));
+            }
+        }
 
         return ret.build();
     }

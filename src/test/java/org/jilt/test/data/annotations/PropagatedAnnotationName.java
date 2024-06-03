@@ -8,7 +8,6 @@ import javax.annotation.Nonnull;
 
 @Builder(style = BuilderStyle.STAGED_PRESERVING_ORDER)
 public class PropagatedAnnotationName {
-
   public final String firstName;
   public final String middleName;
 
@@ -21,5 +20,4 @@ public class PropagatedAnnotationName {
     this.middleName = middleName;
     this.lastName = lastName;
   }
-
 }
