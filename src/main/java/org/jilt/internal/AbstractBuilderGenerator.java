@@ -331,8 +331,9 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     }
 
     private ParameterSpec setterParameterSpec(VariableElement attribute, TypeName parameterType) {
-        ParameterSpec.Builder ret = ParameterSpec.builder(parameterType, this.attributeSimpleName(attribute));
-        AnnotationMirror nullableAnnotation = firstAnnotationCalledNullable(attribute);
+        ParameterSpec.Builder ret = ParameterSpec.builder(parameterType,
+                this.attributeSimpleName(attribute));
+        AnnotationMirror nullableAnnotation = this.firstAnnotationCalledNullable(attribute);
         if (nullableAnnotation != null) {
             ret.addAnnotation(AnnotationSpec.get(nullableAnnotation));
         }
