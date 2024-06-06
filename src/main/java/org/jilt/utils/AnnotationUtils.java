@@ -14,7 +14,9 @@ public final class AnnotationUtils {
     static {
         try {
             NON_PARAMETER_ANNOTATIONS.add((ElementType) ElementType.class.getField("RECORD_COMPONENT").get(null));
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+        } catch (NoSuchFieldException e) {
+            // Java version does not support RECORD_COMPONENT
+        } catch (IllegalAccessException e) {
             // Java version does not support RECORD_COMPONENT
         }
     }
