@@ -9,11 +9,12 @@ import java.util.Set;
 public final class AnnotationUtils {
     private static final Set<ElementType> NON_PARAMETER_ANNOTATIONS = EnumSet.of(ElementType.TYPE, ElementType.FIELD,
             ElementType.METHOD, ElementType.CONSTRUCTOR, ElementType.LOCAL_VARIABLE, ElementType.ANNOTATION_TYPE,
-            ElementType.PACKAGE, ElementType.TYPE_PARAMETER, ElementType.MODULE);
+            ElementType.PACKAGE, ElementType.TYPE_PARAMETER);
 
     static {
         try {
             NON_PARAMETER_ANNOTATIONS.add((ElementType) ElementType.class.getField("RECORD_COMPONENT").get(null));
+            NON_PARAMETER_ANNOTATIONS.add((ElementType) ElementType.class.getField("MODULE").get(null));
         } catch (NoSuchFieldException e) {
             // Java version does not support RECORD_COMPONENT
         } catch (IllegalAccessException e) {
