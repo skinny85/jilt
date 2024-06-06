@@ -16,7 +16,7 @@ public class PropagatedAnnotationName {
     public String middleName;
 
     @Nonnull
-	@NonParameterAnnotation
+    @NonParameterAnnotation
     public String lastName;
 
     public PropagatedAnnotationName(String firstName, String middleName, String lastName) {
