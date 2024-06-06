@@ -5,19 +5,23 @@ import org.jilt.BuilderStyle;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 @Builder(style = BuilderStyle.STAGED_PRESERVING_ORDER)
 public class PropagatedAnnotationName {
-  public final String firstName;
-  public final String middleName;
+    @CheckForNull
+    public String firstName;
 
-  @Nonnull
-  @CheckForNull
-  public final String lastName;
+    @Nullable
+    public String middleName;
 
-  public PropagatedAnnotationName(String firstName, String middleName, String lastName) {
-    this.firstName = firstName;
-    this.middleName = middleName;
-    this.lastName = lastName;
-  }
+    @Nonnull
+	@NonParameterAnnotation
+    public String lastName;
+
+    public PropagatedAnnotationName(String firstName, String middleName, String lastName) {
+        this.firstName = firstName;
+        this.middleName = middleName;
+        this.lastName = lastName;
+    }
 }
