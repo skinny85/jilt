@@ -14,7 +14,6 @@ import com.squareup.javapoet.TypeVariableName;
 import com.squareup.javapoet.WildcardTypeName;
 import org.jilt.Builder;
 import org.jilt.Opt;
-import org.jilt.utils.AnnotationUtils;
 import org.jilt.utils.Utils;
 
 import javax.annotation.processing.Filer;
