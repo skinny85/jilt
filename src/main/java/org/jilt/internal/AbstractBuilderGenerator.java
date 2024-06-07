@@ -28,6 +28,8 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
