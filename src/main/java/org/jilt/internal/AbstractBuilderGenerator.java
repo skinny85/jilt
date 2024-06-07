@@ -334,17 +334,32 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private ParameterSpec setterParameterSpec(VariableElement attribute, TypeName parameterType) {
         ParameterSpec.Builder ret = ParameterSpec.builder(parameterType,
                 this.attributeSimpleName(attribute));
-        addAnnotations(ret, attribute.getAnnotationMirrors());
-        addAnnotations(ret, attribute.asType().getAnnotationMirrors());
+        this.addAnnotationsToParam(ret, attribute.getAnnotationMirrors());
+        this.addAnnotationsToParam(ret, attribute.asType().getAnnotationMirrors());
         return ret.build();
     }
 
-    private void addAnnotations(final ParameterSpec.Builder ret, final List<? extends AnnotationMirror> annotationMirrors) {
-        for (final AnnotationMirror annotation : annotationMirrors) {
-            if (AnnotationUtils.isAnnotationAllowedInParameter(annotation)) {
+    private void addAnnotationsToParam(ParameterSpec.Builder ret, List<? extends AnnotationMirror> annotationMirrors) {
+        for (AnnotationMirror annotation : annotationMirrors) {
+            if (this.isAnnotationAllowedInParameter(annotation)) {
                 ret.addAnnotation(AnnotationSpec.get(annotation));
             }
         }
+    }
+
+    public boolean isAnnotationAllowedInParameter(AnnotationMirror annotation) {
+        Target targetAnnotation = annotation.getAnnotationType().asElement().getAnnotation(Target.class);
+        if (targetAnnotation == null) {
+            return true;
+        }
+
+        for (ElementType elementType : targetAnnotation.value()) {
+            if (ElementType.TYPE_USE.equals(elementType) || ElementType.PARAMETER.equals(elementType)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private Set<VariableElement> initOptionalAttributes() {
