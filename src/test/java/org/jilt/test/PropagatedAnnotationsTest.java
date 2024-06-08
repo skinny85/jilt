@@ -1,8 +1,8 @@
 package org.jilt.test;
 
 import org.jilt.test.data.annotations.NonParameterAnnotation;
-import org.jilt.test.data.annotations.PropagatedAnnotationNameBuilder;
-import org.jilt.test.data.annotations.PropagatedAnnotationNameBuilders;
+import org.jilt.test.data.annotations.PropagatedAnnotationsFullNameBuilder;
+import org.jilt.test.data.annotations.PropagatedAnnotationsFullNameBuilders;
 import org.junit.Test;
 
 import javax.annotation.CheckForNull;
