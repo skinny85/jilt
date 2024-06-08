@@ -340,22 +340,22 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return ret.build();
     }
 
-    private void addAnnotationsToParam(ParameterSpec.Builder ret, List<? extends AnnotationMirror> annotationMirrors) {
-        for (AnnotationMirror annotation : annotationMirrors) {
-            if (this.isAnnotationAllowedInParameter(annotation)) {
-                ret.addAnnotation(AnnotationSpec.get(annotation));
+    private void addAnnotationsToParam(ParameterSpec.Builder param, List<? extends AnnotationMirror> annotations) {
+        for (AnnotationMirror annotation : annotations) {
+            if (this.isAnnotationAllowedOnParam(annotation)) {
+                param.addAnnotation(AnnotationSpec.get(annotation));
             }
         }
     }
 
-    public boolean isAnnotationAllowedInParameter(AnnotationMirror annotation) {
+    private boolean isAnnotationAllowedOnParam(AnnotationMirror annotation) {
         Target targetAnnotation = annotation.getAnnotationType().asElement().getAnnotation(Target.class);
         if (targetAnnotation == null) {
             return true;
         }
 
         for (ElementType elementType : targetAnnotation.value()) {
-            if (ElementType.TYPE_USE.equals(elementType) || ElementType.PARAMETER.equals(elementType)) {
+            if (ElementType.PARAMETER.equals(elementType) || "TYPE_USE".equals(elementType.name())) {
                 return true;
             }
         }

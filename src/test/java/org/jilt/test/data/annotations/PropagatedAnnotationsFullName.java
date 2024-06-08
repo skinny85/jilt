@@ -8,7 +8,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 @Builder(style = BuilderStyle.STAGED_PRESERVING_ORDER)
-public class PropagatedAnnotationName {
+public class PropagatedAnnotationsFullName {
     @CheckForNull
     public String firstName;
 
@@ -19,7 +19,7 @@ public class PropagatedAnnotationName {
     @NonParameterAnnotation
     public String lastName;
 
-    public PropagatedAnnotationName(String firstName, String middleName, String lastName) {
+    public PropagatedAnnotationsFullName(String firstName, String middleName, String lastName) {
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
