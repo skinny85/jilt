@@ -13,7 +13,6 @@ import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
 import com.squareup.javapoet.WildcardTypeName;
 import org.jilt.Builder;
-import org.jilt.Opt;
 import org.jilt.utils.Utils;
 
 import javax.annotation.processing.Filer;
@@ -30,9 +29,7 @@ import javax.lang.model.util.Elements;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private final Elements elements;
@@ -40,7 +37,6 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     private final TypeElement targetClassType;
     private final List<? extends VariableElement> attributes;
-    private final Set<VariableElement> optionalAttributes;
     private final Builder builderAnnotation;
     private final ExecutableElement targetCreationMethod;
 
@@ -55,7 +51,6 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
         this.targetClassType = targetClass;
         this.attributes = attributes;
-        this.optionalAttributes = initOptionalAttributes();
         this.builderAnnotation = builderAnnotation;
         this.targetCreationMethod = targetCreationMethod;
 
@@ -98,7 +93,10 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                                 : Modifier.PRIVATE)
                     .build());
 
-            builderClassBuilder.addMethod(this.generateBuilderSetterMethod(attribute));
+            MethodSpec setterMethod = this.generateBuilderSetterMethod(attribute);
+            if (setterMethod != null) {
+                builderClassBuilder.addMethod(setterMethod);
+            }
         }
 
         // add the 'build' method
@@ -130,7 +128,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return modifiers.toArray(new Modifier[]{});
     }
 
-    private MethodSpec makeStaticFactoryMethod() {
+    protected MethodSpec makeStaticFactoryMethod() {
         if (this.builderClassNeedsToBeAbstract()) {
             // if the Builder class has to be abstract,
             // don't generate a static factory method
@@ -147,7 +145,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 .build();
     }
 
-    private MethodSpec makeToBuilderMethod() {
+    protected MethodSpec makeToBuilderMethod() {
         // if the @Builder annotation has an empty toBuilder attribute,
         // don't generate this method
         if (this.builderAnnotation.toBuilder().isEmpty()) {
@@ -165,9 +163,9 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                         .build());
 
         CodeBlock.Builder methodBody = CodeBlock.builder();
-        String returnVarName = Utils.deCapitalize(this.builderClassClassName.simpleName());
-        methodBody.addStatement("$T $L = new $T()", this.builderClassTypeName(),
-                returnVarName, this.builderClassTypeName());
+        String returnVarName = Utils.deCapitalize(this.builderClassStringName());
+        methodBody.addStatement("$1T $2N = new $1T()", this.builderClassTypeName(),
+                returnVarName);
         // iterate through all attributes,
         // and add a setter statement to the method body for each
         for (VariableElement attribute : attributes) {
@@ -206,7 +204,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return buildMethod.build();
     }
 
-    private String accessAttributeOfTargetClass(VariableElement attribute) {
+    protected final String accessAttributeOfTargetClass(VariableElement attribute) {
         String fieldName = this.attributeSimpleName(attribute);
         for (Element member : this.elements.getAllMembers(this.targetClassType)) {
             // if there's a getter method, use it
@@ -248,8 +246,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 /* abstractMethod */ false);
     }
 
-    protected final MethodSpec generateSetterMethod(VariableElement attribute, boolean mangleTypeParameters,
-            boolean abstractMethod) {
+    protected MethodSpec generateSetterMethod(VariableElement attribute,
+            boolean mangleTypeParameters, boolean abstractMethod) {
         String fieldName = this.attributeSimpleName(attribute);
         TypeName parameterType = this.attributeType(attribute, mangleTypeParameters);
         MethodSpec.Builder setter = MethodSpec
@@ -275,7 +273,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     protected abstract TypeName returnTypeForSetterFor(VariableElement attribute, boolean withMangledTypeParameters);
 
-    private TypeName attributeType(VariableElement attribute,
+    protected final TypeName attributeType(VariableElement attribute,
             boolean withMangledTypeParameters) {
         TypeName ret = TypeName.get(attribute.asType());
         return withMangledTypeParameters ? this.mangleTypeName(ret) : ret;
@@ -332,9 +330,10 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 this.mangleTypeParameters(typeVariableName.bounds).toArray(new TypeName[]{}));
     }
 
-    private ParameterSpec setterParameterSpec(VariableElement attribute, TypeName parameterType) {
-        ParameterSpec.Builder ret = ParameterSpec.builder(parameterType,
-                this.attributeSimpleName(attribute));
+    protected final ParameterSpec setterParameterSpec(VariableElement attribute, TypeName parameterType) {
+        ParameterSpec.Builder ret = ParameterSpec
+                .builder(parameterType, this.attributeSimpleName(attribute))
+                .addModifiers(Modifier.FINAL);
         this.addAnnotationsToParam(ret, attribute.getAnnotationMirrors());
         this.addAnnotationsToParam(ret, attribute.asType().getAnnotationMirrors());
         return ret.build();
@@ -363,46 +362,6 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return false;
     }
 
-    private Set<VariableElement> initOptionalAttributes() {
-        Set<VariableElement> ret = new HashSet<VariableElement>();
-        for (VariableElement attribute : attributes) {
-            if (this.determineIfAttributeIsOptional(attribute)) {
-                ret.add(attribute);
-            }
-        }
-        return ret;
-    }
-
-    private boolean determineIfAttributeIsOptional(VariableElement attribute) {
-        if (attribute.getAnnotation(Opt.class) != null) {
-            return true;
-        }
-        if (this.firstAnnotationCalledNullable(attribute) != null) {
-            return true;
-        }
-        return false;
-    }
-
-    private AnnotationMirror firstAnnotationCalledNullable(VariableElement attribute) {
-        for (AnnotationMirror annotation : attribute.getAnnotationMirrors()) {
-            if (annotationIsCalledNullable(annotation)) {
-                return annotation;
-            }
-        }
-        // some annotations are applied to the type, instead of the attribute,
-        // like the ones from JSpecify
-        for (AnnotationMirror annotation : attribute.asType().getAnnotationMirrors()) {
-            if (annotationIsCalledNullable(annotation)) {
-                return annotation;
-            }
-        }
-        return null;
-    }
-
-    private static boolean annotationIsCalledNullable(AnnotationMirror annotation) {
-        return "Nullable".equals(annotation.getAnnotationType().asElement().getSimpleName().toString());
-    }
-
     private String initBuilderClassPackage() {
         String annotationBuilderPackageName = builderAnnotation.packageName();
         return annotationBuilderPackageName.isEmpty()
@@ -421,7 +380,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return filer;
     }
 
-    private Name targetClassSimpleName() {
+    protected final Name targetClassSimpleName() {
         return this.targetClassType.getSimpleName();
     }
 
@@ -433,10 +392,6 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     protected final List<? extends VariableElement> attributes() {
         return attributes;
-    }
-
-    protected final boolean isOptional(VariableElement attribute) {
-        return optionalAttributes.contains(attribute);
     }
 
     protected final String builderClassPackage() {
@@ -492,7 +447,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return this.elements.getPackageOf(this.targetClassType).getQualifiedName().toString();
     }
 
-    private String builderFactoryMethodName() {
+    protected final String builderFactoryMethodName() {
         String annotationFactoryMethod = this.builderAnnotation.factoryMethod();
         return annotationFactoryMethod.isEmpty()
                 ? Utils.deCapitalize(this.targetClassSimpleName().toString())

@@ -325,5 +325,55 @@ public enum BuilderStyle {
      * @see BuilderInterfaces
      * @since 1.4
      */
-    STAGED_PRESERVING_ORDER
+    STAGED_PRESERVING_ORDER,
+
+    /**
+     * A Functional variant of the Builder pattern.
+     * It is inspired by a <a href="https://glaforge.dev/posts/2024/01/16/java-functional-builder-approach">blog article</a>
+     * from Guillaume Laforge, creator of the Groovy programming language.
+     * <p>
+     * In this variant, an instance of a Builder is not explicitly used -
+     * instead, a static factory method is generated on the Builder class
+     * that directly returns an instance of the target class.
+     * The arguments of that method are generated interfaces.
+     * Each required property has its own interface,
+     * while all optional properties share one interface.
+     * <p>
+     * Instances of these interfaces are obtained by calling static factory methods generated on the Builder class
+     * (static methods for the optional properties are nested inside an additional {@code Optional} class,
+     * for discoverability), and passing them the value for a given property.
+     * Typically, you would use Java's static imports to bring those static methods directly into the scope that creates the instance.
+     * <p>
+     * For example, given this value class:
+     *
+     * <pre><code>
+     * package example;
+     *
+     * public final class FullName {
+     *     public final String firstName, middleName, lastName;
+     *
+     *    {@literal @}Builder(style = BuilderStyle.FUNCTIONAL)
+     *     public FullName(String firstName, @Opt String middleName, String lastName) {
+     *         this.firstName = firstName;
+     *         this.middleName = middleName;
+     *         this.lastName = lastName;
+     *     }
+     * }
+     * </code></pre>
+     *
+     * You use the generated Builder like so:
+     *
+     * <pre><code>
+     * import static example.FullNameBuilder.firstName;
+     * import static example.FullNameBuilder.lastName;
+     * import static example.FullNameBuilder.middleName;
+     *
+     * FullName fullName = FullNameBuilder.fullName(
+     *     firstName("John"), // this is required
+     *     lastName("Doe"),  // this is required
+     *     middleName("Muriel") // this is optional
+     * );
+     * </code></pre>
+     */
+    FUNCTIONAL
 }
