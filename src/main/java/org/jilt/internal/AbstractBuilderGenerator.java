@@ -27,6 +27,8 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -333,11 +335,32 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private ParameterSpec setterParameterSpec(VariableElement attribute, TypeName parameterType) {
         ParameterSpec.Builder ret = ParameterSpec.builder(parameterType,
                 this.attributeSimpleName(attribute));
-        AnnotationMirror nullableAnnotation = this.firstAnnotationCalledNullable(attribute);
-        if (nullableAnnotation != null) {
-            ret.addAnnotation(AnnotationSpec.get(nullableAnnotation));
-        }
+        this.addAnnotationsToParam(ret, attribute.getAnnotationMirrors());
+        this.addAnnotationsToParam(ret, attribute.asType().getAnnotationMirrors());
         return ret.build();
+    }
+
+    private void addAnnotationsToParam(ParameterSpec.Builder param, List<? extends AnnotationMirror> annotations) {
+        for (AnnotationMirror annotation : annotations) {
+            if (this.isAnnotationAllowedOnParam(annotation)) {
+                param.addAnnotation(AnnotationSpec.get(annotation));
+            }
+        }
+    }
+
+    private boolean isAnnotationAllowedOnParam(AnnotationMirror annotation) {
+        Target targetAnnotation = annotation.getAnnotationType().asElement().getAnnotation(Target.class);
+        if (targetAnnotation == null) {
+            return true;
+        }
+
+        for (ElementType elementType : targetAnnotation.value()) {
+            if (ElementType.PARAMETER.equals(elementType) || "TYPE_USE".equals(elementType.name())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private Set<VariableElement> initOptionalAttributes() {
