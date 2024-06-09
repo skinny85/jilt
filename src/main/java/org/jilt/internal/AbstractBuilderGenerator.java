@@ -211,6 +211,10 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             if (elementIsMethodWithoutArgumentsCalled(member, "get" + Utils.capitalize(fieldName))) {
                 return member.getSimpleName().toString() + "()";
             }
+            // getters for boolean properties start with "is" instead of "get"
+            if (elementIsMethodWithoutArgumentsCalled(member, "is" + Utils.capitalize(fieldName))) {
+                return member.getSimpleName().toString() + "()";
+            }
             // if there's a no-argument method with the field name,
             // like with Records, use that
             if (elementIsMethodWithoutArgumentsCalled(member, fieldName)) {
