@@ -1,6 +1,8 @@
 package org.jilt.test;
 
 import org.jilt.test.data.functional.LargeLanguageModel;
+import org.jilt.test.data.functional.TrickyNamesF;
+import org.jilt.test.data.functional.TrickyNamesFuncBuilder;
 import org.jilt.test.data.functional.UserFunc;
 import org.jilt.test.data.functional.UserFuncBuilder;
 import org.junit.Test;
@@ -109,5 +111,22 @@ public class FunctionalBuilderTest {
         assertThat(copy.name).isEqualTo("changed-name");
         assertThat(copy.temperature).isEqualTo(20F);
         assertThat(copy.outputTokensLimit).isEqualTo(50);
+    }
+
+    @Test
+    public void tricky_names_builder_works() {
+        TrickyNamesF trickyNames = TrickyNamesFuncBuilder.trickyNamesF(
+                TrickyNamesFuncBuilder.setter("setter"),
+                TrickyNamesFuncBuilder.optional(true),
+                TrickyNamesFuncBuilder.builder('b'),
+                TrickyNamesFuncBuilder.trickyNamesFBuilder(11.0),
+                TrickyNamesFuncBuilder.Optional.optValue(13)
+        );
+
+        assertThat(trickyNames.setter).isEqualTo("setter");
+        assertThat(trickyNames.optional).isTrue();
+        assertThat(trickyNames.builder).isEqualTo('b');
+        assertThat(trickyNames.trickyNamesFBuilder).isEqualTo(11.0);
+        assertThat(trickyNames.optValue).isEqualTo(13);
     }
 }

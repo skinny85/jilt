@@ -99,7 +99,7 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
         }
 
         // calling the setters
-        String builderVariableName = Utils.deCapitalize(this.builderClassStringName());
+        String builderVariableName = this.builderClassMethodParamName();
         method.addStatement("$1T $2N = new $1T()", this.builderClassTypeName(), builderVariableName);
         for (VariableElement currentAttribute : this.attributes()) {
             if (this.isOptional(currentAttribute)) {
@@ -141,7 +141,7 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
 
         // generate a static nested class that will contain the setters for the optional properties
         TypeSpec.Builder optionalSettersClass = TypeSpec
-                .classBuilder(this.lastInterfaceName())
+                .classBuilder("Optional")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         for (VariableElement currentAttribute : this.attributes()) {
             MethodSpec setterMethod = this.generateSetterMethod(currentAttribute, false, true);
@@ -160,9 +160,10 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
             return null;
         }
 
-        String fieldName = this.attributeSimpleName(attribute);
-        TypeName parameterType = this.attributeType(attribute, mangleTypeParameters);
         TypeName setterInterface = this.returnTypeForSetterFor(attribute, mangleTypeParameters);
+        TypeName parameterType = this.attributeType(attribute, mangleTypeParameters);
+        String builderClassMethodParamName = this.builderClassMethodParamName();
+        String fieldName = this.attributeSimpleName(attribute);
         return MethodSpec
                 .methodBuilder(this.setterMethodName(attribute))
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
@@ -175,7 +176,7 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
                                 .methodBuilder("accept")
                                 .addModifiers(Modifier.PUBLIC)
                                 .addParameter(this.setterBuilderParameter())
-                                .addStatement("builder.$1L = $1L", fieldName)
+                                .addStatement("$1L.$2L = $2L", builderClassMethodParamName, fieldName)
                                 .build())
                         .build())
                 .build();
@@ -221,7 +222,7 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
                 .varargs();
 
         CodeBlock.Builder methodBody = CodeBlock.builder();
-        String returnVarName = Utils.deCapitalize(this.builderClassStringName());
+        String returnVarName = this.builderClassMethodParamName();
         methodBody.addStatement("$1T $2N = new $1T()", this.builderClassTypeName(),
                 returnVarName);
         // iterate through all attributes,
@@ -245,7 +246,11 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
     }
 
     private String baseSetterInterfaceName() {
-        return this.interfaceNameFromBaseName("Base");
+        // we deliberately don't use interfaceNameFromBaseName() here,
+        // since, if there is a property with the name 'setter',
+        // it allows us to remove that conflict with @BuilderInterfaces#innerNames
+        // (otherwise, both interfaces would be changed to again have the same name)
+        return "Setter";
     }
 
     private TypeSpec functionalSetterInterface(String interfaceName, String baseSetterInterfaceName) {
@@ -258,7 +263,7 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
 
     private ParameterSpec setterBuilderParameter() {
         return ParameterSpec
-                .builder(this.builderClassTypeName(), "builder")
+                .builder(this.builderClassTypeName(), this.builderClassMethodParamName())
                 .build();
     }
 }

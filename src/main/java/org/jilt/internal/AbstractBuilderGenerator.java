@@ -163,7 +163,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                         .build());
 
         CodeBlock.Builder methodBody = CodeBlock.builder();
-        String returnVarName = Utils.deCapitalize(this.builderClassStringName());
+        String returnVarName = this.builderClassMethodParamName();
         methodBody.addStatement("$1T $2N = new $1T()", this.builderClassTypeName(),
                 returnVarName);
         // iterate through all attributes,
@@ -371,6 +371,10 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return annotationBuilderPackageName.isEmpty()
                 ? this.determineTargetClassPackage()
                 : annotationBuilderPackageName;
+    }
+
+    protected final String builderClassMethodParamName() {
+        return Utils.deCapitalize(this.builderClassStringName());
     }
 
     protected final String builderClassStringName() {
