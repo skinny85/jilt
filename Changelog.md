@@ -1,3 +1,13 @@
+Version 1.6 - 2024-06-15
+------------------------
+
+- Add support for Functional Builders
+  ([Issue #17](https://github.com/skinny85/jilt/issues/17))
+- Fix a bug where boolean getters were not correctly recognized in
+  `toBuilder` methods ([Issue #18](https://github.com/skinny85/jilt/issues/18))
+- Propagate all annotations to setter methods, not only `@Nullable`
+  ([Issue #20](https://github.com/skinny85/jilt/issues/20))
+
 Version 1.5 - 2024-03-23
 ------------------------
 - Add capability to generate a `toBuilder()` method

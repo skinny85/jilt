@@ -77,7 +77,7 @@ Example Maven settings:
     <dependency>
         <groupId>cc.jilt</groupId>
         <artifactId>jilt</artifactId>
-        <version>1.5</version>
+        <version>1.6</version>
         <scope>provided</scope> <!-- Jilt is not needed at runtime -->
     </dependency>
 </dependencies>
@@ -92,13 +92,13 @@ repositories {
 
 dependencies {
     // ...
-    compileOnly 'cc.jilt:jilt:1.5' // Jilt is not needed at runtime
-    annotationProcessor 'cc.jilt:jilt:1.5' // you might also need this dependency in newer Gradle versions
+    compileOnly 'cc.jilt:jilt:1.6' // Jilt is not needed at runtime
+    annotationProcessor 'cc.jilt:jilt:1.6' // you might also need this dependency in newer Gradle versions
 }
 ```
 
 If you're not using dependency managers, you can
-[download the JAR directly](https://repo1.maven.org/maven2/cc/jilt/jilt/1.5/jilt-1.5.jar)
+[download the JAR directly](https://repo1.maven.org/maven2/cc/jilt/jilt/1.6/jilt-1.6.jar)
 (it's distributed as a self-contained JAR, you don't need any additional dependencies for it)
 and add it to your classpath.
 
@@ -462,7 +462,7 @@ public final class User {
 }
 ```
 
-The generated Functional Builder can be used like this:
+The generated Functional Builder can be used like so:
 
 ```java
 User user = UserBuilder.user(
@@ -474,7 +474,7 @@ User user = UserBuilder.user(
 ```
 
 If we use Java's [static imports](https://docs.oracle.com/javase/7/docs/technotes/guides/language/static-import.html)
-feature, this becomes much more concise:
+feature, it becomes much more concise:
 
 ```java
 import static example.UserBuilder.Optional.username;
@@ -497,10 +497,12 @@ since we assume the required properties will be initialized from the passed targ
 
 ```java
 import static example.UserBuilder.Optional.displayName;
+import static example.UserBuilder.lastName;
 
 User user = new User(/* ... */);
 User copy = UserBuilder.toBuilder(user,
-        displayName("Johnny D") // only an optional property is fine here
+        lastName("Johnson"), // a single required property is allowed here
+        displayName("Johnny D") // optional properties are also allowed here
 );
 ```
 
