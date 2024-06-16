@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ToBuilderTest {
     @Test
     public void test_to_builder() {
-        ToBuilderValue value = new ToBuilderValue(1, Collections.singletonList("A"), 'a');
+        ToBuilderValue value = new ToBuilderValue(1, Collections.singletonList("A"), 'a', true);
         ToBuilderValue builder = ToBuilderValueBuilder.toBuilder(value)
                 .build();
 

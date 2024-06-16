@@ -108,6 +108,9 @@ public final class BuilderGeneratorFactory {
             case TYPE_SAFE_UNGROUPED_OPTIONALS:
                 return new TypeSafeUngroupedOptionalsBuilderGenerator(targetClass, attributes, builderAnnotation,
                         builderInterfaces, targetCreationMethod, elements, filer);
+            case FUNCTIONAL:
+                return new FunctionalBuilderGenerator(targetClass, attributes, builderAnnotation,
+                        builderInterfaces, targetCreationMethod, elements, filer);
             case CLASSIC:
             default:
                 return new ClassicBuilderGenerator(targetClass, attributes, builderAnnotation,

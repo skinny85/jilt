@@ -9,12 +9,14 @@ public class ToBuilderValue {
     private final int getterAttr;
     private final List<String> methodAttr;
     final char fieldAttr;
+    private final Boolean booleanGetter;
 
     @Builder(toBuilder = "toBuilder")
-    public ToBuilderValue(int getterAttr, List<String> methodAttr, char fieldAttr) {
+    public ToBuilderValue(int getterAttr, List<String> methodAttr, char fieldAttr, Boolean booleanGetter) {
         this.getterAttr = getterAttr;
         this.methodAttr = new ArrayList<String>(methodAttr);
         this.fieldAttr = fieldAttr;
+        this.booleanGetter = booleanGetter;
     }
 
     public int getGetterAttr() {
@@ -25,6 +27,10 @@ public class ToBuilderValue {
         return methodAttr;
     }
 
+    public Boolean isBooleanGetter() {
+        return booleanGetter;
+    }
+
     @Override
     public boolean equals(Object object) {
         if (!(object instanceof ToBuilderValue)) {
@@ -33,11 +39,13 @@ public class ToBuilderValue {
         ToBuilderValue that = (ToBuilderValue) object;
         return this.getterAttr == that.getterAttr &&
                 this.methodAttr.equals(that.methodAttr) &&
-                this.fieldAttr == that.fieldAttr;
+                this.fieldAttr == that.fieldAttr &&
+                this.booleanGetter == that.booleanGetter;
     }
 
     @Override
     public int hashCode() {
-        return this.getterAttr + 17 * this.methodAttr.hashCode() + 31 * this.fieldAttr;
+        return this.getterAttr + 17 * this.methodAttr.hashCode() + 31 * this.fieldAttr +
+                37 * this.booleanGetter.hashCode();
     }
 }
