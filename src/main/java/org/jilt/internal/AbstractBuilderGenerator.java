@@ -341,8 +341,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 .builder(parameterType, this.attributeSimpleName(attribute))
                 .addModifiers(Modifier.FINAL);
         Set<String> presentAnnotations = new HashSet<String>();
-        addAnnotationsToParam(ret, attribute.getAnnotationMirrors(), presentAnnotations);
-        addAnnotationsToParam(ret, attribute.asType().getAnnotationMirrors(), presentAnnotations);
+        this.addAnnotationsToParam(ret, attribute.getAnnotationMirrors(), presentAnnotations);
+        this.addAnnotationsToParam(ret, attribute.asType().getAnnotationMirrors(), presentAnnotations);
         return ret.build();
     }
 
