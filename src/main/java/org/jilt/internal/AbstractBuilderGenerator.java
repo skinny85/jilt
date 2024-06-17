@@ -29,7 +29,9 @@ import javax.lang.model.util.Elements;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private final Elements elements;
@@ -338,15 +340,17 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         ParameterSpec.Builder ret = ParameterSpec
                 .builder(parameterType, this.attributeSimpleName(attribute))
                 .addModifiers(Modifier.FINAL);
-        this.addAnnotationsToParam(ret, attribute.getAnnotationMirrors());
-        this.addAnnotationsToParam(ret, attribute.asType().getAnnotationMirrors());
+        Set<String> presentAnnotations = new HashSet<String>();
+        this.addAnnotationsToParam(ret, attribute.getAnnotationMirrors(), presentAnnotations);
+        this.addAnnotationsToParam(ret, attribute.asType().getAnnotationMirrors(), presentAnnotations);
         return ret.build();
     }
 
-    private void addAnnotationsToParam(ParameterSpec.Builder param, List<? extends AnnotationMirror> annotations) {
+    private void addAnnotationsToParam(ParameterSpec.Builder param, List<? extends AnnotationMirror> annotations, Set<String> presentAnnotations) {
         for (AnnotationMirror annotation : annotations) {
-            if (this.isAnnotationAllowedOnParam(annotation)) {
+            if (!presentAnnotations.contains(annotation.toString()) && this.isAnnotationAllowedOnParam(annotation)) {
                 param.addAnnotation(AnnotationSpec.get(annotation));
+                presentAnnotations.add(annotation.toString());
             }
         }
     }
