@@ -340,7 +340,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         ParameterSpec.Builder ret = ParameterSpec
                 .builder(parameterType, this.attributeSimpleName(attribute))
                 .addModifiers(Modifier.FINAL);
-        Set<String> presentAnnotations = new HashSet<>();
+        Set<String> presentAnnotations = new HashSet<String>();
         addAnnotationsToParam(ret, attribute.getAnnotationMirrors(), presentAnnotations);
         addAnnotationsToParam(ret, attribute.asType().getAnnotationMirrors(), presentAnnotations);
         return ret.build();
