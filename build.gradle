@@ -87,7 +87,7 @@ repositories {
 if (JavaVersion.current() <= JavaVersion.VERSION_11) {
     sourceCompatibility = JavaVersion.VERSION_1_6
     targetCompatibility = JavaVersion.VERSION_1_6
-    sourceSets.test.java.exclude '**/Optional*.java', '**/JSpecify*.java'
+    sourceSets.test.java.exclude '**/Optional*.java', '**/JSpecify*.java', '**/Repeatable*.java'
 } else {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
