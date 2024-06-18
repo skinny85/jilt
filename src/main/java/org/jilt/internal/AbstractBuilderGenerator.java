@@ -348,8 +348,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     }
 
     private void addAnnotationsToParam(ParameterSpec.Builder param, List<? extends AnnotationMirror> annotations, Set<DeclaredType> presentAnnotations) {
-        for(AnnotationMirror annotation : annotations) {
-            if(!presentAnnotations.contains(annotation.getAnnotationType()) && this.isAnnotationAllowedOnParam(annotation)) {
+        for (AnnotationMirror annotation : annotations) {
+            if (!presentAnnotations.contains(annotation.getAnnotationType()) && this.isAnnotationAllowedOnParam(annotation)) {
                 param.addAnnotation(AnnotationSpec.get(annotation));
                 presentAnnotations.add(annotation.getAnnotationType());
             }
