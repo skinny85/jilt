@@ -13,6 +13,7 @@ import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
 import com.squareup.javapoet.WildcardTypeName;
 import org.jilt.Builder;
+import org.jilt.Opt;
 import org.jilt.utils.Utils;
 
 import javax.annotation.processing.Filer;
@@ -25,15 +26,19 @@ import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.util.Elements;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private final Elements elements;
     private final Filer filer;
+    private final Element optElement;
 
     private final TypeElement targetClassType;
     private final List<? extends VariableElement> attributes;
@@ -48,6 +53,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             Elements elements, Filer filer) {
         this.elements = elements;
         this.filer = filer;
+        this.optElement = this.elements.getTypeElement(Opt.class.getCanonicalName());
 
         this.targetClassType = targetClass;
         this.attributes = attributes;
@@ -338,27 +344,47 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         ParameterSpec.Builder ret = ParameterSpec
                 .builder(parameterType, this.attributeSimpleName(attribute))
                 .addModifiers(Modifier.FINAL);
-        this.addAnnotationsToParam(ret, attribute.getAnnotationMirrors());
-        this.addAnnotationsToParam(ret, attribute.asType().getAnnotationMirrors());
+
+        // copy the correct annotations
+        Set<DeclaredType> alreadyAddedAnnotations = null;
+        for (AnnotationMirror annotation : attribute.getAnnotationMirrors()) {
+            if (this.isAnnotationAllowedOnParam(annotation)) {
+                ret.addAnnotation(AnnotationSpec.get(annotation));
+                if (alreadyAddedAnnotations == null) {
+                    alreadyAddedAnnotations = new HashSet<DeclaredType>();
+                }
+                alreadyAddedAnnotations.add(annotation.getAnnotationType());
+            }
+        }
+        for (AnnotationMirror annotation : attribute.asType().getAnnotationMirrors()) {
+            // In Java versions starting from 17, the behavior of this API changed -
+            // it now also returns all annotations that have @Target as both TYPE_USE,
+            // and PARAMETER/FIELD (depending on where the annotation was placed),
+            // even though they are also returned by `attribute.getAnnotationMirrors()`.
+            // In order not to duplicate the annotations on the parameter,
+            // make sure we haven't added them already
+            if (alreadyAddedAnnotations == null || !alreadyAddedAnnotations.contains(annotation.getAnnotationType())) {
+                ret.addAnnotation(AnnotationSpec.get(annotation));
+            }
+        }
+
         return ret.build();
     }
 
-    private void addAnnotationsToParam(ParameterSpec.Builder param, List<? extends AnnotationMirror> annotations) {
-        for (AnnotationMirror annotation : annotations) {
-            if (this.isAnnotationAllowedOnParam(annotation)) {
-                param.addAnnotation(AnnotationSpec.get(annotation));
-            }
-        }
-    }
-
     private boolean isAnnotationAllowedOnParam(AnnotationMirror annotation) {
-        Target targetAnnotation = annotation.getAnnotationType().asElement().getAnnotation(Target.class);
+        Element annotationElement = annotation.getAnnotationType().asElement();
+        if (annotationElement == this.optElement) {
+            // we don't want to propagate Jilt's @Opt annotation to the builder
+            return false;
+        }
+
+        Target targetAnnotation = annotationElement.getAnnotation(Target.class);
         if (targetAnnotation == null) {
             return true;
         }
 
         for (ElementType elementType : targetAnnotation.value()) {
-            if (ElementType.PARAMETER.equals(elementType) || "TYPE_USE".equals(elementType.name())) {
+            if (elementType == ElementType.PARAMETER) {
                 return true;
             }
         }

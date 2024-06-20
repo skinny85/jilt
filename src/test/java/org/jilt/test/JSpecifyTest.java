@@ -25,14 +25,14 @@ public class JSpecifyTest {
     }
 
     @Test
-    public void setter_in_builder_propagates_jspecify_nullable_annotation() throws Exception {
+    public void setter_in_builder_propagates_jspecify_nullable_type_use_only_annotation() throws Exception {
         Method middleNameSetter = JSpecifyFullNameBuilder.class.getMethod("middleName", String.class);
 
         assertThat(middleNameSetter.getParameters()[0].getAnnotatedType().getAnnotation(Nullable.class)).isNotNull();
     }
 
     @Test
-    public void setter_in_type_safe_interface_propagates_jspecify_nullable_annotation() throws Exception {
+    public void setter_in_type_safe_interface_propagates_jspecify_nullable_type_use_only_annotation() throws Exception {
         Method middleNameSetter = JSpecifyFullNameBuilders.MiddleName.class.getMethod("middleName", String.class);
 
         assertThat(middleNameSetter.getParameters()[0].getAnnotatedType().getAnnotation(Nullable.class)).isNotNull();

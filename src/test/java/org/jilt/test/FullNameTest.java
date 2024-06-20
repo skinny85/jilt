@@ -26,14 +26,14 @@ public class FullNameTest {
     }
 
     @Test
-    public void setter_in_builder_propagates_nullable_annotation() throws Exception {
+    public void setter_in_builder_propagates_nullable_annotation_from_constructor_parameter() throws Exception {
         Method middleNameSetter = FullNameBuilder.class.getMethod("middleName", String.class);
 
         assertThat(middleNameSetter.getParameters()[0].getAnnotation(Nullable.class)).isNotNull();
     }
 
     @Test
-    public void setter_in_type_safe_interface_propagates_nullable_annotation() throws Exception {
+    public void setter_in_type_safe_interface_propagates_nullable_annotation_from_constructor_parameter() throws Exception {
         Method middleNameSetter = FullNameBuilders.MiddleName.class.getMethod("middleName", String.class);
 
         assertThat(middleNameSetter.getParameters()[0].getAnnotation(Nullable.class)).isNotNull();
