@@ -85,18 +85,17 @@ repositories {
 }
 
 if (JavaVersion.current() <= JavaVersion.VERSION_11) {
-    sourceCompatibility = JavaVersion.VERSION_1_6
-    targetCompatibility = JavaVersion.VERSION_1_6
-    sourceSets.test.java.exclude '**/Optional*.java', '**/JSpecify*.java'
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceSets.test.java.exclude '**/Optional*.java',
+            '**/Record*.java',
+            '**/JSpecify*.java'
 } else {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
     dependencies {
         testImplementation 'org.jspecify:jspecify:0.3.0'
     }
-}
-if (JavaVersion.current() < JavaVersion.VERSION_16) {
-    sourceSets.test.java.exclude '**/Record*.java'
 }
 
 dependencies {
