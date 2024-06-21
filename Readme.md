@@ -497,12 +497,18 @@ since we assume the required properties will be initialized from the passed targ
 
 ```java
 import static example.UserBuilder.Optional.displayName;
+import static example.UserBuilder.email;
+import static example.UserBuilder.firstName;
 import static example.UserBuilder.lastName;
 
-User user = new User(/* ... */);
+User user = UserBuilder.user(
+    email("jd@example.com"),
+    firstName("John"),
+    lastName("Doe")
+);
 User copy = UserBuilder.toBuilder(user,
-        lastName("Johnson"), // a single required property is allowed here
-        displayName("Johnny D") // optional properties are also allowed here
+    lastName("Johnson"), // a single required property is allowed here
+    displayName("Johnny D") // optional properties are also allowed here
 );
 ```
 
@@ -534,7 +540,7 @@ It has the following attributes (all of them are optional):
 
 ##### Meta-annotations
 
-In some cases, you may want to re-use the same Builder configuration for multiple classes.
+Under certain circumstances, you might want to re-use the same Builder configuration for multiple classes.
 For example, you might decide that every value class in your project should use a Staged Builder,
 with "set" as the prefix for setter methods, "create" as the name of the `build` method,
 and "B_" as the prefix of the per-property interface names used for the Builder stages.
