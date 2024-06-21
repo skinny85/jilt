@@ -21,6 +21,6 @@ public final class OptionalsWithOrderValue<T> {
     @Builder(style = BuilderStyle.STAGED_PRESERVING_ORDER,
         className = "NullableOptionalsWithOrderValueBuilder")
     static <T> OptionalsWithOrderValue<T> unwrapped(@Nullable List<? super T> optional, @Opt Void v) {
-        return new OptionalsWithOrderValue<>(Optional.ofNullable(optional), v);
+        return new OptionalsWithOrderValue<T>(Optional.ofNullable(optional), v);
     }
 }

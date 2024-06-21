@@ -345,27 +345,14 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 .builder(parameterType, this.attributeSimpleName(attribute))
                 .addModifiers(Modifier.FINAL);
 
-        // copy the correct annotations
-        Set<DeclaredType> alreadyAddedAnnotations = null;
+        // copy the relevant annotations
         for (AnnotationMirror annotation : attribute.getAnnotationMirrors()) {
             if (this.isAnnotationAllowedOnParam(annotation)) {
                 ret.addAnnotation(AnnotationSpec.get(annotation));
-                if (alreadyAddedAnnotations == null) {
-                    alreadyAddedAnnotations = new HashSet<DeclaredType>();
-                }
-                alreadyAddedAnnotations.add(annotation.getAnnotationType());
             }
         }
         for (AnnotationMirror annotation : attribute.asType().getAnnotationMirrors()) {
-            // In Java versions starting from 17, the behavior of this API changed -
-            // it now also returns all annotations that have @Target as both TYPE_USE,
-            // and PARAMETER/FIELD (depending on where the annotation was placed),
-            // even though they are also returned by `attribute.getAnnotationMirrors()`.
-            // In order not to duplicate the annotations on the parameter,
-            // make sure we haven't added them already
-            if (alreadyAddedAnnotations == null || !alreadyAddedAnnotations.contains(annotation.getAnnotationType())) {
-                ret.addAnnotation(AnnotationSpec.get(annotation));
-            }
+            ret.addAnnotation(AnnotationSpec.get(annotation));
         }
 
         return ret.build();
@@ -383,13 +370,16 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             return true;
         }
 
+        boolean hasParamEl = false, hasTypeUseEl = false;
         for (ElementType elementType : targetAnnotation.value()) {
             if (elementType == ElementType.PARAMETER) {
-                return true;
+                hasParamEl = true;
+            } else if (elementType == ElementType.TYPE_USE) {
+                hasTypeUseEl = true;
             }
         }
 
-        return false;
+        return hasParamEl && !hasTypeUseEl;
     }
 
     private String initBuilderClassPackage() {
