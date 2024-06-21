@@ -1,3 +1,9 @@
+Version 1.6.1 - 2024-06-20
+--------------------------
+
+- Fix a bug where some annotations were copied twice to the setter methods
+  ([Issue #22](https://github.com/skinny85/jilt/pull/22))
+
 Version 1.6 - 2024-06-15
 ------------------------
 
