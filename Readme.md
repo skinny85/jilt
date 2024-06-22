@@ -64,6 +64,16 @@ public class PersonBuilder {
 }
 ```
 
+Jilt also works for [Java 14+ Records](https://docs.oracle.com/en/java/javase/17/language/records.html):
+
+```java
+import org.jilt.Builder;
+
+@Builder
+public record Person(String name, boolean isAdult) {
+}
+```
+
 Check out the [documentation below](#customizing-the-generated-code) for ways to customize what Jilt generates.
 
 #### Getting Jilt
@@ -436,7 +446,7 @@ while optional properties all share the same interface.
 Instances of those interfaces are obtained by calling other static methods of the Builder class,
 with the same name as the name of the interface, which is the same as the name of the required property
 (just uppercased in the case of the interface name).
-For optional properties, since they share the same interface, the static methods are nested in one more interface,
+For optional properties, since they share the same interface, the static methods are nested in one more class,
 called `Optional`, to make them more discoverable.
 You pass the value of a given property to those static methods.
 
@@ -448,7 +458,7 @@ package example;
 public final class User {
     public final String email, username, firstName, lastName, displayName;
 
-    @Builder(style = BuilderStyle.FUNCTIONAL, toBuilder = "toBuilder")
+    @Builder(style = BuilderStyle.FUNCTIONAL, toBuilder = "copy")
     public User(String email, @Opt String username, String firstName,
             String lastName, @Opt String displayName) {
         this.email = email;
@@ -456,8 +466,8 @@ public final class User {
         this.firstName = firstName;
         this.lastName = lastName;
         this.displayName = displayName == null
-                ? firstName + " " + lastName
-                : displayName;
+            ? firstName + " " + lastName
+            : displayName;
     }
 }
 ```
@@ -466,10 +476,10 @@ The generated Functional Builder can be used like so:
 
 ```java
 User user = UserBuilder.user(
-        UserBuilder.email("jd@example.com"), // this is required
-        UserBuilder.firstName("John"), // this is required
-        UserBuilder.lastName("Doe"), // this is required
-        UserBuilder.Optional.displayName("Johnny D") // this is optional
+    UserBuilder.email("jd@example.com"), // this is required
+    UserBuilder.firstName("John"), // this is required
+    UserBuilder.lastName("Doe"), // this is required
+    UserBuilder.Optional.displayName("Johnny D") // this is optional
 );
 ```
 
@@ -484,10 +494,10 @@ import static example.UserBuilder.lastName;
 import static example.UserBuilder.user;
 
 User user = user(
-        email("jd@example.com"), // this is required
-        firstName("John"), // this is required
-        lastName("Doe"), // this is required
-        username("johnnyd") // this is optional
+    email("jd@example.com"), // this is required
+    firstName("John"), // this is required
+    lastName("Doe"), // this is required
+    username("johnnyd") // this is optional
 );
 ```
 
@@ -506,7 +516,7 @@ User user = UserBuilder.user(
     firstName("John"),
     lastName("Doe")
 );
-User copy = UserBuilder.toBuilder(user,
+User copy = UserBuilder.copy(user,
     lastName("Johnson"), // a single required property is allowed here
     displayName("Johnny D") // optional properties are also allowed here
 );
@@ -612,8 +622,8 @@ public final class User {
         this.firstName = firstName;
         this.lastName = lastName;
         this.displayName = displayName == null
-                ? firstName + " " + lastName
-                : displayName;
+            ? firstName + " " + lastName
+            : displayName;
     }
 
     private static class InnerBuilder extends UserBuilder {
