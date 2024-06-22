@@ -26,14 +26,11 @@ import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.DeclaredType;
 import javax.lang.model.util.Elements;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private final Elements elements;
@@ -267,7 +264,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                         // for setters in interfaces, we want to return a different interface type
                         ? this.returnTypeForSetterFor(attribute, mangleTypeParameters)
                         // for setters in the Builder class, we want to return itself
-                        // (this is useful for toBuilder() usecases,
+                        // (this is useful for toBuilder() scenarios,
                         // where we chain methods of the Builder class directly)
                         : this.builderClassTypeName())
                 .addParameter(this.setterParameterSpec(attribute, parameterType));
@@ -378,7 +375,6 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 hasTypeUseEl = true;
             }
         }
-
         return hasParamEl && !hasTypeUseEl;
     }
 
