@@ -64,7 +64,7 @@ public class PersonBuilder {
 }
 ```
 
-Jilt also works for [Java 14+ Records](https://docs.oracle.com/en/java/javase/17/language/records.html):
+Jilt also works with [Java 14+ Records](https://docs.oracle.com/en/java/javase/17/language/records.html):
 
 ```java
 import org.jilt.Builder;
@@ -520,6 +520,19 @@ User copy = UserBuilder.copy(user,
     lastName("Johnson"), // a single required property is allowed here
     displayName("Johnny D") // optional properties are also allowed here
 );
+```
+
+You can also define a `toBuilder` instance method on your target class,
+that delegates to the static method on the Builder class:
+
+```java
+public final class User {
+    // ...
+
+    public User copy(UserBuilders.Setter... setters) {
+        return UserBuilder.copy(this, setters);
+    }
+}
 ```
 
 ##### @BuilderInterfaces annotation
