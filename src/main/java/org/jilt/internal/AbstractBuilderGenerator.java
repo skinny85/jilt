@@ -468,6 +468,10 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     }
 
     private String determineTargetClassPackage() {
+        if (this.targetCreationMethod != null) {
+            Element enclosingElement = this.targetCreationMethod.getEnclosingElement();
+            return this.elements.getPackageOf(enclosingElement).getQualifiedName().toString();
+        }
         return this.elements.getPackageOf(this.targetClassType).getQualifiedName().toString();
     }
 
