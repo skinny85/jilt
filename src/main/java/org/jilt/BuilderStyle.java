@@ -374,6 +374,8 @@ public enum BuilderStyle {
      *     middleName("Muriel") // this is optional
      * );
      * </code></pre>
+     *
+     * @since 1.6
      */
     FUNCTIONAL
 }

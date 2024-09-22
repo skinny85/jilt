@@ -518,7 +518,7 @@ User user = UserBuilder.user(
 );
 User copy = UserBuilder.copy(user,
     lastName("Johnson"), // a single required property is allowed here
-    displayName("Johnny D") // optional properties are also allowed here
+    displayName("Johnny J") // optional properties are also allowed here
 );
 ```
 
