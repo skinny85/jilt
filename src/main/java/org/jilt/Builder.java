@@ -333,4 +333,11 @@ public @interface Builder {
     @Retention(RetentionPolicy.SOURCE)
     @interface Ignore {
     }
+
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.SOURCE)
+    @interface Default {
+
+        String value();
+    }
 }

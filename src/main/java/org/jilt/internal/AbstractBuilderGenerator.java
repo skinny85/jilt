@@ -88,12 +88,14 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         for (VariableElement attribute : attributes) {
             String fieldName = attributeSimpleName(attribute);
             TypeName fieldType = TypeName.get(attribute.asType());
+            Builder.Default defaultAnnot = attribute.getAnnotation(Builder.Default.class);
 
             builderClassBuilder.addField(FieldSpec
                     .builder(fieldType, fieldName,
                             this.builderClassNeedsToBeAbstract()
                                 ? Modifier.PROTECTED
                                 : Modifier.PRIVATE)
+                            .initializer(defaultAnnot != null ? defaultAnnot.value() : "")
                     .build());
 
             MethodSpec setterMethod = this.generateBuilderSetterMethod(attribute);
