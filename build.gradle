@@ -100,6 +100,7 @@ dependencies {
     compileOnly 'com.squareup:javapoet:1.8.0'
 
     testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.projectlombok:lombok:1.18.36'
     testImplementation 'org.assertj:assertj-core:3.6.2'
     testImplementation 'com.google.code.findbugs:jsr305:3.0.2'
     testAnnotationProcessor project

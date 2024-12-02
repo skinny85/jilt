@@ -334,10 +334,4 @@ public @interface Builder {
     @interface Ignore {
     }
 
-    @Target(ElementType.FIELD)
-    @Retention(RetentionPolicy.SOURCE)
-    @interface Default {
-
-        String value();
-    }
 }
