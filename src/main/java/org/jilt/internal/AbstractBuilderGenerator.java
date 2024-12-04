@@ -99,7 +99,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
             CodeBlock initializer = CODE_BLOC_EMPTY;
             if (attribute.getAnnotation(Opt.class) != null || getLombokBuilderDefaultAnnotation(attribute.getAnnotationMirrors())){
-                initializer = getCodeBlockInitializer(attribute);
+                initializer = builderFieldInitializer(attribute);
             }
 
             builderClassBuilder.addField(FieldSpec
@@ -136,7 +136,10 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 .anyMatch(a -> "lombok.Builder.Default".equals(a.getAnnotationType().asElement().toString()));
     }
 
-    private CodeBlock getCodeBlockInitializer(VariableElement attribute) {
+    private CodeBlock builderFieldInitializer(VariableElement attribute) {
+        if (attribute.getAnnotation(Opt.class) == null && !getLombokBuilderDefaultAnnotation(attribute.getAnnotationMirrors())){
+            return  CodeBlock.of("");
+        }
         Tree tree = trees.getPath(attribute).getLeaf();
         String initializer = "";
         if (tree instanceof VariableTree && ((VariableTree) tree).getInitializer() != null) {

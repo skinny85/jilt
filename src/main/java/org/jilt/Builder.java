@@ -333,5 +333,4 @@ public @interface Builder {
     @Retention(RetentionPolicy.SOURCE)
     @interface Ignore {
     }
-
 }
