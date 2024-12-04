@@ -23,8 +23,8 @@ import java.util.List;
 
 final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
     public FunctionalBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
-                                      Builder builderAnnotation, BuilderInterfaces builderInterfaces,
-                                      ExecutableElement targetCreationMethod, Elements elements, Trees trees, Filer filer) {
+            Builder builderAnnotation, BuilderInterfaces builderInterfaces,
+            ExecutableElement targetCreationMethod, Elements elements, Trees trees, Filer filer) {
         super(targetClass, attributes, builderAnnotation, builderInterfaces, targetCreationMethod,
                 elements, trees, filer);
     }

@@ -107,7 +107,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                             this.builderClassNeedsToBeAbstract()
                                 ? Modifier.PROTECTED
                                 : Modifier.PRIVATE)
-                            .initializer(initializer)
+                    .initializer(initializer)
                     .build());
 
             MethodSpec setterMethod = this.generateBuilderSetterMethod(attribute);
