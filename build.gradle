@@ -84,6 +84,10 @@ repositories {
     mavenCentral()
 }
 
+if (JavaVersion.current() <= JavaVersion.VERSION_1_8) {
+    sourceSets.test.java.exclude '**/AnnotationPosition*.java'
+}
+
 if (JavaVersion.current() <= JavaVersion.VERSION_11) {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
