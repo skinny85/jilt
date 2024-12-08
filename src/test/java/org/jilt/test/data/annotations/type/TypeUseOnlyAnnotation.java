@@ -1,4 +1,4 @@
-package org.jilt.test.data.annotation_position;
+package org.jilt.test.data.annotations.type;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
