@@ -31,6 +31,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private final Elements elements;
@@ -338,16 +339,17 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     }
 
     protected final ParameterSpec setterParameterSpec(VariableElement attribute, TypeName parameterType) {
-        // copy the annotations of type
-        for (AnnotationMirror annotation : attribute.asType().getAnnotationMirrors()) {
-            parameterType = parameterType.annotated(AnnotationSpec.get(annotation));
-        }
+        // copy the annotations on the type of the parameter
+        TypeName annotatedParameterType = parameterType.annotated(attribute.asType().getAnnotationMirrors().stream()
+                .map(AnnotationSpec::get)
+                .collect(Collectors.toList())
+        );
 
         ParameterSpec.Builder ret = ParameterSpec
-                .builder(parameterType, this.attributeSimpleName(attribute))
+                .builder(annotatedParameterType, this.attributeSimpleName(attribute))
                 .addModifiers(Modifier.FINAL);
 
-        // copy the annotations of parameter
+        // copy the annotations on the parameter itself
         for (AnnotationMirror annotation : attribute.getAnnotationMirrors()) {
             if (this.isAnnotationAllowedOnParam(annotation)) {
                 ret.addAnnotation(AnnotationSpec.get(annotation));
