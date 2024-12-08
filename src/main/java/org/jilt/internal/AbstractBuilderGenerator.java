@@ -338,18 +338,20 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     }
 
     protected final ParameterSpec setterParameterSpec(VariableElement attribute, TypeName parameterType) {
+        // copy the annotations of type
+        for (AnnotationMirror annotation : attribute.asType().getAnnotationMirrors()) {
+            parameterType = parameterType.annotated(AnnotationSpec.get(annotation));
+        }
+
         ParameterSpec.Builder ret = ParameterSpec
                 .builder(parameterType, this.attributeSimpleName(attribute))
                 .addModifiers(Modifier.FINAL);
 
-        // copy the relevant annotations
+        // copy the annotations of parameter
         for (AnnotationMirror annotation : attribute.getAnnotationMirrors()) {
             if (this.isAnnotationAllowedOnParam(annotation)) {
                 ret.addAnnotation(AnnotationSpec.get(annotation));
             }
-        }
-        for (AnnotationMirror annotation : attribute.asType().getAnnotationMirrors()) {
-            ret.addAnnotation(AnnotationSpec.get(annotation));
         }
 
         return ret.build();
