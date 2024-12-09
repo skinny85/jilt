@@ -1,3 +1,9 @@
+Version 1.6.2 - 2024-12-08
+--------------------------
+
+- Fix a bug where type-use annotations were copied incorrectly to the setter methods
+  ([Issue #32](https://github.com/skinny85/jilt/pull/32))
+
 Version 1.6.1 - 2024-06-20
 --------------------------
 
