@@ -503,10 +503,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     private ClassName determineGeneratedAnnotationClass() {
         TypeElement generatedAnnotation = this.elements.getTypeElement("javax.annotation.processing.Generated");
-        if (generatedAnnotation == null) {
-            generatedAnnotation = this.elements.getTypeElement("javax.annotation.Generated");
-        }
-
-        return ClassName.get(generatedAnnotation);
+        return ClassName.get(generatedAnnotation == null
+            ? this.elements.getTypeElement("javax.annotation.Generated")
+            : generatedAnnotation);
     }
 }
