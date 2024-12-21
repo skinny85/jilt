@@ -493,20 +493,18 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return this.targetCreationMethod.getModifiers().contains(Modifier.PRIVATE);
     }
 
-    protected final AnnotationSpec generatedAnnotation() throws Exception {
-        Class<?> generatedAnnotationClass = determineGeneratedAnnotationClass();
+    protected final AnnotationSpec generatedAnnotation() {
+        ClassName generatedAnnotationClass = determineGeneratedAnnotationClass();
         return AnnotationSpec
                 .builder(generatedAnnotationClass)
                 .addMember("value", "$S", "Jilt-1.6.2")
                 .build();
     }
 
-    private Class<?> determineGeneratedAnnotationClass() throws Exception {
-        try {
-            // available since 9
-            return Class.forName("javax.annotation.processing.Generated");
-        } catch (ClassNotFoundException e) {
-            return Class.forName("javax.annotation.Generated");
-        }
+    private ClassName determineGeneratedAnnotationClass() {
+        TypeElement generatedAnnotation = this.elements.getTypeElement("javax.annotation.processing.Generated");
+        return ClassName.get(generatedAnnotation == null
+            ? this.elements.getTypeElement("javax.annotation.Generated")
+            : generatedAnnotation);
     }
 }
