@@ -84,7 +84,7 @@ repositories {
     mavenCentral()
 }
 
-if (JavaVersion.current() <= JavaVersion.VERSION_11) {
+if (JavaVersion.current() < JavaVersion.VERSION_17) {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
     sourceSets.test.java.exclude '**/Record*.java', '**/JSpecify*.java', '**/TypeUseAnnotationsTest.java'
