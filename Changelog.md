@@ -1,3 +1,9 @@
+Version 1.6.3 (2024-12-20)
+--------------------------
+
+- Fix a bug where the wrong `@Generated` annotation was used when passing `--release 8`
+  to the compiler ([Issue #34](https://github.com/skinny85/jilt/pull/34))
+
 Version 1.6.2 (2024-12-08)
 --------------------------
 
