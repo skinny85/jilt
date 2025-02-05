@@ -6,6 +6,7 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
+import com.sun.source.util.Trees;
 import org.jilt.Builder;
 import org.jilt.BuilderInterfaces;
 import org.jilt.Opt;
@@ -29,8 +30,8 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
 
     AbstractTypeSafeBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
             Builder builderAnnotation, BuilderInterfaces builderInterfaces,
-            ExecutableElement targetCreationMethod, Elements elements, Filer filer) {
-        super(targetClass, attributes, builderAnnotation, targetCreationMethod, elements, filer);
+            ExecutableElement targetCreationMethod, Elements elements, Trees trees, Filer filer) {
+        super(targetClass, attributes, builderAnnotation, targetCreationMethod, elements, trees, filer);
         this.optionalAttributes = this.initOptionalAttributes(attributes);
         this.builderInterfaces = builderInterfaces;
     }

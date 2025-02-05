@@ -1,5 +1,6 @@
 package org.jilt.internal;
 
+import com.sun.source.util.Trees;
 import org.jilt.Builder;
 import org.jilt.BuilderInterfaces;
 
@@ -29,10 +30,12 @@ public final class BuilderGeneratorFactory {
 
     private final Filer filer;
     private final Elements elements;
+    private final Trees trees;
 
-    public BuilderGeneratorFactory(Filer filer, Elements elements) {
+    public BuilderGeneratorFactory(Filer filer, Elements elements, Trees trees) {
         this.filer = filer;
         this.elements = elements;
+        this.trees = trees;
     }
 
     public BuilderGenerator forElement(Element annotatedElement, RoundEnvironment roundEnv) throws Exception {
@@ -103,18 +106,18 @@ public final class BuilderGeneratorFactory {
             case STAGED:
             case TYPE_SAFE:
                 return new TypeSafeBuilderGenerator(targetClass, attributes, builderAnnotation,
-                        builderInterfaces, targetCreationMethod, elements, filer);
+                        builderInterfaces, targetCreationMethod, elements, trees, filer);
             case STAGED_PRESERVING_ORDER:
             case TYPE_SAFE_UNGROUPED_OPTIONALS:
                 return new TypeSafeUngroupedOptionalsBuilderGenerator(targetClass, attributes, builderAnnotation,
-                        builderInterfaces, targetCreationMethod, elements, filer);
+                        builderInterfaces, targetCreationMethod, elements, trees, filer);
             case FUNCTIONAL:
                 return new FunctionalBuilderGenerator(targetClass, attributes, builderAnnotation,
-                        builderInterfaces, targetCreationMethod, elements, filer);
+                        builderInterfaces, targetCreationMethod, elements, trees, filer);
             case CLASSIC:
             default:
                 return new ClassicBuilderGenerator(targetClass, attributes, builderAnnotation,
-                        targetCreationMethod, elements, filer);
+                        targetCreationMethod, elements, trees, filer);
         }
     }
 
