@@ -595,6 +595,13 @@ public final class MyValueClass {
 }
 ```
 
+Note that Jilt as an annotation-processor gets its todo list by scanning the given source files for its own annotations.
+A _meta annotation_ needs, therefore, to be a member of the source fileset.
+Jilt will get it for processing as it is annotated with `@Builder`  and can start the search then in source fileset accordingly.
+This disables recognizing meta-annotations in two usage scenarios:
+* meta-annotation in `src/main/java` and annotated class in `src/test/java` and vice versa
+* meta-annotation in another jar
+
 ##### Supporting classes with private constructors
 
 In some cases, you might want to force customers of a class to only be able to instantiate it through its Builder,
