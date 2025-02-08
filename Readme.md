@@ -582,7 +582,7 @@ public @interface MyBuilder {
 }
 ```
 
-And then, you can place this `MyBuilder` so-called _meta annotation_ wherever `@Builder`
+And then, you can place this `MyBuilder` so-called _meta-annotation_ wherever `@Builder`
 can be placed (so, a class, constructor, or static method),
 and the effect will be as if that element was annotated with the same `@Builder`
 and `@BuilderInterfaces` values as `@MyBuilder` is annotated with,
@@ -594,6 +594,18 @@ public final class MyValueClass {
     // ...
 }
 ```
+
+**Note**: since Jilt is implemented as a Java annotation processor,
+that means it shares the limitations common to all annotation processors.
+The restriction that is most relevant to meta-annotation support is that only files from a single source set
+(the one that is currently being compiled) are passed to the processor. 
+This means that you can't, for example, define the meta-annotation in your main source set,
+and then use it in your tests, or package the meta-annotation in a library,
+and then depend on that library from your main project that uses Jilt --
+in both of those cases, the meta annotation won't be passed to Jilt during compilation,
+and so `@Builder` on the meta-annotation won't be recognized.
+In order for meta-annotations to work correctly,
+they have to be defined and used in the same source set.
 
 ##### Supporting classes with private constructors
 
