@@ -6,14 +6,13 @@ import org.jilt.BuilderStyle;
 
 @Builder(
         style = BuilderStyle.TYPE_SAFE_UNGROUPED_OPTIONALS,
-        className = "TypeSafeValueCreator",
+        className = "*Creator",
         packageName = "org.jilt.test.data.typesafe_ungrouped.custom",
         setterPrefix = "with",
         factoryMethod = "creator",
         buildMethod = "create"
 )
 @BuilderInterfaces(
-        outerName = "TypeSafeValueCreators",
         packageName = "org.jilt.test.data.typesafe_ungrouped.custom.customer",
         innerNames = "Step_*"
 )

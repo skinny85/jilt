@@ -595,6 +595,22 @@ public final class MyValueClass {
 }
 ```
 
+If you want to change the name of the generated Builder class with a meta-annotation,
+you typically need that name to depend on the name of the class being built,
+not just be a constant string
+(since that's likely to cause conflicts if the meta-annotation is used more than once).
+Because of that, similarly to `@BuilderInterfaces.innerName`,
+`@Builder.className` allows using the `*` character as a placeholder for the name of the built class,
+so you could define the meta-annotation like this:
+
+```java
+import org.jilt.Builder;
+
+@Builder(className = "*JiltBuilder")
+public @interface MyBuilder {
+}
+```
+
 **Note**: since Jilt is implemented as a Java annotation processor,
 that means it shares the limitations common to all annotation processors.
 The restriction that is most relevant to meta-annotation support is that only files from a single source set
