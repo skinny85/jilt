@@ -13,7 +13,6 @@ import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
 import com.squareup.javapoet.WildcardTypeName;
 import org.jilt.Builder;
-import org.jilt.BuilderStyle;
 import org.jilt.Opt;
 import org.jilt.utils.Utils;
 
@@ -116,51 +115,9 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     }
 
     private Modifier[] determineBuilderClassModifiers() {
-        List<Modifier> modifiers = new ArrayList<Modifier>(2);
-        Modifier builderAccessLevel = this.determineBuilderClassAccessLevel();
-        if (builderAccessLevel != null) {
-            modifiers.add(builderAccessLevel);
-        }
-        if (this.builderClassNeedsToBeAbstract()) {
-            // if the creation method is private,
-            // we need to make the Builder abstract
-            modifiers.add(Modifier.ABSTRACT);
-        }
-        return modifiers.toArray(new Modifier[]{});
-    }
-
-    private Modifier determineBuilderClassAccessLevel() {
-        BuilderStyle builderStyle = this.builderAnnotation.style();
-        if (builderStyle == BuilderStyle.CLASSIC) {
-            // Classic Builders always have their class public,
-            // even if they are abstract
-            return Modifier.PUBLIC;
-        }
-        if (!this.builderClassNeedsToBeAbstract()) {
-            // if the Builder class doesn't need to be abstract,
-            // customers of the class will most likely interact with
-            // (they only won't have to if the target class defines a handwritten static factory method,
-            // plus a toBuilder method, if requested)
-            // so it needs to be public
-            return Modifier.PUBLIC;
-        }
-        if (!this.builderClassPackage.equals(this.determineTargetClassPackage())) {
-            // if the Builder and the built class are in different packages,
-            // obviously the Builder needs to be public
-            return Modifier.PUBLIC;
-        }
-        if (builderStyle == BuilderStyle.FUNCTIONAL) {
-            // for a Functional abstract Builder in the same package,
-            // it still can't be package-private,
-            // since customers use it for the static setter methods
-            return Modifier.PUBLIC;
-        }
-        // here, we know that the Builder style is a Staged one -
-        // so, we make the Builder class package-private only if toBuilder wasn't requested,
-        // since you need the type of the Builder to return from toBuilder
-        return this.builderAnnotation.toBuilder().isEmpty()
-                ? null
-                : Modifier.PUBLIC;
+        return this.builderClassNeedsToBeAbstract()
+                ? new Modifier[]{Modifier.PUBLIC, Modifier.ABSTRACT}
+                : new Modifier[]{Modifier.PUBLIC};
     }
 
     protected MethodSpec makeStaticFactoryMethod() {
