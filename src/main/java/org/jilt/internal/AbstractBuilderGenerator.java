@@ -151,9 +151,9 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         }
         if (builderStyle == BuilderStyle.FUNCTIONAL) {
             // for a Functional abstract Builder in the same package,
-            // it can be package-private, since you'll have to add a static factory method
-            // (and toBuilder method, if requested) to the built class anyway
-            return null;
+            // it still can't be package-private,
+            // since customers use it for the static setter methods
+            return Modifier.PUBLIC;
         }
         // here, we know that the Builder style is a Staged one -
         // so, we make the Builder class package-private only if toBuilder wasn't requested,

@@ -13,13 +13,12 @@ import static org.jilt.test.data.functional.LargeLanguageModelBuilder.name;
 import static org.jilt.test.data.functional.LargeLanguageModelBuilder.outputTokensLimit;
 import static org.jilt.test.data.functional.LargeLanguageModelBuilder.temperature;
 import static org.jilt.test.data.functional.LargeLanguageModelBuilder.toBuilder;
+import static org.jilt.test.data.functional.UserFunc.userFunc;
 import static org.jilt.test.data.functional.UserFuncBuilder.Optional.displayName;
 import static org.jilt.test.data.functional.UserFuncBuilder.Optional.username;
-import static org.jilt.test.data.functional.UserFuncBuilder.copy;
 import static org.jilt.test.data.functional.UserFuncBuilder.email;
 import static org.jilt.test.data.functional.UserFuncBuilder.firstName;
 import static org.jilt.test.data.functional.UserFuncBuilder.lastName;
-import static org.jilt.test.data.functional.UserFuncBuilder.userFunc;
 
 public class FunctionalBuilderTest {
     @Test
@@ -52,7 +51,7 @@ public class FunctionalBuilderTest {
 
     @Test
     public void func_builder_with_one_optional_property_works() {
-        UserFunc user = UserFuncBuilder.userFunc(
+        UserFunc user = UserFunc.userFunc(
                 UserFuncBuilder.email("my-email"),
                 UserFuncBuilder.firstName("first-name"),
                 UserFuncBuilder.lastName("last-name"),
@@ -90,7 +89,7 @@ public class FunctionalBuilderTest {
                 firstName("first-name"),
                 lastName("last-name")
         );
-        UserFunc copy = copy(user);
+        UserFunc copy = user.copy();
 
         assertThat(copy.email).isEqualTo(user.email);
         assertThat(copy.username).isEqualTo(user.username);
