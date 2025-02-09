@@ -13,6 +13,7 @@ import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
 import com.squareup.javapoet.WildcardTypeName;
 import org.jilt.Builder;
+import org.jilt.BuilderStyle;
 import org.jilt.Opt;
 import org.jilt.utils.Utils;
 
@@ -116,20 +117,50 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     private Modifier[] determineBuilderClassModifiers() {
         List<Modifier> modifiers = new ArrayList<Modifier>(2);
+        Modifier builderAccessLevel = this.determineBuilderClassAccessLevel();
+        if (builderAccessLevel != null) {
+            modifiers.add(builderAccessLevel);
+        }
         if (this.builderClassNeedsToBeAbstract()) {
             // if the creation method is private,
             // we need to make the Builder abstract
             modifiers.add(Modifier.ABSTRACT);
-            // if the Builder is in the same package as the target class,
-            // make it package-private (it will only be available through the target class anyway,
-            // because of the creation method being private)
-            if (!this.builderClassPackage.equals(this.determineTargetClassPackage())) {
-                modifiers.add(Modifier.PUBLIC);
-            }
-        } else {
-            modifiers.add(Modifier.PUBLIC);
         }
         return modifiers.toArray(new Modifier[]{});
+    }
+
+    private Modifier determineBuilderClassAccessLevel() {
+        BuilderStyle builderStyle = this.builderAnnotation.style();
+        if (builderStyle == BuilderStyle.CLASSIC) {
+            // Classic Builders always have their class public,
+            // even if they are abstract
+            return Modifier.PUBLIC;
+        }
+        if (!this.builderClassNeedsToBeAbstract()) {
+            // if the Builder class doesn't need to be abstract,
+            // customers of the class will most likely interact with
+            // (they only won't have to if the target class defines a handwritten static factory method,
+            // plus a toBuilder method, if requested)
+            // so it needs to be public
+            return Modifier.PUBLIC;
+        }
+        if (!this.builderClassPackage.equals(this.determineTargetClassPackage())) {
+            // if the Builder and the built class are in different packages,
+            // obviously the Builder needs to be public
+            return Modifier.PUBLIC;
+        }
+        if (builderStyle == BuilderStyle.FUNCTIONAL) {
+            // for a Functional abstract Builder in the same package,
+            // it can be package-private, since you'll have to add a static factory method
+            // (and toBuilder method, if requested) to the built class anyway
+            return null;
+        }
+        // here, we know that the Builder style is a Staged one -
+        // so, we make the Builder class package-private only if toBuilder wasn't requested,
+        // since you need the type of the Builder to return from toBuilder
+        return this.builderAnnotation.toBuilder().isEmpty()
+                ? null
+                : Modifier.PUBLIC;
     }
 
     protected MethodSpec makeStaticFactoryMethod() {
@@ -156,20 +187,31 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             return null;
         }
 
-        String targetClassParam = Utils.deCapitalize(this.targetClassSimpleName().toString());
         MethodSpec.Builder toBuilderMethod = MethodSpec
                 .methodBuilder(this.builderAnnotation.toBuilder())
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addTypeVariables(this.builderClassTypeParameters())
-                .returns(this.builderClassTypeName())
-                .addParameter(ParameterSpec
-                        .builder(this.targetClassTypeName(), targetClassParam)
-                        .build());
+                .returns(this.builderClassTypeName());
+        String returnVarName = this.builderClassMethodParamName();
+        if (this.builderClassNeedsToBeAbstract()) {
+            // if the Builder is abstract, we need to make the toBuilder()
+            // method accept a parameter of the Builder type
+            toBuilderMethod.addParameter(ParameterSpec
+                    .builder(this.builderClassTypeName(), returnVarName)
+                    .build());
+        }
+        String targetClassParam = Utils.deCapitalize(this.targetClassSimpleName().toString());
+        toBuilderMethod.addParameter(ParameterSpec
+                .builder(this.targetClassTypeName(), targetClassParam)
+                .build());
 
         CodeBlock.Builder methodBody = CodeBlock.builder();
-        String returnVarName = this.builderClassMethodParamName();
-        methodBody.addStatement("$1T $2N = new $1T()", this.builderClassTypeName(),
-                returnVarName);
+        // create an instance of the Builder class,
+        // but only if the Builder class is not abstract
+        if (!this.builderClassNeedsToBeAbstract()) {
+            methodBody.addStatement("$1T $2N = new $1T()", this.builderClassTypeName(),
+                    returnVarName);
+        }
         // iterate through all attributes,
         // and add a setter statement to the method body for each
         for (VariableElement attribute : attributes) {
