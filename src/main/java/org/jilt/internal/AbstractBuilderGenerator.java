@@ -13,6 +13,7 @@ import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
 import com.squareup.javapoet.WildcardTypeName;
 import org.jilt.Builder;
+import org.jilt.JiltGenerated;
 import org.jilt.Opt;
 import org.jilt.utils.Utils;
 
@@ -70,6 +71,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         // builder class
         TypeSpec.Builder builderClassBuilder = TypeSpec.classBuilder(this.builderClassClassName)
                 .addAnnotation(this.generatedAnnotation())
+                .addAnnotation(JiltGenerated.class)
                 .addModifiers(this.determineBuilderClassModifiers())
                 .addTypeVariables(this.builderClassTypeParameters());
 
