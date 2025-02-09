@@ -7,7 +7,7 @@ import org.jilt.Opt;
 public final class UserFunc {
     public final String email, username, firstName, lastName, displayName;
 
-    @Builder(style = BuilderStyle.FUNCTIONAL, toBuilder = "toBuilder")
+    @Builder(style = BuilderStyle.FUNCTIONAL, toBuilder = "copy")
     public UserFunc(String email, @Opt String username, String firstName,
             String lastName, @Opt String displayName) {
         this.email = email;

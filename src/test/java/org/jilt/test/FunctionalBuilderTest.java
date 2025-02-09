@@ -15,6 +15,7 @@ import static org.jilt.test.data.functional.LargeLanguageModelBuilder.temperatur
 import static org.jilt.test.data.functional.LargeLanguageModelBuilder.toBuilder;
 import static org.jilt.test.data.functional.UserFuncBuilder.Optional.displayName;
 import static org.jilt.test.data.functional.UserFuncBuilder.Optional.username;
+import static org.jilt.test.data.functional.UserFuncBuilder.copy;
 import static org.jilt.test.data.functional.UserFuncBuilder.email;
 import static org.jilt.test.data.functional.UserFuncBuilder.firstName;
 import static org.jilt.test.data.functional.UserFuncBuilder.lastName;
@@ -83,6 +84,22 @@ public class FunctionalBuilderTest {
     }
 
     @Test
+    public void func_toBuilder_no_properties_works() {
+        UserFunc user = userFunc(
+                email("my-email"),
+                firstName("first-name"),
+                lastName("last-name")
+        );
+        UserFunc copy = copy(user);
+
+        assertThat(copy.email).isEqualTo(user.email);
+        assertThat(copy.username).isEqualTo(user.username);
+        assertThat(copy.firstName).isEqualTo(user.firstName);
+        assertThat(copy.lastName).isEqualTo(user.lastName);
+        assertThat(copy.displayName).isEqualTo(user.displayName);
+    }
+
+    @Test
     public void func_builder_toBuilder_without_changes_works() {
         LargeLanguageModel llm = new LargeLanguageModel("my-name", 0.3F, 100);
         LargeLanguageModel copy = toBuilder(llm);
@@ -128,5 +145,24 @@ public class FunctionalBuilderTest {
         assertThat(trickyNames.builder).isEqualTo('b');
         assertThat(trickyNames.trickyNamesFBuilder).isEqualTo(11.0);
         assertThat(trickyNames.optValue).isEqualTo(13);
+    }
+
+    @Test
+    public void tricky_names_toBuilder_works() {
+        TrickyNamesF trickyNames = TrickyNamesFuncBuilder.trickyNamesF(
+                TrickyNamesFuncBuilder.setter("setter"),
+                TrickyNamesFuncBuilder.optional(true),
+                TrickyNamesFuncBuilder.builder('b'),
+                TrickyNamesFuncBuilder.trickyNamesFBuilder(11.0)
+        );
+        TrickyNamesF modifiedTrickyNames = TrickyNamesFuncBuilder.trickyToBuilder(trickyNames,
+                TrickyNamesFuncBuilder.Optional.optValue(13),
+                TrickyNamesFuncBuilder.builder('c'));
+
+        assertThat(modifiedTrickyNames.setter).isEqualTo("setter");
+        assertThat(modifiedTrickyNames.optional).isTrue();
+        assertThat(modifiedTrickyNames.builder).isEqualTo('c');
+        assertThat(modifiedTrickyNames.trickyNamesFBuilder).isEqualTo(11.0);
+        assertThat(modifiedTrickyNames.optValue).isEqualTo(13);
     }
 }
