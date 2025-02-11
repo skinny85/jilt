@@ -655,7 +655,7 @@ it would look something like this:
 public final class User {
     public final String email, username, firstName, lastName, displayName;
 
-    @Builder(style = BuilderStyle.STAGED)
+    @Builder(style = BuilderStyle.STAGED, toBuilder = "toBuilder")
     private User(String email, @Opt String username, String firstName,
             String lastName, @Opt String displayName) {
         this.email = email;
@@ -676,6 +676,10 @@ public final class User {
 
     public static UserBuilders.Email builder() {
         return new InnerBuilder();
+    }
+
+    public UserBuilder toBuilder() {
+        return UserBuilder.toBuilder(new InnerBuilder(), this);
     }
 }
 ```

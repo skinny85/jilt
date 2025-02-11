@@ -20,4 +20,23 @@ public class PrivateConstructorTest {
         assertThat(user.lastName).isNull();
         assertThat(user.displayName).isEqualTo("First null");
     }
+
+    @Test
+    public void toBuilder_works_with_private_constructor() {
+        UserPriv user = UserPriv.builder()
+                .email("user@example.com")
+                .firstName("First")
+                .lastName(null)
+                .build();
+        UserPriv modifiedUser = user.toBuilder()
+                .lastName("Last")
+                .displayName(null)
+                .build();
+
+        assertThat(modifiedUser.email).isEqualTo("user@example.com");
+        assertThat(modifiedUser.username).isEqualTo("user@example.com");
+        assertThat(modifiedUser.firstName).isEqualTo("First");
+        assertThat(modifiedUser.lastName).isEqualTo("Last");
+        assertThat(modifiedUser.displayName).isEqualTo("First Last");
+    }
 }
