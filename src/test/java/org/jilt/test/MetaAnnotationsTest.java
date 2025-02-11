@@ -1,8 +1,8 @@
 package org.jilt.test;
 
 import org.jilt.test.data.meta.MetaConstructorValue;
-import org.jilt.test.data.meta.MetaConstructorValueBuilder;
-import org.jilt.test.data.meta.MetaConstructorValueBuilders.Meta;
+import org.jilt.test.data.meta.MetaConstructorValueJiltBuilder;
+import org.jilt.test.data.meta.MetaConstructorValueJiltBuilders.Meta;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MetaAnnotationsTest {
     @Test
     public void test_meta_builder_on_constructor() {
-        Meta lastValue = MetaConstructorValueBuilder.builder()
+        Meta lastValue = MetaConstructorValueJiltBuilder.builder()
                 .withAttr2("attr2_value")
                 .withAttr4(4)
                 .withAttr3(true);

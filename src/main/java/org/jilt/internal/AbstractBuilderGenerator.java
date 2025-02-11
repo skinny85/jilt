@@ -397,7 +397,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         String annotationBuilderClassName = builderAnnotation.className();
         return annotationBuilderClassName.isEmpty()
                 ? this.targetClassSimpleName() + "Builder"
-                : annotationBuilderClassName;
+                // we need to replace any '*' in className with the target class's name
+                : annotationBuilderClassName.replaceAll("\\*", this.targetClassSimpleName().toString());
     }
 
     protected final Filer filer() {
