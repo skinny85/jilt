@@ -257,7 +257,6 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     protected MethodSpec generateSetterMethod(VariableElement attribute,
             boolean mangleTypeParameters, boolean abstractMethod) {
-        String fieldName = this.attributeSimpleName(attribute);
         TypeName parameterType = this.attributeType(attribute, mangleTypeParameters);
         MethodSpec.Builder setter = MethodSpec
                 .methodBuilder(this.setterMethodName(attribute))
@@ -273,7 +272,9 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         if (abstractMethod) {
             setter.addModifiers(Modifier.ABSTRACT);
         } else {
-            setter.addStatement("this.$1L = $1L", fieldName)
+            setter
+                    .addStatement("this.$1L = $1L",
+                            this.attributeSimpleName(attribute))
                     .addStatement("return this");
         }
 
@@ -347,8 +348,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         );
 
         ParameterSpec.Builder ret = ParameterSpec
-                .builder(annotatedParameterType, this.attributeSimpleName(attribute))
-                .addModifiers(Modifier.FINAL);
+                .builder(annotatedParameterType, this.attributeSimpleName(attribute));
 
         // copy the annotations on the parameter itself
         for (AnnotationMirror annotation : attribute.getAnnotationMirrors()) {
