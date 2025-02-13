@@ -171,25 +171,15 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
             return null;
         }
 
-        TypeName setterInterface = this.returnTypeForSetterFor(attribute, mangleTypeParameters);
         TypeName parameterType = this.attributeType(attribute, mangleTypeParameters);
-        String builderClassMethodParamName = this.builderClassMethodParamName();
-        String fieldName = this.attributeSimpleName(attribute);
         return MethodSpec
                 .methodBuilder(this.setterMethodName(attribute))
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .returns(setterInterface)
+                .returns(this.returnTypeForSetterFor(attribute, mangleTypeParameters))
                 .addParameter(this.setterParameterSpec(attribute, parameterType))
-                .addStatement("return $L", TypeSpec
-                        .anonymousClassBuilder("")
-                        .addSuperinterface(setterInterface)
-                        .addMethod(MethodSpec
-                                .methodBuilder("accept")
-                                .addModifiers(Modifier.PUBLIC)
-                                .addParameter(this.setterBuilderParameter())
-                                .addStatement("$1L.$2L = $2L", builderClassMethodParamName, fieldName)
-                                .build())
-                        .build())
+                .addStatement("return $1L -> $1L.$2L = $2L",
+                        this.builderClassMethodParamName(),
+                        this.attributeSimpleName(attribute))
                 .build();
     }
 
