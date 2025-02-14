@@ -323,6 +323,8 @@ public @interface Builder {
      * <p>
      * The value of this attribute is the name to use for the generated method.
      * The default is the empty string, which means no method will be generated.
+     *
+     * @since 1.5
      */
     String toBuilder() default "";
 
