@@ -23,6 +23,8 @@ import java.lang.annotation.Target;
  * <p>
  * Other than being a marker, this annotation has no effect,
  * and can be safely ignored.
+ *
+ * @since 1.7
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.CLASS)

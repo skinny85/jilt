@@ -1,24 +1,29 @@
+Version 1.7 (2025-02-13)
+------------------------
+- Allow using `*` in `@Builder.className`
+  ([Issue #39](https://github.com/skinny85/jilt/pull/39))
+- Add `@JiltGenerated` annotation with `RetentionPolicy.CLASS`
+  to all generated Builder classes ([Issue #28](https://github.com/skinny85/jilt/issues/28))
+- Fix a bug where setting `@Builder.toBuilder` on a class with a private constructor
+  would generate non-compiling code ([Issue #29](https://github.com/skinny85/jilt/issues/29))
+
 Version 1.6.3 (2024-12-20)
 --------------------------
-
 - Fix a bug where the wrong `@Generated` annotation was used when passing `--release 8`
   to the compiler ([Issue #34](https://github.com/skinny85/jilt/pull/34))
 
 Version 1.6.2 (2024-12-08)
 --------------------------
-
 - Fix a bug where type-use annotations were copied incorrectly to the setter methods
   ([Issue #32](https://github.com/skinny85/jilt/pull/32))
 
 Version 1.6.1 (2024-06-20)
 --------------------------
-
 - Fix a bug where some annotations were copied twice to the setter methods
   ([Issue #22](https://github.com/skinny85/jilt/pull/22))
 
 Version 1.6 (2024-06-15)
 ------------------------
-
 - Add support for Functional Builders
   ([Issue #17](https://github.com/skinny85/jilt/issues/17))
 - Fix a bug where boolean getters were not correctly recognized in
