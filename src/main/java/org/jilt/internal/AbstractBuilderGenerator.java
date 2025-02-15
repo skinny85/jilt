@@ -12,6 +12,9 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
 import com.squareup.javapoet.WildcardTypeName;
+import com.sun.source.tree.Tree;
+import com.sun.source.tree.VariableTree;
+import com.sun.source.util.Trees;
 import org.jilt.Builder;
 import org.jilt.JiltGenerated;
 import org.jilt.Opt;
@@ -35,7 +38,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 abstract class AbstractBuilderGenerator implements BuilderGenerator {
+
+    private static final CodeBlock CODE_BLOC_EMPTY = CodeBlock.of("");
+
     private final Elements elements;
+    private final Trees trees;
     private final Filer filer;
     private final Element optElement;
 
@@ -49,8 +56,9 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     AbstractBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
             Builder builderAnnotation, ExecutableElement targetCreationMethod,
-            Elements elements, Filer filer) {
+            Elements elements, Trees trees, Filer filer) {
         this.elements = elements;
+        this.trees = trees;
         this.filer = filer;
         this.optElement = this.elements.getTypeElement(Opt.class.getCanonicalName());
 
@@ -92,11 +100,17 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             String fieldName = attributeSimpleName(attribute);
             TypeName fieldType = TypeName.get(attribute.asType());
 
+            CodeBlock initializer = CODE_BLOC_EMPTY;
+            if (attribute.getAnnotation(Opt.class) != null || getLombokBuilderDefaultAnnotation(attribute.getAnnotationMirrors())){
+                initializer = builderFieldInitializer(attribute);
+            }
+
             builderClassBuilder.addField(FieldSpec
                     .builder(fieldType, fieldName,
                             this.builderClassNeedsToBeAbstract()
                                 ? Modifier.PROTECTED
                                 : Modifier.PRIVATE)
+                    .initializer(initializer)
                     .build());
 
             MethodSpec setterMethod = this.generateBuilderSetterMethod(attribute);
@@ -114,6 +128,27 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 .builder(builderClassPackage(), builderClassBuilder.build())
                 .build();
         javaFile.writeTo(filer);
+    }
+
+    private static boolean getLombokBuilderDefaultAnnotation(List<? extends AnnotationMirror> annotationMirrors) {
+        if (annotationMirrors == null || annotationMirrors.isEmpty()) {
+            return false;
+        }
+        return annotationMirrors
+                .stream()
+                .anyMatch(a -> "lombok.Builder.Default".equals(a.getAnnotationType().asElement().toString()));
+    }
+
+    private CodeBlock builderFieldInitializer(VariableElement attribute) {
+        if (attribute.getAnnotation(Opt.class) == null && !getLombokBuilderDefaultAnnotation(attribute.getAnnotationMirrors())){
+            return  CodeBlock.of("");
+        }
+        Tree tree = trees.getPath(attribute).getLeaf();
+        String initializer = "";
+        if (tree instanceof VariableTree && ((VariableTree) tree).getInitializer() != null) {
+            initializer = ((VariableTree) tree).getInitializer().toString();
+        }
+        return initializer.isEmpty()? CodeBlock.of("") : CodeBlock.of("$L", initializer);
     }
 
     private Modifier[] determineBuilderClassModifiers() {
