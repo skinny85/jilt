@@ -95,6 +95,11 @@ if (JavaVersion.current() < JavaVersion.VERSION_17) {
         testImplementation 'org.jspecify:jspecify:0.3.0'
     }
 }
+if (JavaVersion.current() <= JavaVersion.VERSION_1_8) {
+    dependencies {
+        implementation files("${System.properties['java.home']}/../lib/tools.jar")
+    }
+}
 
 dependencies {
     compileOnly 'com.squareup:javapoet:1.13.0'
