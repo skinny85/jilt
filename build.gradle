@@ -10,6 +10,7 @@ version '1.7'
 
 shadowJar {
     relocate 'com.squareup', 'org.jilt.shaded.com.squareup'
+    exclude 'com.sun'
 
     archiveClassifier = '' // we want the shadow JAR to be the main output JAR
     configurations = [project.configurations.compileClasspath]
