@@ -96,8 +96,10 @@ if (JavaVersion.current() < JavaVersion.VERSION_17) {
     }
 }
 if (JavaVersion.current() <= JavaVersion.VERSION_1_8) {
+    // before Java 9, com.sun.source.util.Trees and its related classes
+    // are available only through lib/tools.jar
     dependencies {
-        implementation files("${System.properties['java.home']}/../lib/tools.jar")
+        compileOnly files("${System.properties['java.home']}/../lib/tools.jar")
     }
 }
 

@@ -162,37 +162,40 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
     private Set<VariableElement> initOptionalAttributes(List<? extends VariableElement> attributes) {
         Set<VariableElement> ret = new HashSet<VariableElement>();
         for (VariableElement attribute : attributes) {
-            if (this.determineIfAttributeIsOptional(attribute)) {
+            if (this.attributeIsOptional(attribute)) {
                 ret.add(attribute);
             }
         }
         return ret;
     }
 
-    private boolean determineIfAttributeIsOptional(VariableElement attribute) {
+    private boolean attributeIsOptional(VariableElement attribute) {
         if (attribute.getAnnotation(Opt.class) != null) {
             return true;
         }
-        if (this.firstAnnotationCalledNullable(attribute) != null) {
+        if (this.hasAnnotationCalledNullable(attribute)) {
+            return true;
+        }
+        if (this.hasLombokDefaultAnnotation(attribute)) {
             return true;
         }
         return false;
     }
 
-    private AnnotationMirror firstAnnotationCalledNullable(VariableElement attribute) {
+    private boolean hasAnnotationCalledNullable(VariableElement attribute) {
         for (AnnotationMirror annotation : attribute.getAnnotationMirrors()) {
             if (annotationIsCalledNullable(annotation)) {
-                return annotation;
+                return true;
             }
         }
         // some annotations are applied to the type, instead of the attribute,
         // like the ones from JSpecify
         for (AnnotationMirror annotation : attribute.asType().getAnnotationMirrors()) {
             if (annotationIsCalledNullable(annotation)) {
-                return annotation;
+                return true;
             }
         }
-        return null;
+        return false;
     }
 
     private static boolean annotationIsCalledNullable(AnnotationMirror annotation) {

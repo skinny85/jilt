@@ -1,6 +1,7 @@
 package org.jilt.test.data.defaultvalue;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.jilt.Builder;
 import org.jilt.BuilderStyle;
 import org.jilt.Opt;
@@ -11,22 +12,24 @@ import static lombok.Builder.Default;
 
 @Builder(style = BuilderStyle.STAGED)
 @AllArgsConstructor
+@Getter
 public class DefaultValueWithLombok {
     @Default
-    public int nr = 1;
+    private int nr = 1;
 
     @Default
-    public String strNrPlus1k = String.valueOf(this.nr + 1_000);
+    private String strNrPlus1k = String.valueOf(this.nr + 1_000);
 
-    public char charNoDefaultWithInit = 'c';
-
-    @Default
-    public final boolean boolDefaultNoInit;
+    // this initializer is ignored
+    private char charNoDefaultWithInit = 'c';
 
     @Default
-    public Set<String> strings = java.util.Collections.emptySet();
+    private final boolean boolDefaultNoInit;
+
+    @Default
+    private Set<String> strings = java.util.Collections.singleton("s");
 
     @Opt
-    // ToDo - fix this so that it doesn't require a fully-qualified class name
-    public String optAttr = java.util.Collections.singletonList("opt").toString();
+    // this initializer is ignored
+    private String optAttr = java.util.Collections.singletonList("opt").toString();
 }

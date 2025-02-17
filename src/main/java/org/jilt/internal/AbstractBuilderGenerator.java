@@ -125,7 +125,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     private CodeBlock builderFieldInitializer(VariableElement attribute) {
         String initializerString = null;
-        if (this.attributeHasLombokDefaultAnnotation(attribute)) {
+        if (this.hasLombokDefaultAnnotation(attribute)) {
             Tree tree = this.trees.getPath(attribute).getLeaf();
             if (tree instanceof VariableTree) {
                 ExpressionTree initializer = ((VariableTree) tree).getInitializer();
@@ -137,16 +137,6 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return initializerString == null
                 ? CodeBlock.of("")
                 : CodeBlock.of("$L", initializerString);
-    }
-
-    private boolean attributeHasLombokDefaultAnnotation(VariableElement attribute) {
-        List<? extends AnnotationMirror> annotationMirrors = attribute.getAnnotationMirrors();
-        if (annotationMirrors == null || annotationMirrors.isEmpty()) {
-            return false;
-        }
-        return annotationMirrors
-                .stream()
-                .anyMatch(a -> "lombok.Builder.Default".equals(a.getAnnotationType().asElement().toString()));
     }
 
     private Modifier[] determineBuilderClassModifiers() {
@@ -240,6 +230,16 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             }
         }
         return buildMethod.build();
+    }
+
+    protected final boolean hasLombokDefaultAnnotation(VariableElement attribute) {
+        List<? extends AnnotationMirror> annotationMirrors = attribute.getAnnotationMirrors();
+        if (annotationMirrors == null || annotationMirrors.isEmpty()) {
+            return false;
+        }
+        return annotationMirrors
+                .stream()
+                .anyMatch(a -> "lombok.Builder.Default".equals(a.getAnnotationType().asElement().toString()));
     }
 
     protected final String accessAttributeOfTargetClass(VariableElement attribute) {
