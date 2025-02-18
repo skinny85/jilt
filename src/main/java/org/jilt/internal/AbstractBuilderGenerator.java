@@ -12,10 +12,12 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
 import com.squareup.javapoet.WildcardTypeName;
+import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.Trees;
 import org.jilt.Builder;
+import org.jilt.JiltGenerated;
 import org.jilt.Opt;
 import org.jilt.utils.Utils;
 
@@ -34,11 +36,9 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 abstract class AbstractBuilderGenerator implements BuilderGenerator {
-
-    private static final CodeBlock CODE_BLOC_EMPTY = CodeBlock.of("");
-
     private final Elements elements;
     private final Trees trees;
     private final Filer filer;
@@ -77,6 +77,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         // builder class
         TypeSpec.Builder builderClassBuilder = TypeSpec.classBuilder(this.builderClassClassName)
                 .addAnnotation(this.generatedAnnotation())
+                .addAnnotation(JiltGenerated.class)
                 .addModifiers(this.determineBuilderClassModifiers())
                 .addTypeVariables(this.builderClassTypeParameters());
 
@@ -97,17 +98,12 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             String fieldName = attributeSimpleName(attribute);
             TypeName fieldType = TypeName.get(attribute.asType());
 
-            CodeBlock initializer = CODE_BLOC_EMPTY;
-            if (attribute.getAnnotation(Opt.class) != null || getLombokBuilderDefaultAnnotation(attribute.getAnnotationMirrors())){
-                initializer = builderFieldInitializer(attribute);
-            }
-
             builderClassBuilder.addField(FieldSpec
                     .builder(fieldType, fieldName,
                             this.builderClassNeedsToBeAbstract()
                                 ? Modifier.PROTECTED
                                 : Modifier.PRIVATE)
-                    .initializer(initializer)
+                    .initializer(this.builderFieldInitializer(attribute))
                     .build());
 
             MethodSpec setterMethod = this.generateBuilderSetterMethod(attribute);
@@ -127,43 +123,26 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         javaFile.writeTo(filer);
     }
 
-    private static boolean getLombokBuilderDefaultAnnotation(List<? extends AnnotationMirror> annotationMirrors) {
-        if (annotationMirrors == null || annotationMirrors.isEmpty()) {
-            return false;
-        }
-        return annotationMirrors
-                .stream()
-                .anyMatch(a -> "lombok.Builder.Default".equals(a.getAnnotationType().asElement().toString()));
-    }
-
     private CodeBlock builderFieldInitializer(VariableElement attribute) {
-        if (attribute.getAnnotation(Opt.class) == null && !getLombokBuilderDefaultAnnotation(attribute.getAnnotationMirrors())){
-            return  CodeBlock.of("");
+        String initializerString = null;
+        if (this.hasLombokDefaultAnnotation(attribute)) {
+            Tree tree = this.trees.getPath(attribute).getLeaf();
+            if (tree instanceof VariableTree) {
+                ExpressionTree initializer = ((VariableTree) tree).getInitializer();
+                if (initializer != null) {
+                    initializerString = initializer.toString();
+                }
+            }
         }
-        Tree tree = trees.getPath(attribute).getLeaf();
-        String initializer = "";
-        if (tree instanceof VariableTree && ((VariableTree) tree).getInitializer() != null) {
-            initializer = ((VariableTree) tree).getInitializer().toString();
-        }
-        return initializer.isEmpty()? CodeBlock.of("") : CodeBlock.of("$L", initializer);
+        return initializerString == null
+                ? CodeBlock.of("")
+                : CodeBlock.of("$L", initializerString);
     }
 
     private Modifier[] determineBuilderClassModifiers() {
-        List<Modifier> modifiers = new ArrayList<Modifier>(2);
-        if (this.builderClassNeedsToBeAbstract()) {
-            // if the creation method is private,
-            // we need to make the Builder abstract
-            modifiers.add(Modifier.ABSTRACT);
-            // if the Builder is in the same package as the target class,
-            // make it package-private (it will only be available through the target class anyway,
-            // because of the creation method being private)
-            if (!this.builderClassPackage.equals(this.determineTargetClassPackage())) {
-                modifiers.add(Modifier.PUBLIC);
-            }
-        } else {
-            modifiers.add(Modifier.PUBLIC);
-        }
-        return modifiers.toArray(new Modifier[]{});
+        return this.builderClassNeedsToBeAbstract()
+                ? new Modifier[]{Modifier.PUBLIC, Modifier.ABSTRACT}
+                : new Modifier[]{Modifier.PUBLIC};
     }
 
     protected MethodSpec makeStaticFactoryMethod() {
@@ -190,20 +169,31 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             return null;
         }
 
-        String targetClassParam = Utils.deCapitalize(this.targetClassSimpleName().toString());
         MethodSpec.Builder toBuilderMethod = MethodSpec
                 .methodBuilder(this.builderAnnotation.toBuilder())
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addTypeVariables(this.builderClassTypeParameters())
-                .returns(this.builderClassTypeName())
-                .addParameter(ParameterSpec
-                        .builder(this.targetClassTypeName(), targetClassParam)
-                        .build());
+                .returns(this.builderClassTypeName());
+        String returnVarName = this.builderClassMethodParamName();
+        if (this.builderClassNeedsToBeAbstract()) {
+            // if the Builder is abstract, we need to make the toBuilder()
+            // method accept a parameter of the Builder type
+            toBuilderMethod.addParameter(ParameterSpec
+                    .builder(this.builderClassTypeName(), returnVarName)
+                    .build());
+        }
+        String targetClassParam = Utils.deCapitalize(this.targetClassSimpleName().toString());
+        toBuilderMethod.addParameter(ParameterSpec
+                .builder(this.targetClassTypeName(), targetClassParam)
+                .build());
 
         CodeBlock.Builder methodBody = CodeBlock.builder();
-        String returnVarName = this.builderClassMethodParamName();
-        methodBody.addStatement("$1T $2N = new $1T()", this.builderClassTypeName(),
-                returnVarName);
+        // create an instance of the Builder class,
+        // but only if the Builder class is not abstract
+        if (!this.builderClassNeedsToBeAbstract()) {
+            methodBody.addStatement("$1T $2N = new $1T()", this.builderClassTypeName(),
+                    returnVarName);
+        }
         // iterate through all attributes,
         // and add a setter statement to the method body for each
         for (VariableElement attribute : attributes) {
@@ -240,6 +230,16 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             }
         }
         return buildMethod.build();
+    }
+
+    protected final boolean hasLombokDefaultAnnotation(VariableElement attribute) {
+        List<? extends AnnotationMirror> annotationMirrors = attribute.getAnnotationMirrors();
+        if (annotationMirrors == null || annotationMirrors.isEmpty()) {
+            return false;
+        }
+        return annotationMirrors
+                .stream()
+                .anyMatch(a -> "lombok.Builder.Default".equals(a.getAnnotationType().asElement().toString()));
     }
 
     protected final String accessAttributeOfTargetClass(VariableElement attribute) {
@@ -290,7 +290,6 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     protected MethodSpec generateSetterMethod(VariableElement attribute,
             boolean mangleTypeParameters, boolean abstractMethod) {
-        String fieldName = this.attributeSimpleName(attribute);
         TypeName parameterType = this.attributeType(attribute, mangleTypeParameters);
         MethodSpec.Builder setter = MethodSpec
                 .methodBuilder(this.setterMethodName(attribute))
@@ -306,7 +305,9 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         if (abstractMethod) {
             setter.addModifiers(Modifier.ABSTRACT);
         } else {
-            setter.addStatement("this.$1L = $1L", fieldName)
+            setter
+                    .addStatement("this.$1L = $1L",
+                            this.attributeSimpleName(attribute))
                     .addStatement("return this");
         }
 
@@ -373,18 +374,20 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     }
 
     protected final ParameterSpec setterParameterSpec(VariableElement attribute, TypeName parameterType) {
-        ParameterSpec.Builder ret = ParameterSpec
-                .builder(parameterType, this.attributeSimpleName(attribute))
-                .addModifiers(Modifier.FINAL);
+        // copy the annotations on the type of the parameter
+        TypeName annotatedParameterType = parameterType.annotated(attribute.asType().getAnnotationMirrors().stream()
+                .map(AnnotationSpec::get)
+                .collect(Collectors.toList())
+        );
 
-        // copy the relevant annotations
+        ParameterSpec.Builder ret = ParameterSpec
+                .builder(annotatedParameterType, this.attributeSimpleName(attribute));
+
+        // copy the annotations on the parameter itself
         for (AnnotationMirror annotation : attribute.getAnnotationMirrors()) {
             if (this.isAnnotationAllowedOnParam(annotation)) {
                 ret.addAnnotation(AnnotationSpec.get(annotation));
             }
-        }
-        for (AnnotationMirror annotation : attribute.asType().getAnnotationMirrors()) {
-            ret.addAnnotation(AnnotationSpec.get(annotation));
         }
 
         return ret.build();
@@ -428,7 +431,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         String annotationBuilderClassName = builderAnnotation.className();
         return annotationBuilderClassName.isEmpty()
                 ? this.targetClassSimpleName() + "Builder"
-                : annotationBuilderClassName;
+                // we need to replace any '*' in className with the target class's name
+                : annotationBuilderClassName.replaceAll("\\*", this.targetClassSimpleName().toString());
     }
 
     protected final Filer filer() {
@@ -524,20 +528,18 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return this.targetCreationMethod.getModifiers().contains(Modifier.PRIVATE);
     }
 
-    protected final AnnotationSpec generatedAnnotation() throws Exception {
-        Class<?> generatedAnnotationClass = determineGeneratedAnnotationClass();
+    protected final AnnotationSpec generatedAnnotation() {
+        ClassName generatedAnnotationClass = determineGeneratedAnnotationClass();
         return AnnotationSpec
                 .builder(generatedAnnotationClass)
-                .addMember("value", "$S", "Jilt-1.6.1")
+                .addMember("value", "$S", "Jilt-1.7")
                 .build();
     }
 
-    private Class<?> determineGeneratedAnnotationClass() throws Exception {
-        try {
-            // available since 9
-            return Class.forName("javax.annotation.processing.Generated");
-        } catch (ClassNotFoundException e) {
-            return Class.forName("javax.annotation.Generated");
-        }
+    private ClassName determineGeneratedAnnotationClass() {
+        TypeElement generatedAnnotation = this.elements.getTypeElement("javax.annotation.processing.Generated");
+        return ClassName.get(generatedAnnotation == null
+            ? this.elements.getTypeElement("javax.annotation.Generated")
+            : generatedAnnotation);
     }
 }

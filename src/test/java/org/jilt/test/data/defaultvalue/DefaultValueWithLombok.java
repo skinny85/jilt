@@ -1,32 +1,35 @@
 package org.jilt.test.data.defaultvalue;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.jilt.Builder;
+import org.jilt.BuilderStyle;
+import org.jilt.Opt;
 
 import java.util.Set;
 
 import static lombok.Builder.Default;
 
-@Builder
+@Builder(style = BuilderStyle.STAGED)
 @AllArgsConstructor
+@Getter
 public class DefaultValueWithLombok {
-
-    @lombok.Builder.Default
-    public int attr1 = 1;
+    @Default
+    private int nr = 1;
 
     @Default
-    public String attr2 = "attr2";
+    private String strNrPlus1k = String.valueOf(this.nr + 1_000);
 
-    @lombok.Builder.Default
-    public boolean attr3 = true;
+    // this initializer is ignored
+    private char charNoDefaultWithInit = 'c';
 
-    public int attr4 = 1000;
+    @Default
+    private final boolean boolDefaultNoInit;
 
-    @lombok.Builder.Default
-    public int attr5 = attr1 + 1000;
+    @Default
+    private Set<String> strings = java.util.Collections.singleton("s");
 
-    @lombok.Builder.Default
-    public Set<String> attrs = java.util.Collections.emptySet();
-
-    public Set<String> attrsWithNoDefault = java.util.Collections.emptySet();
+    @Opt
+    // this initializer is ignored
+    private String optAttr = java.util.Collections.singletonList("opt").toString();
 }

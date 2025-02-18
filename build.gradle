@@ -6,10 +6,11 @@ plugins {
 }
 
 group 'cc.jilt' // we need a domain we own for Maven Central, and jilt.org is scalped
-version '1.6.1'
+version '1.7'
 
 shadowJar {
     relocate 'com.squareup', 'org.jilt.shaded.com.squareup'
+    exclude 'tools.jar'
 
     archiveClassifier = '' // we want the shadow JAR to be the main output JAR
     configurations = [project.configurations.compileClasspath]
@@ -84,10 +85,10 @@ repositories {
     mavenCentral()
 }
 
-if (JavaVersion.current() <= JavaVersion.VERSION_11) {
+if (JavaVersion.current() < JavaVersion.VERSION_17) {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
-    sourceSets.test.java.exclude '**/Record*.java', '**/JSpecify*.java'
+    sourceSets.test.java.exclude '**/Record*.java', '**/JSpecify*.java', '**/TypeUseAnnotationsTest.java'
 } else {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
@@ -95,15 +96,22 @@ if (JavaVersion.current() <= JavaVersion.VERSION_11) {
         testImplementation 'org.jspecify:jspecify:0.3.0'
     }
 }
+if (JavaVersion.current() <= JavaVersion.VERSION_1_8) {
+    // before Java 9, com.sun.source.util.Trees and its related classes
+    // are available only through lib/tools.jar
+    dependencies {
+        compileOnly files("${System.properties['java.home']}/../lib/tools.jar")
+    }
+}
 
 dependencies {
-    compileOnly 'com.squareup:javapoet:1.8.0'
+    compileOnly 'com.squareup:javapoet:1.13.0'
 
     testImplementation 'junit:junit:4.13.2'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.36'
-    testImplementation 'org.projectlombok:lombok:1.18.36'
     testImplementation 'org.assertj:assertj-core:3.6.2'
     testImplementation 'com.google.code.findbugs:jsr305:3.0.2'
+    testImplementation 'org.projectlombok:lombok:1.18.36'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.36'
     testAnnotationProcessor project
 }
 // required in Gradle 8, since the above line 'testAnnotationProcessor project'

@@ -87,7 +87,7 @@ Example Maven settings:
     <dependency>
         <groupId>cc.jilt</groupId>
         <artifactId>jilt</artifactId>
-        <version>1.6.1</version>
+        <version>1.7</version>
         <scope>provided</scope> <!-- Jilt is not needed at runtime -->
     </dependency>
 </dependencies>
@@ -102,13 +102,13 @@ repositories {
 
 dependencies {
     // ...
-    compileOnly 'cc.jilt:jilt:1.6.1' // Jilt is not needed at runtime
-    annotationProcessor 'cc.jilt:jilt:1.6.1' // you might also need this dependency in newer Gradle versions
+    compileOnly 'cc.jilt:jilt:1.7' // Jilt is not needed at runtime
+    annotationProcessor 'cc.jilt:jilt:1.7' // you might also need this dependency in newer Gradle versions
 }
 ```
 
 If you're not using dependency managers, you can
-[download the JAR directly](https://repo1.maven.org/maven2/cc/jilt/jilt/1.6.1/jilt-1.6.1.jar)
+[download the JAR directly](https://repo1.maven.org/maven2/cc/jilt/jilt/1.7/jilt-1.7.jar)
 (it's distributed as a self-contained JAR, you don't need any additional dependencies for it)
 and add it to your classpath.
 
@@ -582,7 +582,7 @@ public @interface MyBuilder {
 }
 ```
 
-And then, you can place this `MyBuilder` so-called _meta annotation_ wherever `@Builder`
+And then, you can place this `MyBuilder` so-called _meta-annotation_ wherever `@Builder`
 can be placed (so, a class, constructor, or static method),
 and the effect will be as if that element was annotated with the same `@Builder`
 and `@BuilderInterfaces` values as `@MyBuilder` is annotated with,
@@ -594,6 +594,34 @@ public final class MyValueClass {
     // ...
 }
 ```
+
+If you want to change the name of the generated Builder class with a meta-annotation,
+you typically need that name to depend on the name of the class being built,
+not just be a constant string
+(since that's likely to cause conflicts if the meta-annotation is used more than once).
+Because of that, similarly to `@BuilderInterfaces.innerName`,
+`@Builder.className` allows using the `*` character as a placeholder for the name of the built class,
+so you could define the meta-annotation like this:
+
+```java
+import org.jilt.Builder;
+
+@Builder(className = "*JiltBuilder")
+public @interface MyBuilder {
+}
+```
+
+**Note**: since Jilt is implemented as a Java annotation processor,
+that means it shares the limitations common to all annotation processors.
+The restriction that is most relevant to meta-annotation support is that only files from a single source set
+(the one that is currently being compiled) are passed to the processor. 
+This means that you can't, for example, define the meta-annotation in your main source set,
+and then use it in your tests, or package the meta-annotation in a library,
+and then depend on that library from your main project that uses Jilt --
+in both of those cases, the meta annotation won't be passed to Jilt during compilation,
+and so `@Builder` on the meta-annotation won't be recognized.
+In order for meta-annotations to work correctly,
+they have to be defined and used in the same source set.
 
 ##### Supporting classes with private constructors
 
@@ -627,7 +655,7 @@ it would look something like this:
 public final class User {
     public final String email, username, firstName, lastName, displayName;
 
-    @Builder(style = BuilderStyle.STAGED)
+    @Builder(style = BuilderStyle.STAGED, toBuilder = "toBuilder")
     private User(String email, @Opt String username, String firstName,
             String lastName, @Opt String displayName) {
         this.email = email;
@@ -648,6 +676,10 @@ public final class User {
 
     public static UserBuilders.Email builder() {
         return new InnerBuilder();
+    }
+
+    public UserBuilder toBuilder() {
+        return UserBuilder.toBuilder(new InnerBuilder(), this);
     }
 }
 ```

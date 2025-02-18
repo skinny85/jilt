@@ -78,7 +78,16 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
                 .addTypeVariables(this.builderClassTypeParameters())
                 .returns(this.targetClassTypeName());
 
-        // parameters
+        String builderVariableName = this.builderClassMethodParamName();
+        if (this.builderClassNeedsToBeAbstract()) {
+            // if the Builder class is abstract, we have to add it as a parameter to the method
+            method.addParameter(ParameterSpec
+                    .builder(this.builderClassTypeName(), builderVariableName)
+                    .build());
+        }
+
+        // remaining parameters - one for each required property,
+        // and one variadic property for the optional ones
         boolean hasOptionalAttribute = false;
         for (VariableElement currentAttribute : this.attributes()) {
             if (this.isOptional(currentAttribute)) {
@@ -100,8 +109,10 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
         }
 
         // calling the setters
-        String builderVariableName = this.builderClassMethodParamName();
-        method.addStatement("$1T $2N = new $1T()", this.builderClassTypeName(), builderVariableName);
+        if (!this.builderClassNeedsToBeAbstract()) {
+            // if the Builder is not abstract, create a new instance of it
+            method.addStatement("$1T $2N = new $1T()", this.builderClassTypeName(), builderVariableName);
+        }
         for (VariableElement currentAttribute : this.attributes()) {
             if (this.isOptional(currentAttribute)) {
                 continue;
@@ -161,25 +172,15 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
             return null;
         }
 
-        TypeName setterInterface = this.returnTypeForSetterFor(attribute, mangleTypeParameters);
         TypeName parameterType = this.attributeType(attribute, mangleTypeParameters);
-        String builderClassMethodParamName = this.builderClassMethodParamName();
-        String fieldName = this.attributeSimpleName(attribute);
         return MethodSpec
                 .methodBuilder(this.setterMethodName(attribute))
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .returns(setterInterface)
+                .returns(this.returnTypeForSetterFor(attribute, mangleTypeParameters))
                 .addParameter(this.setterParameterSpec(attribute, parameterType))
-                .addStatement("return $L", TypeSpec
-                        .anonymousClassBuilder("")
-                        .addSuperinterface(setterInterface)
-                        .addMethod(MethodSpec
-                                .methodBuilder("accept")
-                                .addModifiers(Modifier.PUBLIC)
-                                .addParameter(this.setterBuilderParameter())
-                                .addStatement("$1L.$2L = $2L", builderClassMethodParamName, fieldName)
-                                .build())
-                        .build())
+                .addStatement("return $1L -> $1L.$2L = $2L",
+                        this.builderClassMethodParamName(),
+                        this.attributeSimpleName(attribute))
                 .build();
     }
 
@@ -213,7 +214,18 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
                 .methodBuilder(toBuilderSuperMethod.name)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addTypeVariables(this.builderClassTypeParameters())
-                .returns(this.targetClassTypeName())
+                .returns(this.targetClassTypeName());
+
+        String builderVariableName = this.builderClassMethodParamName();
+        if (this.builderClassNeedsToBeAbstract()) {
+            // if the Builder class is abstract,
+            // we have to add a parameter for it to the toBuilder() method
+            toBuilderMethod.addParameter(ParameterSpec
+                    .builder(this.builderClassTypeName(), builderVariableName)
+                    .build());
+        }
+
+        toBuilderMethod
                 .addParameter(ParameterSpec
                         .builder(this.targetClassTypeName(), targetClassParam)
                         .build())
@@ -223,23 +235,27 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
                 .varargs();
 
         CodeBlock.Builder methodBody = CodeBlock.builder();
-        String returnVarName = this.builderClassMethodParamName();
-        methodBody.addStatement("$1T $2N = new $1T()", this.builderClassTypeName(),
-                returnVarName);
+        if (!this.builderClassNeedsToBeAbstract()) {
+            // if the Builder class is not abstract,
+            // create a local variable for it,
+            // and initialize it by calling its no-arg constructor
+            methodBody.addStatement("$1T $2N = new $1T()", this.builderClassTypeName(),
+                    builderVariableName);
+        }
         // iterate through all attributes,
         // and add a setter statement to the method body for each
         for (VariableElement attribute : this.attributes()) {
             String attributeAccess = this.accessAttributeOfTargetClass(attribute);
             methodBody.addStatement("$L.$L = $L.$L",
-                    returnVarName,
+                    builderVariableName,
                     this.setterMethodName(attribute),
                     targetClassParam, attributeAccess);
         }
         methodBody
                 .beginControlFlow("for ($1T $2N : $2Ns)", baseSetterInterface, baseSetterInterfaceParam)
-                .addStatement("$N.accept($N)", baseSetterInterfaceParam, returnVarName)
+                .addStatement("$N.accept($N)", baseSetterInterfaceParam, builderVariableName)
                 .endControlFlow();
-        methodBody.addStatement("return $N.$N()", returnVarName, this.buildMethodName());
+        methodBody.addStatement("return $N.$N()", builderVariableName, this.buildMethodName());
 
         return toBuilderMethod
                 .addCode(methodBody.build())

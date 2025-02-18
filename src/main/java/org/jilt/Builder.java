@@ -244,9 +244,13 @@ public @interface Builder {
      * Allows declaring what should be the name of the generated Builder class.
      * Must be a valid Java (top-level) class name.
      * <p>
-     * This is an optional attribute - the default is <code>&lt;TargetClass&gt;Builder</code>
-     * (so, for example, if we're building an instance of a <code>Person</code> class,
-     * the default name will be <code>PersonBuilder</code>).
+     * When used for creating a meta-annotation by placing {@link Builder} on a different annotation,
+     * you can use the {@code *} character as a placeholder for the name of the target class.
+     * <p>
+     * This is an optional attribute - the default is {@code <TargetClassName>Builder},
+     * same as {@code *Builder}
+     * (so, for example, if we're building an instance of a {@code Person} class,
+     * the default name will be {@code PersonBuilder}).
      */
     String className() default "";
 
@@ -319,6 +323,8 @@ public @interface Builder {
      * <p>
      * The value of this attribute is the name to use for the generated method.
      * The default is the empty string, which means no method will be generated.
+     *
+     * @since 1.5
      */
     String toBuilder() default "";
 

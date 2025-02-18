@@ -7,7 +7,7 @@ import org.jilt.Opt;
 public final class UserPriv {
     public final String email, username, firstName, lastName, displayName;
 
-    @Builder(style = BuilderStyle.STAGED)
+    @Builder(style = BuilderStyle.STAGED, toBuilder = "toBuilder")
     private UserPriv(String email, @Opt String username, String firstName,
             String lastName, @Opt String displayName) {
         this.email = email;
@@ -28,5 +28,9 @@ public final class UserPriv {
 
     public static UserPrivBuilders.Email builder() {
         return new InnerBuilder();
+    }
+
+    public UserPrivBuilder toBuilder() {
+        return UserPrivBuilder.toBuilder(new InnerBuilder(), this);
     }
 }
