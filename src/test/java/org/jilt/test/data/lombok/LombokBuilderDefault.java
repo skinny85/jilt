@@ -1,6 +1,7 @@
-package org.jilt.test.data.defaultvalue;
+package org.jilt.test.data.lombok;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder.Default;
 import lombok.Getter;
 import org.jilt.Builder;
 import org.jilt.BuilderStyle;
@@ -8,17 +9,16 @@ import org.jilt.Opt;
 
 import java.util.Set;
 
-import static lombok.Builder.Default;
-
 @Builder(style = BuilderStyle.STAGED)
 @AllArgsConstructor
 @Getter
-public class DefaultValueWithLombok {
+public class LombokBuilderDefault {
     @Default
     private int nr = 1;
 
     @Default
-    private String strNrPlus1k = String.valueOf(this.nr + 1_000);
+    @Opt // redundant, but doesn't hurt
+    private String strNrPlus1k = (this.nr + 1_000) + "";
 
     // this initializer is ignored
     private char charNoDefaultWithInit = 'c';

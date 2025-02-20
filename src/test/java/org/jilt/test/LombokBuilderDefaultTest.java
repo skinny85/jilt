@@ -1,15 +1,15 @@
 package org.jilt.test;
 
-import org.jilt.test.data.defaultvalue.DefaultValueWithLombok;
+import org.jilt.test.data.lombok.LombokBuilderDefault;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.jilt.test.data.defaultvalue.DefaultValueWithLombokBuilder.defaultValueWithLombok;
+import static org.jilt.test.data.lombok.LombokBuilderDefaultBuilder.lombokBuilderDefault;
 
-public class LombokDefaultTest {
+public class LombokBuilderDefaultTest {
     @Test
-    public void set_attribute_to_default_value_when_is_not_specified_in_builder_with_lombok_builder_default_value(){
-        DefaultValueWithLombok value = defaultValueWithLombok()
+    public void Builder_Default_sets_property_value(){
+        LombokBuilderDefault value = lombokBuilderDefault()
                 .charNoDefaultWithInit('x')
                 .nr(11)
                 .build();

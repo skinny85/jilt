@@ -233,13 +233,10 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     }
 
     protected final boolean hasLombokDefaultAnnotation(VariableElement attribute) {
-        List<? extends AnnotationMirror> annotationMirrors = attribute.getAnnotationMirrors();
-        if (annotationMirrors == null || annotationMirrors.isEmpty()) {
-            return false;
-        }
-        return annotationMirrors
-                .stream()
-                .anyMatch(a -> "lombok.Builder.Default".equals(a.getAnnotationType().asElement().toString()));
+        return attribute.getAnnotationMirrors().stream()
+                .anyMatch(annotation -> {
+                    return "lombok.Builder.Default".equals(annotation.getAnnotationType().asElement().toString());
+                });
     }
 
     protected final String accessAttributeOfTargetClass(VariableElement attribute) {
