@@ -136,6 +136,10 @@ public final class Person {
 }
 ```
 
+Jilt also supports Lombok's
+[`@Builder.Default` annotation](https://projectlombok.org/features/Builder#builderdefault)
+([see below](#lomboks-builderdefault) for details).
+
 ##### @Builder on constructors
 
 You can also place the annotation on a constructor;
@@ -323,6 +327,66 @@ All types of `@Nullable` annotations are supported,
 including `javax.annotation.Nullable` from [JSR-305](https://mvnrepository.com/artifact/com.google.code.findbugs/jsr305),
 `org.jetbrains.annotations.Nullable` from [JetBrains annotations](https://mvnrepository.com/artifact/org.jetbrains/annotations),
 and others.
+
+###### Lombok's `@Builder.Default`
+
+If you're using [Lombok](https://projectlombok.org),
+Jilt respects Lombok's
+[`@Builder.Default` annotation](https://projectlombok.org/features/Builder#builderdefault).
+It works exactly as if you were using it with Lombok's own `@Builder`,
+and also implicitly makes the property optional,
+so you don't have to redundantly annotate it with `@Opt` in addition to `@Builder.Default`.
+
+Example:
+
+```java
+import lombok.AllArgsConstructor;
+import lombok.Builder.Default;
+import lombok.Getter;
+import lombok.NonNull;
+import org.jilt.Builder;
+import org.jilt.BuilderStyle;
+
+@Getter
+@AllArgsConstructor
+@Builder(style = BuilderStyle.STAGED)
+public final class Person {
+    @NonNull
+    private String name;
+
+    @Default
+    private int age = 21;
+}
+```
+
+**Note**: if you want to combine Jilt's `@Builder` with Lombok's
+[`@Value` annotation](https://projectlombok.org/features/Value),
+in order for Lombok to generate the correct initialization code,
+you also need to place Lombok's `@Builder` on the class.
+In order to not confuse the users of your class with two Builders,
+you can make the Lombok-generated Builder `private` with the `access` attribute of `@lombok.Builder`:
+
+```java
+import lombok.Builder.Default;
+import lombok.NonNull;
+import lombok.Value;
+import org.jilt.Builder;
+import org.jilt.BuilderStyle;
+
+@Value
+@Builder(style = BuilderStyle.STAGED)
+@lombok.Builder(access = lombok.AccessLevel.PRIVATE)
+public class Person {
+    @NonNull
+    String name;
+
+    @Default
+    int age = 21;
+}
+```
+
+This trick also silences a false-positive compilation warning about using `@Default`
+without `@lombok.Builder`.
 
 ##### 'Staged, but preserving order' Builder style
 

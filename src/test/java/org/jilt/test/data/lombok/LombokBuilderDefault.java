@@ -18,7 +18,7 @@ public class LombokBuilderDefault {
 
     @Default
     @Opt // redundant, but doesn't hurt
-    private String strNrPlus1k = (this.nr + 1_000) + "";
+    private String strNrPlus1k = String.valueOf(this.nr + 1_000);
 
     // this initializer is ignored
     private char charNoDefaultWithInit = 'c';
