@@ -6,6 +6,7 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
+import com.sun.source.util.Trees;
 import org.jilt.Builder;
 import org.jilt.BuilderInterfaces;
 import org.jilt.Opt;
@@ -29,8 +30,8 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
 
     AbstractTypeSafeBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
             Builder builderAnnotation, BuilderInterfaces builderInterfaces,
-            ExecutableElement targetCreationMethod, Elements elements, Filer filer) {
-        super(targetClass, attributes, builderAnnotation, targetCreationMethod, elements, filer);
+            ExecutableElement targetCreationMethod, Elements elements, Trees trees, Filer filer) {
+        super(targetClass, attributes, builderAnnotation, targetCreationMethod, elements, trees, filer);
         this.optionalAttributes = this.initOptionalAttributes(attributes);
         this.builderInterfaces = builderInterfaces;
     }
@@ -172,26 +173,29 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
         if (attribute.getAnnotation(Opt.class) != null) {
             return true;
         }
-        if (this.firstAnnotationCalledNullable(attribute) != null) {
+        if (this.hasAnnotationCalledNullable(attribute)) {
+            return true;
+        }
+        if (this.hasLombokDefaultAnnotation(attribute)) {
             return true;
         }
         return false;
     }
 
-    private AnnotationMirror firstAnnotationCalledNullable(VariableElement attribute) {
+    private boolean hasAnnotationCalledNullable(VariableElement attribute) {
         for (AnnotationMirror annotation : attribute.getAnnotationMirrors()) {
             if (annotationIsCalledNullable(annotation)) {
-                return annotation;
+                return true;
             }
         }
         // some annotations are applied to the type, instead of the attribute,
         // like the ones from JSpecify
         for (AnnotationMirror annotation : attribute.asType().getAnnotationMirrors()) {
             if (annotationIsCalledNullable(annotation)) {
-                return annotation;
+                return true;
             }
         }
-        return null;
+        return false;
     }
 
     private static boolean annotationIsCalledNullable(AnnotationMirror annotation) {

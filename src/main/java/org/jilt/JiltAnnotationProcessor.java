@@ -1,5 +1,6 @@
 package org.jilt;
 
+import com.sun.source.util.Trees;
 import org.jilt.internal.BuilderGeneratorFactory;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -23,7 +24,8 @@ public class JiltAnnotationProcessor extends AbstractProcessor {
 
         this.messager = processingEnv.getMessager();
         this.builderGeneratorFactory = new BuilderGeneratorFactory(
-                processingEnv.getFiler(), processingEnv.getElementUtils());
+                processingEnv.getFiler(), processingEnv.getElementUtils(),
+                Trees.instance(processingEnv));
     }
 
     @Override
