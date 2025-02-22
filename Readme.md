@@ -359,34 +359,67 @@ public final class Person {
 }
 ```
 
-**Note**: if you want to combine Jilt's `@Builder` with Lombok's
-[`@Value` annotation](https://projectlombok.org/features/Value),
-in order for Lombok to generate the correct initialization code,
-you also need to place Lombok's `@Builder` on the class.
-In order to not confuse the users of your class with two Builders,
-you can make the Lombok-generated Builder `private` with the `access` attribute of `@lombok.Builder`:
+Two notes on using this functionality:
 
-```java
-import lombok.Builder.Default;
-import lombok.NonNull;
-import lombok.Value;
-import org.jilt.Builder;
-import org.jilt.BuilderStyle;
+1. Since Jilt, unlike Lombok, generates the Builder in a separate file than the class being built is in,
+   it can't rely on imports present in that file.
+   This means that any references present in the initializer expression of a field marked with `@Builder.Default`
+   must be fully qualified. For example, if you want to initialize a `Set` by using one of the methods in the
+   [`Collections` utility class](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Collections.html),
+   the reference to it must be `java.util.Collections`, for example:
 
-@Value
-@Builder(style = BuilderStyle.STAGED)
-@lombok.Builder(access = lombok.AccessLevel.PRIVATE)
-public class Person {
-    @NonNull
-    String name;
+    ```java
+    import lombok.AllArgsConstructor;
+    import lombok.Builder.Default;
+    import lombok.Getter;
+    import lombok.NonNull;
+    import org.jilt.Builder;
+    import org.jilt.BuilderStyle;
+    import java.util.Set;
 
-    @Default
-    int age = 21;
-}
-```
+    @Getter
+    @AllArgsConstructor
+    @Builder(style = BuilderStyle.STAGED)
+    public final class Person {
+        @NonNull
+        private String name;
+    
+        @Default
+        private int age = 21;
+    
+        @Default
+        private Set<Person> friends = java.util.Collections.emptySet();
+    }
+    ```
 
-This trick also silences a false-positive compilation warning about using `@Default`
-without `@lombok.Builder`.
+2. If you want to combine Jilt's `@Builder` with Lombok's
+   [`@Value` annotation](https://projectlombok.org/features/Value),
+   in order for Lombok to generate the correct initialization code,
+   you also need to place Lombok's `@Builder` on the class.
+   To not confuse the users of your class with two Builders,
+   you can make the Lombok-generated Builder `private` with the `access` attribute of `@lombok.Builder`:
+
+    ```java
+    import lombok.AccessLevel;
+    import lombok.Builder.Default;
+    import lombok.NonNull;
+    import lombok.Value;
+    import org.jilt.Builder;
+    import org.jilt.BuilderStyle;
+    
+    @Value
+    @Builder(style = BuilderStyle.STAGED)
+    @lombok.Builder(access = AccessLevel.PRIVATE)
+    public class Person {
+        @NonNull
+        String name;
+    
+        @Default
+        int age = 21;
+    }
+    ```
+    This trick also silences a false-positive compilation warning about using `@Default`
+    without `@lombok.Builder`.
 
 ##### 'Staged, but preserving order' Builder style
 

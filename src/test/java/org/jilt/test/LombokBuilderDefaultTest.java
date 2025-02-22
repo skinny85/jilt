@@ -1,8 +1,6 @@
 package org.jilt.test;
 
 import org.jilt.test.data.lombok.LombokBuilderDefault;
-import org.jilt.test.data.lombok.PersonLombok;
-import org.jilt.test.data.lombok.PersonLombokBuilder;
 import org.jilt.test.data.lombok.PersonLombokValue;
 import org.jilt.test.data.lombok.PersonLombokValueBuilder;
 import org.junit.Test;
@@ -27,21 +25,10 @@ public class LombokBuilderDefaultTest {
     }
 
     @Test
-    public void lombok_non_Value_works_with_Builder_Default(){
-        PersonLombok person = PersonLombokBuilder.personLombok()
-                .name("John")
-//                .name(null) // gives a warning
-                .build();
-
-        assertThat(person.getName()).isEqualTo("John");
-        assertThat(person.getAge()).isEqualTo(21);
-    }
-
-    @Test
     public void lombok_Value_works_with_Builder_Default(){
         PersonLombokValue person = PersonLombokValueBuilder.personLombokValue()
                 .name("John")
-//                .name(null) // gives a warning
+//                .name(null) // gives a compilation warning and runtime exception
                 .build();
 
         assertThat(person.getName()).isEqualTo("John");

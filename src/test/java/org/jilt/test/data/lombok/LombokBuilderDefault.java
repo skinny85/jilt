@@ -12,7 +12,7 @@ import java.util.Set;
 @Builder(style = BuilderStyle.STAGED)
 @AllArgsConstructor
 @Getter
-public class LombokBuilderDefault {
+public final class LombokBuilderDefault {
     @Default
     private int nr = 1;
 
