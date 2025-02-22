@@ -162,14 +162,14 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
     private Set<VariableElement> initOptionalAttributes(List<? extends VariableElement> attributes) {
         Set<VariableElement> ret = new HashSet<VariableElement>();
         for (VariableElement attribute : attributes) {
-            if (this.attributeIsOptional(attribute)) {
+            if (this.determineIfAttributeIsOptional(attribute)) {
                 ret.add(attribute);
             }
         }
         return ret;
     }
 
-    private boolean attributeIsOptional(VariableElement attribute) {
+    private boolean determineIfAttributeIsOptional(VariableElement attribute) {
         if (attribute.getAnnotation(Opt.class) != null) {
             return true;
         }
