@@ -1,7 +1,7 @@
 package org.jilt;
 
-import com.sun.source.util.Trees;
 import org.jilt.internal.BuilderGeneratorFactory;
+import org.jilt.internal.LazyTrees;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Messager;
@@ -25,7 +25,7 @@ public class JiltAnnotationProcessor extends AbstractProcessor {
         this.messager = processingEnv.getMessager();
         this.builderGeneratorFactory = new BuilderGeneratorFactory(
                 processingEnv.getFiler(), processingEnv.getElementUtils(),
-                Trees.instance(processingEnv));
+                new LazyTrees(processingEnv));
     }
 
     @Override

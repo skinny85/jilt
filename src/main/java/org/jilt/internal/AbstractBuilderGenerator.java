@@ -15,7 +15,6 @@ import com.squareup.javapoet.WildcardTypeName;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
-import com.sun.source.util.Trees;
 import org.jilt.Builder;
 import org.jilt.JiltGenerated;
 import org.jilt.Opt;
@@ -40,7 +39,7 @@ import java.util.stream.Collectors;
 
 abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private final Elements elements;
-    private final Trees trees;
+    private final LazyTrees trees;
     private final Filer filer;
     private final Element optElement;
 
@@ -54,7 +53,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     AbstractBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
             Builder builderAnnotation, ExecutableElement targetCreationMethod,
-            Elements elements, Trees trees, Filer filer) {
+            Elements elements, LazyTrees trees, Filer filer) {
         this.elements = elements;
         this.trees = trees;
         this.filer = filer;

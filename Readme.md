@@ -383,10 +383,10 @@ Two notes on using this functionality:
     public final class Person {
         @NonNull
         private String name;
-    
+
         @Default
         private int age = 21;
-    
+
         @Default
         private Set<Person> friends = java.util.Collections.emptySet();
     }
@@ -406,21 +406,21 @@ Two notes on using this functionality:
     import lombok.Value;
     import org.jilt.Builder;
     import org.jilt.BuilderStyle;
-    
+
     @Value
     @Builder(style = BuilderStyle.STAGED)
     @lombok.Builder(access = AccessLevel.PRIVATE)
     public class Person {
         @NonNull
         String name;
-    
+
         @Default
         int age = 21;
     }
     ```
 
-    This trick also silences a false-positive compilation warning about using `@Default`
-    without `@lombok.Builder`.
+   This trick also silences a false-positive compilation warning about using `@Default`
+   without `@lombok.Builder`.
 
 ##### 'Staged, but preserving order' Builder style
 

@@ -1,6 +1,5 @@
 package org.jilt.internal;
 
-import com.sun.source.util.Trees;
 import org.jilt.Builder;
 import org.jilt.BuilderInterfaces;
 
@@ -30,9 +29,9 @@ public final class BuilderGeneratorFactory {
 
     private final Filer filer;
     private final Elements elements;
-    private final Trees trees;
+    private final LazyTrees trees;
 
-    public BuilderGeneratorFactory(Filer filer, Elements elements, Trees trees) {
+    public BuilderGeneratorFactory(Filer filer, Elements elements, LazyTrees trees) {
         this.filer = filer;
         this.elements = elements;
         this.trees = trees;

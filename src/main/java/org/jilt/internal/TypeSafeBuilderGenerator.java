@@ -4,7 +4,6 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import com.sun.source.util.Trees;
 import org.jilt.Builder;
 import org.jilt.BuilderInterfaces;
 
@@ -19,7 +18,7 @@ import java.util.List;
 final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
     TypeSafeBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
             Builder builderAnnotation, BuilderInterfaces builderInterfaces,
-            ExecutableElement targetCreationMethod, Elements elements, Trees trees, Filer filer) {
+            ExecutableElement targetCreationMethod, Elements elements, LazyTrees trees, Filer filer) {
         super(targetClass, attributes, builderAnnotation, builderInterfaces, targetCreationMethod,
                 elements, trees, filer);
     }
