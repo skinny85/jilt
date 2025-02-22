@@ -361,12 +361,12 @@ public final class Person {
 
 Two notes on using this functionality:
 
-1. Since Jilt, unlike Lombok, generates the Builder in a separate file than the class being built is in,
+1. Since Jilt, unlike Lombok, generates the Builder in a different file than the class being built is in,
    it can't rely on imports present in that file.
-   This means that any references present in the initializer expression of a field marked with `@Builder.Default`
+   This means that any references used in the initializer expression of a field marked with `@Builder.Default`
    must be fully qualified. For example, if you want to initialize a `Set` by using one of the methods in the
    [`Collections` utility class](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Collections.html),
-   the reference to it must be `java.util.Collections`, for example:
+   the reference to it must be `java.util.Collections`:
 
     ```java
     import lombok.AllArgsConstructor;
@@ -418,6 +418,7 @@ Two notes on using this functionality:
         int age = 21;
     }
     ```
+
     This trick also silences a false-positive compilation warning about using `@Default`
     without `@lombok.Builder`.
 
