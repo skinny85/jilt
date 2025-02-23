@@ -1,4 +1,4 @@
-package org.jilt.test.data.typesafe_ungrouped.optional;
+package org.jilt.test.data.typesafe.ungrouped.optional;
 
 import org.jilt.Builder;
 import org.jilt.BuilderStyle;
