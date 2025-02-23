@@ -10,6 +10,7 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.jilt.Builder;
 import org.jilt.BuilderInterfaces;
+import org.jilt.JiltGenerated;
 import org.jilt.utils.Utils;
 
 import javax.annotation.processing.Filer;
@@ -153,6 +154,7 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
         // generate a static nested class that will contain the setters for the optional properties
         TypeSpec.Builder optionalSettersClass = TypeSpec
                 .classBuilder("Optional")
+                .addAnnotation(JiltGenerated.class)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         for (VariableElement currentAttribute : this.attributes()) {
             MethodSpec setterMethod = this.generateSetterMethod(currentAttribute, false, true);
