@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 abstract class AbstractBuilderGenerator implements BuilderGenerator {
+    protected final Element annotatedElement;
     private final Elements elements;
     private final LazyTrees trees;
     private final Filer filer;
@@ -51,9 +52,10 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private final String builderClassPackage;
     private final ClassName builderClassClassName;
 
-    AbstractBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
+    AbstractBuilderGenerator(Element annotatedElement, TypeElement targetClass, List<? extends VariableElement> attributes,
             Builder builderAnnotation, ExecutableElement targetCreationMethod,
             Elements elements, LazyTrees trees, Filer filer) {
+        this.annotatedElement = annotatedElement;
         this.elements = elements;
         this.trees = trees;
         this.filer = filer;
@@ -116,6 +118,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
         enhance(builderClassBuilder);
 
+        builderClassBuilder.addOriginatingElement(this.annotatedElement);
         JavaFile javaFile = JavaFile
                 .builder(builderClassPackage(), builderClassBuilder.build())
                 .build();

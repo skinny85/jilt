@@ -14,6 +14,7 @@ import org.jilt.JiltGenerated;
 import org.jilt.utils.Utils;
 
 import javax.annotation.processing.Filer;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
@@ -22,10 +23,10 @@ import javax.lang.model.util.Elements;
 import java.util.List;
 
 final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
-    public FunctionalBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
+    public FunctionalBuilderGenerator(Element annotatedElement, TypeElement targetClass, List<? extends VariableElement> attributes,
             Builder builderAnnotation, BuilderInterfaces builderInterfaces,
             ExecutableElement targetCreationMethod, Elements elements, LazyTrees trees, Filer filer) {
-        super(targetClass, attributes, builderAnnotation, builderInterfaces, targetCreationMethod,
+        super(annotatedElement, targetClass, attributes, builderAnnotation, builderInterfaces, targetCreationMethod,
                 elements, trees, filer);
     }
 
@@ -63,6 +64,7 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
             outerInterfacesBuilder.addType(this.functionalSetterInterface(
                     this.lastInterfaceName(), baseSetterInterfaceName));
         }
+        outerInterfacesBuilder.addOriginatingElement(this.annotatedElement);
 
         JavaFile javaFile = JavaFile
                 .builder(this.outerInterfacesPackage(), outerInterfacesBuilder.build())

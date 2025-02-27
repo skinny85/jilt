@@ -13,6 +13,7 @@ import org.jilt.utils.Utils;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
@@ -27,10 +28,10 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
     private final Set<VariableElement> optionalAttributes;
     private final BuilderInterfaces builderInterfaces;
 
-    AbstractTypeSafeBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
+    AbstractTypeSafeBuilderGenerator(Element annotatedElement, TypeElement targetClass, List<? extends VariableElement> attributes,
             Builder builderAnnotation, BuilderInterfaces builderInterfaces,
             ExecutableElement targetCreationMethod, Elements elements, LazyTrees trees, Filer filer) {
-        super(targetClass, attributes, builderAnnotation, targetCreationMethod, elements, trees, filer);
+        super(annotatedElement, targetClass, attributes, builderAnnotation, targetCreationMethod, elements, trees, filer);
         this.optionalAttributes = this.initOptionalAttributes(attributes);
         this.builderInterfaces = builderInterfaces;
     }
