@@ -104,18 +104,18 @@ public final class BuilderGeneratorFactory {
         switch (builderAnnotation.style()) {
             case STAGED:
             case TYPE_SAFE:
-                return new TypeSafeBuilderGenerator(targetClass, attributes, builderAnnotation,
+                return new TypeSafeBuilderGenerator(annotatedElement, targetClass, attributes, builderAnnotation,
                         builderInterfaces, targetCreationMethod, elements, trees, filer);
             case STAGED_PRESERVING_ORDER:
             case TYPE_SAFE_UNGROUPED_OPTIONALS:
-                return new TypeSafeUngroupedOptionalsBuilderGenerator(targetClass, attributes, builderAnnotation,
+                return new TypeSafeUngroupedOptionalsBuilderGenerator(annotatedElement, targetClass, attributes, builderAnnotation,
                         builderInterfaces, targetCreationMethod, elements, trees, filer);
             case FUNCTIONAL:
-                return new FunctionalBuilderGenerator(targetClass, attributes, builderAnnotation,
+                return new FunctionalBuilderGenerator(annotatedElement, targetClass, attributes, builderAnnotation,
                         builderInterfaces, targetCreationMethod, elements, trees, filer);
             case CLASSIC:
             default:
-                return new ClassicBuilderGenerator(targetClass, attributes, builderAnnotation,
+                return new ClassicBuilderGenerator(annotatedElement, targetClass, attributes, builderAnnotation,
                         targetCreationMethod, elements, trees, filer);
         }
     }

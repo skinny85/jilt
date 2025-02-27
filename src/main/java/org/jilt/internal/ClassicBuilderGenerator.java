@@ -5,6 +5,7 @@ import com.squareup.javapoet.TypeSpec;
 import org.jilt.Builder;
 
 import javax.annotation.processing.Filer;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -12,10 +13,10 @@ import javax.lang.model.util.Elements;
 import java.util.List;
 
 final class ClassicBuilderGenerator extends AbstractBuilderGenerator {
-    ClassicBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
-                            Builder builderAnnotation, ExecutableElement targetCreationMethod,
-                            Elements elements, LazyTrees trees, Filer filer) {
-        super(targetClass, attributes, builderAnnotation, targetCreationMethod, elements, trees, filer);
+    ClassicBuilderGenerator(Element annotatedElement, TypeElement targetClass, List<? extends VariableElement> attributes,
+            Builder builderAnnotation, ExecutableElement targetCreationMethod,
+            Elements elements, LazyTrees trees, Filer filer) {
+        super(annotatedElement, targetClass, attributes, builderAnnotation, targetCreationMethod, elements, trees, filer);
     }
 
     @Override
