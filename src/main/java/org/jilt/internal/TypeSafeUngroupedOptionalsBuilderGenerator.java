@@ -20,9 +20,9 @@ import java.util.List;
 final class TypeSafeUngroupedOptionalsBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
     TypeSafeUngroupedOptionalsBuilderGenerator(Element annotatedElement, TypeElement targetClass, List<? extends VariableElement> attributes,
             Builder builderAnnotation, BuilderInterfaces builderInterfaces,
-            ExecutableElement targetCreationMethod, Elements elements, LazyTrees trees, Filer filer) {
+            ExecutableElement targetCreationMethod, Elements elements, Filer filer) {
         super(annotatedElement, targetClass, attributes, builderAnnotation, builderInterfaces, targetCreationMethod,
-                elements, trees, filer);
+                elements, filer);
     }
 
     @Override

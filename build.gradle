@@ -10,7 +10,6 @@ version '1.7'
 
 shadowJar {
     relocate 'com.squareup', 'org.jilt.shaded.com.squareup'
-    exclude 'tools.jar'
 
     archiveClassifier = '' // we want the shadow JAR to be the main output JAR
     configurations = [project.configurations.compileClasspath]
@@ -96,13 +95,6 @@ if (JavaVersion.current() < JavaVersion.VERSION_17) {
         testImplementation 'org.jspecify:jspecify:0.3.0'
     }
 }
-if (JavaVersion.current() <= JavaVersion.VERSION_1_8) {
-    // before Java 9, com.sun.source.util.Trees and its related classes
-    // are available only through lib/tools.jar
-    dependencies {
-        compileOnly files("${System.properties['java.home']}/../lib/tools.jar")
-    }
-}
 
 dependencies {
     compileOnly 'com.squareup:javapoet:1.13.0'
@@ -110,8 +102,6 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.assertj:assertj-core:3.6.2'
     testImplementation 'com.google.code.findbugs:jsr305:3.0.2'
-    testImplementation 'org.projectlombok:lombok:1.18.36'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.36'
     testAnnotationProcessor project
 }
 // required in Gradle 8, since the above line 'testAnnotationProcessor project'

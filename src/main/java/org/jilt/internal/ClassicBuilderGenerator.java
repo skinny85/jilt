@@ -15,8 +15,8 @@ import java.util.List;
 final class ClassicBuilderGenerator extends AbstractBuilderGenerator {
     ClassicBuilderGenerator(Element annotatedElement, TypeElement targetClass, List<? extends VariableElement> attributes,
             Builder builderAnnotation, ExecutableElement targetCreationMethod,
-            Elements elements, LazyTrees trees, Filer filer) {
-        super(annotatedElement, targetClass, attributes, builderAnnotation, targetCreationMethod, elements, trees, filer);
+            Elements elements, Filer filer) {
+        super(annotatedElement, targetClass, attributes, builderAnnotation, targetCreationMethod, elements, filer);
     }
 
     @Override

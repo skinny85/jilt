@@ -30,8 +30,8 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
 
     AbstractTypeSafeBuilderGenerator(Element annotatedElement, TypeElement targetClass, List<? extends VariableElement> attributes,
             Builder builderAnnotation, BuilderInterfaces builderInterfaces,
-            ExecutableElement targetCreationMethod, Elements elements, LazyTrees trees, Filer filer) {
-        super(annotatedElement, targetClass, attributes, builderAnnotation, targetCreationMethod, elements, trees, filer);
+            ExecutableElement targetCreationMethod, Elements elements, Filer filer) {
+        super(annotatedElement, targetClass, attributes, builderAnnotation, targetCreationMethod, elements, filer);
         this.optionalAttributes = this.initOptionalAttributes(attributes);
         this.builderInterfaces = builderInterfaces;
     }
@@ -174,9 +174,6 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
             return true;
         }
         if (this.hasAnnotationCalledNullable(attribute)) {
-            return true;
-        }
-        if (this.hasLombokDefaultAnnotation(attribute)) {
             return true;
         }
         return false;

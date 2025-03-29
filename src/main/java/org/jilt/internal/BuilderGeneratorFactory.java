@@ -29,12 +29,10 @@ public final class BuilderGeneratorFactory {
 
     private final Filer filer;
     private final Elements elements;
-    private final LazyTrees trees;
 
-    public BuilderGeneratorFactory(Filer filer, Elements elements, LazyTrees trees) {
+    public BuilderGeneratorFactory(Filer filer, Elements elements) {
         this.filer = filer;
         this.elements = elements;
-        this.trees = trees;
     }
 
     public BuilderGenerator forElement(Element annotatedElement, RoundEnvironment roundEnv) throws Exception {
@@ -105,18 +103,18 @@ public final class BuilderGeneratorFactory {
             case STAGED:
             case TYPE_SAFE:
                 return new TypeSafeBuilderGenerator(annotatedElement, targetClass, attributes, builderAnnotation,
-                        builderInterfaces, targetCreationMethod, elements, trees, filer);
+                        builderInterfaces, targetCreationMethod, elements, filer);
             case STAGED_PRESERVING_ORDER:
             case TYPE_SAFE_UNGROUPED_OPTIONALS:
                 return new TypeSafeUngroupedOptionalsBuilderGenerator(annotatedElement, targetClass, attributes, builderAnnotation,
-                        builderInterfaces, targetCreationMethod, elements, trees, filer);
+                        builderInterfaces, targetCreationMethod, elements, filer);
             case FUNCTIONAL:
                 return new FunctionalBuilderGenerator(annotatedElement, targetClass, attributes, builderAnnotation,
-                        builderInterfaces, targetCreationMethod, elements, trees, filer);
+                        builderInterfaces, targetCreationMethod, elements, filer);
             case CLASSIC:
             default:
                 return new ClassicBuilderGenerator(annotatedElement, targetClass, attributes, builderAnnotation,
-                        targetCreationMethod, elements, trees, filer);
+                        targetCreationMethod, elements, filer);
         }
     }
 
