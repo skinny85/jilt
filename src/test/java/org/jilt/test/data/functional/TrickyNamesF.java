@@ -21,4 +21,24 @@ public class TrickyNamesF {
         this.builder = builder;
         this.trickyNamesFBuilder = trickyNamesFBuilder;
     }
+
+    public String getSetter() {
+        return setter;
+    }
+
+    public boolean isOptional() {
+        return optional;
+    }
+
+    public int getOptValue() {
+        return optValue;
+    }
+
+    public char getBuilder() {
+        return builder;
+    }
+
+    public double getTrickyNamesFBuilder() {
+        return trickyNamesFBuilder;
+    }
 }

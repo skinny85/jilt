@@ -35,4 +35,24 @@ public final class UserFunc {
     public UserFunc copy(UserFuncBuilders.Setter... setters) {
         return UserFuncBuilder.copy(new InnerBuilder(), this, setters);
     }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
 }

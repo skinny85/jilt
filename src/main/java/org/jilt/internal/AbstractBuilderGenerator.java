@@ -259,7 +259,9 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             }
         }
         // if we haven't found a sensible method, fall back to the field name
-        return fieldName;
+//        return fieldName;
+
+        return "get" + Utils.capitalize(fieldName) + "()";
     }
 
     private static boolean elementIsMethodWithoutArgumentsCalled(Element element, String methodName) {

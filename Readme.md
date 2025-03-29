@@ -392,8 +392,9 @@ Two notes on using this functionality:
     }
     ```
 
-2. If you want to combine Jilt's `@Builder` with Lombok's
-   [`@Value` annotation](https://projectlombok.org/features/Value),
+2. If you want to combine Jilt's `@Builder` with either
+   [Lombok's `@Data`](https://projectlombok.org/features/Data) or
+   [`@Value` annotations](https://projectlombok.org/features/Value),
    in order for Lombok to generate the correct initialization code,
    you also need to place Lombok's `@Builder` on the class.
    To not confuse the users of your class with two Builders,

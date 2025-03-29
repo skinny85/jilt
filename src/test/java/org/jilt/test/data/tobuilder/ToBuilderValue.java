@@ -48,4 +48,8 @@ public class ToBuilderValue {
         return this.getterAttr + 17 * this.methodAttr.hashCode() + 31 * this.fieldAttr +
                 37 * this.booleanGetter.hashCode();
     }
+
+    public char getFieldAttr() {
+        return fieldAttr;
+    }
 }

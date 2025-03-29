@@ -16,4 +16,16 @@ public final class LargeLanguageModel {
         this.temperature =  temperature;
         this.outputTokensLimit = outputTokensLimit;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public float getTemperature() {
+        return temperature;
+    }
+
+    public int getOutputTokensLimit() {
+        return outputTokensLimit;
+    }
 }

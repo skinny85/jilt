@@ -33,4 +33,24 @@ public final class UserPriv {
     public UserPrivBuilder toBuilder() {
         return UserPrivBuilder.toBuilder(new InnerBuilder(), this);
     }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
 }

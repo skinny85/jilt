@@ -8,7 +8,7 @@ import org.jilt.Builder;
 import org.jilt.BuilderStyle;
 
 @Value
-@Builder(style = BuilderStyle.STAGED)
+@Builder(style = BuilderStyle.STAGED, toBuilder = "toBuilder")
 @lombok.Builder(access = AccessLevel.PRIVATE)
 public class PersonLombokValue {
     @NonNull

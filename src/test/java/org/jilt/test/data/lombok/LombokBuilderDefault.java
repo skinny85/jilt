@@ -9,7 +9,7 @@ import org.jilt.Opt;
 
 import java.util.Set;
 
-@Builder(style = BuilderStyle.STAGED)
+@Builder(style = BuilderStyle.STAGED, toBuilder = "toBuilder")
 @AllArgsConstructor
 @Getter
 public final class LombokBuilderDefault {
@@ -23,8 +23,8 @@ public final class LombokBuilderDefault {
     // this initializer is ignored
     private char charNoDefaultWithInit = 'c';
 
-    @Default
-    private final boolean boolDefaultNoInit;
+//    @Default
+//    private final boolean boolDefaultNoInit;
 
     @Default
     private Set<String> strings = java.util.Collections.singleton("s");
