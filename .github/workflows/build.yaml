@@ -17,11 +17,7 @@ jobs:
           java-version: ${{ matrix.version }}
 
       - name: Cache Gradle packages
-        uses: actions/cache@v2
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: ${{ runner.os }}-gradle
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Build and test the project
         run: ./gradlew build

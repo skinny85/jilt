@@ -1,3 +1,10 @@
+Version 1.8 (2025-04-04)
+------------------------
+- Make Jilt an incremental annotation processor for Gradle
+  ([Issue #35](https://github.com/skinny85/jilt/issues/35))
+- Fix a bug where not all Functional Builder classes were correctly excluded from code coverage
+  ([Issue #28](https://github.com/skinny85/jilt/issues/28))
+
 Version 1.7 (2025-02-13)
 ------------------------
 - Allow using `*` in `@Builder.className`

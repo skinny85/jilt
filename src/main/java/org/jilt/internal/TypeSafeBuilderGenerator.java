@@ -8,6 +8,7 @@ import org.jilt.Builder;
 import org.jilt.BuilderInterfaces;
 
 import javax.annotation.processing.Filer;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
@@ -16,10 +17,10 @@ import javax.lang.model.util.Elements;
 import java.util.List;
 
 final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
-    TypeSafeBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
+    TypeSafeBuilderGenerator(Element annotatedElement, TypeElement targetClass, List<? extends VariableElement> attributes,
             Builder builderAnnotation, BuilderInterfaces builderInterfaces,
             ExecutableElement targetCreationMethod, Elements elements, Filer filer) {
-        super(targetClass, attributes, builderAnnotation, builderInterfaces, targetCreationMethod,
+        super(annotatedElement, targetClass, attributes, builderAnnotation, builderInterfaces, targetCreationMethod,
                 elements, filer);
     }
 
@@ -52,6 +53,7 @@ final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
         this.addBuildMethodToInterface(optionalsInterfaceBuilder,
                 /* withMangledTypeParameters */ false);
         outerInterfacesBuilder.addType(optionalsInterfaceBuilder.build());
+        outerInterfacesBuilder.addOriginatingElement(this.annotatedElement);
 
         JavaFile javaFile = JavaFile
                 .builder(outerInterfacesPackage(), outerInterfacesBuilder.build())

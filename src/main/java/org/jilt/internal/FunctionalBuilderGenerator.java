@@ -10,9 +10,11 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.jilt.Builder;
 import org.jilt.BuilderInterfaces;
+import org.jilt.JiltGenerated;
 import org.jilt.utils.Utils;
 
 import javax.annotation.processing.Filer;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
@@ -21,10 +23,10 @@ import javax.lang.model.util.Elements;
 import java.util.List;
 
 final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
-    public FunctionalBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
+    public FunctionalBuilderGenerator(Element annotatedElement, TypeElement targetClass, List<? extends VariableElement> attributes,
             Builder builderAnnotation, BuilderInterfaces builderInterfaces,
             ExecutableElement targetCreationMethod, Elements elements, Filer filer) {
-        super(targetClass, attributes, builderAnnotation, builderInterfaces, targetCreationMethod,
+        super(annotatedElement, targetClass, attributes, builderAnnotation, builderInterfaces, targetCreationMethod,
                 elements, filer);
     }
 
@@ -62,6 +64,7 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
             outerInterfacesBuilder.addType(this.functionalSetterInterface(
                     this.lastInterfaceName(), baseSetterInterfaceName));
         }
+        outerInterfacesBuilder.addOriginatingElement(this.annotatedElement);
 
         JavaFile javaFile = JavaFile
                 .builder(this.outerInterfacesPackage(), outerInterfacesBuilder.build())
@@ -153,6 +156,7 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
         // generate a static nested class that will contain the setters for the optional properties
         TypeSpec.Builder optionalSettersClass = TypeSpec
                 .classBuilder("Optional")
+                .addAnnotation(JiltGenerated.class)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         for (VariableElement currentAttribute : this.attributes()) {
             MethodSpec setterMethod = this.generateSetterMethod(currentAttribute, false, true);

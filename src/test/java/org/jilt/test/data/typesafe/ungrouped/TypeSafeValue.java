@@ -1,4 +1,4 @@
-package org.jilt.test.data.typesafe_ungrouped;
+package org.jilt.test.data.typesafe.ungrouped;
 
 import org.jilt.Builder;
 import org.jilt.BuilderInterfaces;
@@ -7,13 +7,13 @@ import org.jilt.BuilderStyle;
 @Builder(
         style = BuilderStyle.TYPE_SAFE_UNGROUPED_OPTIONALS,
         className = "*Creator",
-        packageName = "org.jilt.test.data.typesafe_ungrouped.custom",
+        packageName = "org.jilt.test.data.typesafe.ungrouped.custom",
         setterPrefix = "with",
         factoryMethod = "creator",
         buildMethod = "create"
 )
 @BuilderInterfaces(
-        packageName = "org.jilt.test.data.typesafe_ungrouped.custom.customer",
+        packageName = "org.jilt.test.data.typesafe.ungrouped.custom.customer",
         innerNames = "Step_*"
 )
 public class TypeSafeValue {

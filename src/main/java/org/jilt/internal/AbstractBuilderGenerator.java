@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 abstract class AbstractBuilderGenerator implements BuilderGenerator {
+    protected final Element annotatedElement;
     private final Elements elements;
     private final Filer filer;
     private final Element optElement;
@@ -47,9 +48,10 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private final String builderClassPackage;
     private final ClassName builderClassClassName;
 
-    AbstractBuilderGenerator(TypeElement targetClass, List<? extends VariableElement> attributes,
+    AbstractBuilderGenerator(Element annotatedElement, TypeElement targetClass, List<? extends VariableElement> attributes,
             Builder builderAnnotation, ExecutableElement targetCreationMethod,
             Elements elements, Filer filer) {
+        this.annotatedElement = annotatedElement;
         this.elements = elements;
         this.filer = filer;
         this.optElement = this.elements.getTypeElement(Opt.class.getCanonicalName());
@@ -110,6 +112,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
         enhance(builderClassBuilder);
 
+        builderClassBuilder.addOriginatingElement(this.annotatedElement);
         JavaFile javaFile = JavaFile
                 .builder(builderClassPackage(), builderClassBuilder.build())
                 .build();
@@ -499,7 +502,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         ClassName generatedAnnotationClass = determineGeneratedAnnotationClass();
         return AnnotationSpec
                 .builder(generatedAnnotationClass)
-                .addMember("value", "$S", "Jilt-1.7")
+                .addMember("value", "$S", "Jilt-1.8")
                 .build();
     }
 
