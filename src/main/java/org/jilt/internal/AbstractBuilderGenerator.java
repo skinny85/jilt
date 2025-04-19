@@ -307,13 +307,19 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return ret;
     }
 
+    protected final TypeVariableName mangleTypeParameter(TypeVariableName typeVariableName) {
+        return TypeVariableName.get(typeVariableName.name + "_",
+                // copy over the bounds, if there are any, recursively mangling them too
+                this.mangleTypeParameters(typeVariableName.bounds).toArray(new TypeName[]{}));
+    }
+
     private List<TypeName> mangleTypeParameters(List<TypeName> typeParameters) {
         List<TypeName> ret = new ArrayList<TypeName>(typeParameters.size());
         for (TypeName typeParameter : typeParameters) {
             if (typeParameter instanceof TypeVariableName) {
                 // if this is a type variable, we need to mangle it
                 TypeVariableName typeVariableName = (TypeVariableName) typeParameter;
-                ret.add(this.mangleTypeParameter(typeVariableName));
+                ret.add(this.mangleTypeParameterWithoutBounds(typeVariableName));
             } else if (typeParameter instanceof WildcardTypeName) {
                 WildcardTypeName wildcardTypeName = (WildcardTypeName) typeParameter;
                 List<TypeName> lowerBounds = this.mangleTypeParameters(wildcardTypeName.lowerBounds);
@@ -329,7 +335,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 // if this is an entire parameterized type, we need to mangle it recursively
                 ParameterizedTypeName parameterizedTypeName = (ParameterizedTypeName) typeParameter;
                 ret.add(ParameterizedTypeName.get(parameterizedTypeName.rawType,
-                    this.mangleTypeParameters(parameterizedTypeName.typeArguments).toArray(new TypeName[]{})));
+                        this.mangleTypeParameters(parameterizedTypeName.typeArguments).toArray(new TypeName[]{})));
             } else {
                 ret.add(typeParameter);
             }
@@ -337,10 +343,12 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return ret;
     }
 
-    protected final TypeVariableName mangleTypeParameter(TypeVariableName typeVariableName) {
-        return TypeVariableName.get(typeVariableName.name + "_",
-                // copy over the bounds, if there are any, recursively mangling them too
-                this.mangleTypeParameters(typeVariableName.bounds).toArray(new TypeName[]{}));
+    private TypeVariableName mangleTypeParameterWithoutBounds(TypeVariableName typeVariableName) {
+        // for a type variable like E extends Enum<E>,
+        // we don't want to recursively mangle its bounds,
+        // since the bound will contain the reference to the variable itself,
+        // which will result in an infinite loop if not excluded
+        return TypeVariableName.get(typeVariableName.name + "_");
     }
 
     protected final ParameterSpec setterParameterSpec(VariableElement attribute, TypeName parameterType) {
