@@ -335,7 +335,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 // if this is an entire parameterized type, we need to mangle it recursively
                 ParameterizedTypeName parameterizedTypeName = (ParameterizedTypeName) typeParameter;
                 ret.add(ParameterizedTypeName.get(parameterizedTypeName.rawType,
-                        this.mangleTypeParameters(parameterizedTypeName.typeArguments).toArray(new TypeName[]{})));
+                    this.mangleTypeParameters(parameterizedTypeName.typeArguments).toArray(new TypeName[]{})));
             } else {
                 ret.add(typeParameter);
             }
