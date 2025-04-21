@@ -1,3 +1,8 @@
+Version 1.8.1 (2025-04-20)
+--------------------------
+- Fix a bug where a recursive bound of a generic type would cause an infinite loop
+  ([Issue #43](https://github.com/skinny85/jilt/issues/43))
+
 Version 1.8 (2025-04-04)
 ------------------------
 - Make Jilt an incremental annotation processor for Gradle

@@ -1,4 +1,4 @@
-# Jilt [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![See on Maven Central](https://maven-badges.herokuapp.com/maven-central/cc.jilt/jilt/badge.svg?style=flat&version=1.8)](https://search.maven.org/artifact/cc.jilt/jilt/1.8/jar) [![Build Status](https://github.com/skinny85/jilt/actions/workflows/build.yaml/badge.svg)](https://github.com/skinny85/jilt/actions/workflows/build.yaml)
+# Jilt [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![See on Maven Central](https://maven-badges.herokuapp.com/maven-central/cc.jilt/jilt/badge.svg?style=flat&version=1.8.1)](https://search.maven.org/artifact/cc.jilt/jilt/1.8.1/jar) [![Build Status](https://github.com/skinny85/jilt/actions/workflows/build.yaml/badge.svg)](https://github.com/skinny85/jilt/actions/workflows/build.yaml)
 
 Jilt is a [Java annotation processor](https://docs.oracle.com/javase/8/docs/api/javax/annotation/processing/Processor.html)
 used for automatically generating classes that implement the
@@ -87,7 +87,7 @@ Example Maven settings:
     <dependency>
         <groupId>cc.jilt</groupId>
         <artifactId>jilt</artifactId>
-        <version>1.8</version>
+        <version>1.8.1</version>
         <scope>provided</scope> <!-- Jilt is not needed at runtime -->
     </dependency>
 </dependencies>
@@ -102,13 +102,13 @@ repositories {
 
 dependencies {
     // ...
-    compileOnly 'cc.jilt:jilt:1.8' // Jilt is not needed at runtime
-    annotationProcessor 'cc.jilt:jilt:1.8' // you might also need this dependency in newer Gradle versions
+    compileOnly 'cc.jilt:jilt:1.8.1' // Jilt is not needed at runtime
+    annotationProcessor 'cc.jilt:jilt:1.8.1' // you might also need this dependency in newer Gradle versions
 }
 ```
 
 If you're not using dependency managers, you can
-[download the JAR directly](https://repo1.maven.org/maven2/cc/jilt/jilt/1.8/jilt-1.8.jar)
+[download the JAR directly](https://repo1.maven.org/maven2/cc/jilt/jilt/1.8.1/jilt-1.8.1.jar)
 (it's distributed as a self-contained JAR, you don't need any additional dependencies for it)
 and add it to your classpath.
 

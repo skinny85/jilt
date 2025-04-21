@@ -510,7 +510,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         ClassName generatedAnnotationClass = determineGeneratedAnnotationClass();
         return AnnotationSpec
                 .builder(generatedAnnotationClass)
-                .addMember("value", "$S", "Jilt-1.8")
+                .addMember("value", "$S", "Jilt-1.8.1")
                 .build();
     }
 
