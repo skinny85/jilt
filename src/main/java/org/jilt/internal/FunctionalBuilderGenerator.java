@@ -6,8 +6,10 @@ import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
+import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.TypeVariableName;
 import org.jilt.Builder;
 import org.jilt.BuilderInterfaces;
 import org.jilt.JiltGenerated;
@@ -275,10 +277,15 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
     }
 
     private TypeSpec functionalSetterInterface(String interfaceName, String baseSetterInterfaceName) {
+        ClassName rawBaseSetterType = ClassName.get(this.outerInterfacesName(), baseSetterInterfaceName);
+        List<TypeVariableName> baseSetterTypeVariables = this.mangledBuilderClassTypeParameters();
+        TypeName paramBaseSetterType = baseSetterTypeVariables.isEmpty()
+                ? rawBaseSetterType
+                : ParameterizedTypeName.get(rawBaseSetterType, baseSetterTypeVariables.toArray(new TypeName[0]));
         return TypeSpec.interfaceBuilder(interfaceName)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addTypeVariables(this.builderClassTypeParameters())
-                .addSuperinterface(ClassName.get(this.outerInterfacesName(), baseSetterInterfaceName))
+                .addTypeVariables(baseSetterTypeVariables)
+                .addSuperinterface(paramBaseSetterType)
                 .build();
     }
 
