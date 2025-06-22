@@ -179,6 +179,7 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
         return MethodSpec
                 .methodBuilder(this.setterMethodName(attribute))
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addTypeVariables(this.builderClassTypeParameters())
                 .returns(this.returnTypeForSetterFor(attribute, mangleTypeParameters))
                 .addParameter(this.setterParameterSpec(attribute, parameterType))
                 .addStatement("return $1L -> $1L.$2L = $2L",
