@@ -25,7 +25,8 @@ artifacts {
 }
 
 // defaults if the value of the username and password for Maven Central is not found -
-// they are only needed when running the 'uploadArchives' task to release a new version
+// they are only needed when running the 'publishShadowPublicationToMavenCentralRepository'
+// task to release a new version
 def ossrhUsername = findProperty('ossrhUsername') ?: 'username'
 def ossrhPassword = findProperty('ossrhPassword') ?: 'password'
 
@@ -60,7 +61,7 @@ publishing {
     }
     repositories {
         maven {
-            url = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+            url = 'https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/'
             credentials {
                 username = ossrhUsername
                 password = ossrhPassword
