@@ -1,3 +1,7 @@
+Version 1.8.2 (2025-06-28)
+--------------------------
+- Fix a bug where the Functional Builder style did not work with generic classes
+
 Version 1.8.1 (2025-04-20)
 --------------------------
 - Fix a bug where a recursive bound of a generic type would cause an infinite loop
