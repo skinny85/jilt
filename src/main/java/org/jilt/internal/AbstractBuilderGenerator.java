@@ -35,12 +35,12 @@ import javax.lang.model.util.Elements;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 abstract class AbstractBuilderGenerator implements BuilderGenerator {
-    private static final Set<AccessLevel> ACCESSIBLE_LEVELS = Set.of(AccessLevel.PUBLIC, AccessLevel.MODULE, AccessLevel.PACKAGE);
+    private static final List<AccessLevel> ACCESSIBLE_LEVELS = Arrays.asList(AccessLevel.PUBLIC, AccessLevel.MODULE, AccessLevel.PACKAGE);
 
     protected final Element annotatedElement;
     private final Elements elements;
