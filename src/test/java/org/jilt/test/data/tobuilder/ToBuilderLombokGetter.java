@@ -1,10 +1,11 @@
 package org.jilt.test.data.tobuilder;
 
-import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jilt.Builder;
+
+import java.util.Objects;
 
 @Getter
 @RequiredArgsConstructor

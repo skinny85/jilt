@@ -1,10 +1,11 @@
 package org.jilt.test.data.tobuilder;
 
-import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import org.jilt.Builder;
+
+import java.util.Objects;
 
 @Data
 @Builder(toBuilder = "toBuilder")

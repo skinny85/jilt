@@ -1,8 +1,5 @@
 package org.jilt.test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.Collections;
 import org.jilt.test.data.tobuilder.ToBuilderLombokData;
 import org.jilt.test.data.tobuilder.ToBuilderLombokDataBuilder;
 import org.jilt.test.data.tobuilder.ToBuilderLombokGetter;
@@ -12,6 +9,10 @@ import org.jilt.test.data.tobuilder.ToBuilderValueBuilder;
 import org.jilt.test.data.tobuilder.User;
 import org.jilt.test.data.tobuilder.UserBuilder;
 import org.junit.Test;
+
+import java.util.Collections;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ToBuilderTest {
     @Test
