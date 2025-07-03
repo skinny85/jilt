@@ -12,11 +12,12 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
 import com.squareup.javapoet.WildcardTypeName;
-import org.jilt.Builder;
-import org.jilt.JiltGenerated;
-import org.jilt.Opt;
-import org.jilt.utils.Utils;
-
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
@@ -27,14 +28,19 @@ import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.util.Elements;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Target;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Getter;
+import org.jilt.Builder;
+import org.jilt.JiltGenerated;
+import org.jilt.Opt;
+import org.jilt.utils.Utils;
 
 abstract class AbstractBuilderGenerator implements BuilderGenerator {
+    private static final Set<AccessLevel> ACCESSIBLE_LEVELS = Set.of(AccessLevel.PUBLIC, AccessLevel.MODULE, AccessLevel.PACKAGE);
+
     protected final Element annotatedElement;
     private final Elements elements;
     private final Filer filer;
@@ -228,6 +234,11 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             if (elementIsMethodWithoutArgumentsCalled(member, fieldName)) {
                 return member.getSimpleName().toString() + "()";
             }
+            // if there's a @Getter or @Data annotation
+            if (elementIsAnnotatedWithGetter(member, this.targetClassType) || 
+                    elementIsAnnotatedWithData(member, this.targetClassType)) {
+                return getGetterBegin(attribute) + Utils.capitalize(attribute.getSimpleName().toString()) + "()";
+            }
         }
         // if we haven't found a sensible method, fall back to the field name
         return fieldName;
@@ -237,6 +248,29 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         return element.getKind() == ElementKind.METHOD &&
                 element.getSimpleName().toString().equals(methodName) &&
                 ((ExecutableElement) element).getParameters().isEmpty();
+    }
+
+    private static boolean elementIsAnnotatedWithGetter(Element element, TypeElement targetClassType) {
+        Getter getter = targetClassType.getAnnotation(Getter.class);
+        if (element.getAnnotation(Getter.class) != null) {
+            getter = element.getAnnotation(Getter.class);
+        }
+        return getter != null &&
+                element.getKind() == ElementKind.FIELD &&
+                ACCESSIBLE_LEVELS.contains(getter.value());
+    }
+
+    private static boolean elementIsAnnotatedWithData(Element element, TypeElement targetClassType) {
+        if (element.getKind() != ElementKind.FIELD) return false;
+
+        Getter getter = element.getAnnotation(Getter.class);
+        if (getter != null && ACCESSIBLE_LEVELS.contains(getter.value())) return true;
+
+        return targetClassType.getAnnotation(Data.class) != null;
+    }
+
+    private String getGetterBegin(final Element member) {
+        return member.asType().getKind() == TypeKind.BOOLEAN ? "is" : "get";
     }
 
     private List<String> attributeNames() {
