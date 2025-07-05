@@ -27,7 +27,8 @@ public class ToBuilderValue {
         return methodAttr;
     }
 
-    public Boolean isBooleanGetter() {
+    // Lombok generates Boolean getters with "get", not "is"
+    public Boolean getBooleanGetter() {
         return booleanGetter;
     }
 

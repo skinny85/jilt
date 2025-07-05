@@ -27,6 +27,7 @@ import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.util.Elements;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
@@ -220,19 +221,12 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         // 1. The getter method (getXyz() / isXyz())
         // 2. The record read method (xyz())
         // 3. The field itself (xyz)
-        String getterMethod = "get" + capitalizedFieldName + "()";
-        String recordReadMethod = fieldName + "()";
+        String getterPrefix = attribute.asType().getKind() == TypeKind.BOOLEAN ? "is" : "get";
+        String getterMethod = getterPrefix + capitalizedFieldName ;
         boolean getterFound = false, recordReaderFound = false, publicFieldFound = false;
 
         for (Element member : this.elements.getAllMembers(this.targetClassType)) {
             if (elementIsMethodWithoutArgumentsCalled(member, getterMethod)) {
-                getterFound = true;
-            }
-            // getters for boolean properties start with "is" instead of "get"
-            if (elementIsMethodWithoutArgumentsCalled(member, "is" + capitalizedFieldName)) {
-                // slight problem - this will not work for Lombok-generated getters,
-                // since we'll never find the isXyz() method in their case :/
-                getterMethod = "is" + capitalizedFieldName + "()";
                 getterFound = true;
             }
             if (elementIsMethodWithoutArgumentsCalled(member, fieldName)) {
@@ -246,10 +240,10 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         }
         if (getterFound) {
             // we always prefer the getter if we found one
-            return getterMethod;
+            return getterMethod + "()";
         } else if (recordReaderFound) {
             // if there's no getter, but there's a record-style read method, use that
-            return recordReadMethod;
+            return fieldName + "()";
         } else if (publicFieldFound) {
             // if there's no getter or record-style reader,
             // but the field is public, simply use the field itself
@@ -258,7 +252,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             // It could be that the class uses Lombok,
             // and the getter hasn't been generated yet.
             // To handle that case, default to the getter
-            return getterMethod;
+            return getterMethod + "()";
         }
     }
 
