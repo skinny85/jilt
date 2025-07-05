@@ -8,7 +8,7 @@ import java.util.List;
 public class ToBuilderValue {
     private final int getterAttr;
     private final List<String> methodAttr;
-    public final char fieldAttr;
+    final char fieldAttr;
     private final Boolean booleanGetter;
 
     @Builder(toBuilder = "toBuilder")
@@ -27,8 +27,9 @@ public class ToBuilderValue {
         return methodAttr;
     }
 
-    // Lombok generates Boolean getters with "get", not "is"
-    public Boolean getBooleanGetter() {
+    // Lombok generates Boolean getters with "get", not "is",
+    // but Jilt handles that case correctly
+    public Boolean isBooleanGetter() {
         return booleanGetter;
     }
 

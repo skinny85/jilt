@@ -221,21 +221,29 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         // 1. The getter method (getXyz() / isXyz())
         // 2. The record read method (xyz())
         // 3. The field itself (xyz)
-        String getterPrefix = attribute.asType().getKind() == TypeKind.BOOLEAN ? "is" : "get";
-        String getterMethod = getterPrefix + capitalizedFieldName ;
-        boolean getterFound = false, recordReaderFound = false, publicFieldFound = false;
+        String getterMethod = "get" + capitalizedFieldName ;
+        boolean getterFound = false, recordReaderFound = false, publicFieldFound = false,
+                packagePrivateFieldFound = false;
 
         for (Element member : this.elements.getAllMembers(this.targetClassType)) {
             if (elementIsMethodWithoutArgumentsCalled(member, getterMethod)) {
                 getterFound = true;
             }
+            if (elementIsMethodWithoutArgumentsCalled(member, "is" + capitalizedFieldName)) {
+                getterFound = true;
+                getterMethod = "is" + capitalizedFieldName;
+            }
             if (elementIsMethodWithoutArgumentsCalled(member, fieldName)) {
                 recordReaderFound = true;
             }
             if (member.getKind() == ElementKind.FIELD &&
-                    member.getSimpleName().toString().equals(fieldName) &&
-                    member.getModifiers().contains(Modifier.PUBLIC)) {
-                publicFieldFound = true;
+                    member.getSimpleName().toString().equals(fieldName)) {
+                if (member.getModifiers().contains(Modifier.PUBLIC)) {
+                    publicFieldFound = true;
+                } else if (!member.getModifiers().contains(Modifier.PRIVATE) &&
+                        !member.getModifiers().contains(Modifier.PROTECTED)) {
+                    packagePrivateFieldFound = true;
+                }
             }
         }
         if (getterFound) {
@@ -248,11 +256,17 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             // if there's no getter or record-style reader,
             // but the field is public, simply use the field itself
             return fieldName;
+        } else if (packagePrivateFieldFound &&
+                this.determineTargetClassPackage().equals(this.builderClassPackage)) {
+            return fieldName;
         } else {
             // It could be that the class uses Lombok,
             // and the getter hasn't been generated yet.
-            // To handle that case, default to the getter
-            return getterMethod + "()";
+            // To handle that case, default to the getter.
+            // Note that Lombok uses the 'is' prefix only for boolean
+            // (not Boolean) properties
+            String setterPrefix = attribute.asType().getKind() == TypeKind.BOOLEAN ? "is" : "get";
+            return setterPrefix + capitalizedFieldName + "()";
         }
     }
 

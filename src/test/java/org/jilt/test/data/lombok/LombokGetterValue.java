@@ -4,11 +4,11 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jilt.Builder;
 
-@Builder(toBuilder = "toBuilder")
+@Builder(toBuilder = "toBuilder", packageName = "org.jilt.test.data.lombok.custom")
 @RequiredArgsConstructor
 @Getter
 public final class LombokGetterValue {
     private final String str;
-    private final boolean smallBool;
+    final boolean smallBool;
     private final Boolean bigBool;
 }
