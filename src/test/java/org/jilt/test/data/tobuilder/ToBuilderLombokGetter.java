@@ -11,11 +11,11 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Builder(toBuilder = "toBuilder")
 public class ToBuilderLombokGetter {
-    private final String name;
+    public final String name;
     @Getter(AccessLevel.PACKAGE)
     private final int value;
-    private final boolean active;
-    private final Boolean enabled;
+    final boolean active;
+    protected final Boolean enabled;
 
     @Override
     public boolean equals(Object object) {

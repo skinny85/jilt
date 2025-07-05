@@ -12,9 +12,6 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
 import com.squareup.javapoet.WildcardTypeName;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Getter;
 import org.jilt.Builder;
 import org.jilt.JiltGenerated;
 import org.jilt.Opt;
@@ -40,7 +37,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 abstract class AbstractBuilderGenerator implements BuilderGenerator {
-    private static final List<AccessLevel> ACCESSIBLE_LEVELS = Arrays.asList(AccessLevel.PUBLIC, AccessLevel.MODULE, AccessLevel.PACKAGE);
+    private static final List<Modifier> NON_PUBLIC_MODIFIERS = Arrays.asList(Modifier.PROTECTED, Modifier.PRIVATE);
 
     protected final Element annotatedElement;
     private final Elements elements;
@@ -222,6 +219,10 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     protected final String accessAttributeOfTargetClass(VariableElement attribute) {
         String fieldName = this.attributeSimpleName(attribute);
         for (Element member : this.elements.getAllMembers(this.targetClassType)) {
+            // if the member is publicly accessible, use it directly
+            if(elementIsFieldPubliclyAccessible(member, fieldName)) {
+                return fieldName;
+            }
             // if there's a getter method, use it
             if (elementIsMethodWithoutArgumentsCalled(member, "get" + Utils.capitalize(fieldName))) {
                 return member.getSimpleName().toString() + "()";
@@ -235,14 +236,16 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             if (elementIsMethodWithoutArgumentsCalled(member, fieldName)) {
                 return member.getSimpleName().toString() + "()";
             }
-            // if there's a @Getter or @Data annotation
-            if (elementIsAnnotatedWithGetter(member, this.targetClassType) || 
-                    elementIsAnnotatedWithData(member, this.targetClassType)) {
-                return getGetterBegin(attribute) + Utils.capitalize(attribute.getSimpleName().toString()) + "()";
-            }
         }
-        // if we haven't found a sensible method, fall back to the field name
-        return fieldName;
+        // if we haven't found a sensible method, fall back to the default getter
+        return getGetterBeginning(attribute) + Utils.capitalize(attribute.getSimpleName().toString()) + "()";
+    }
+
+    private boolean elementIsFieldPubliclyAccessible(Element element, String fieldName) {
+        return element.getKind() == ElementKind.FIELD &&
+            element.getSimpleName().toString().equals(fieldName) &&
+            (element.getModifiers().contains(Modifier.PUBLIC) ||
+                element.getModifiers().stream().noneMatch(NON_PUBLIC_MODIFIERS::contains));
     }
 
     private static boolean elementIsMethodWithoutArgumentsCalled(Element element, String methodName) {
@@ -251,26 +254,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 ((ExecutableElement) element).getParameters().isEmpty();
     }
 
-    private static boolean elementIsAnnotatedWithGetter(Element element, TypeElement targetClassType) {
-        Getter getter = targetClassType.getAnnotation(Getter.class);
-        if (element.getAnnotation(Getter.class) != null) {
-            getter = element.getAnnotation(Getter.class);
-        }
-        return getter != null &&
-                element.getKind() == ElementKind.FIELD &&
-                ACCESSIBLE_LEVELS.contains(getter.value());
-    }
-
-    private static boolean elementIsAnnotatedWithData(Element element, TypeElement targetClassType) {
-        if (element.getKind() != ElementKind.FIELD) return false;
-
-        Getter getter = element.getAnnotation(Getter.class);
-        if (getter != null && ACCESSIBLE_LEVELS.contains(getter.value())) return true;
-
-        return targetClassType.getAnnotation(Data.class) != null;
-    }
-
-    private String getGetterBegin(final Element member) {
+    private String getGetterBeginning(final Element member) {
         return member.asType().getKind() == TypeKind.BOOLEAN ? "is" : "get";
     }
 
