@@ -1,13 +1,13 @@
 package org.jilt.test;
 
 import org.jilt.test.data.tobuilder.ToBuilderLombokData;
-import org.jilt.test.data.tobuilder.ToBuilderLombokDataBuilder;
 import org.jilt.test.data.tobuilder.ToBuilderLombokGetter;
 import org.jilt.test.data.tobuilder.ToBuilderLombokGetterBuilder;
 import org.jilt.test.data.tobuilder.ToBuilderValue;
 import org.jilt.test.data.tobuilder.ToBuilderValueBuilder;
 import org.jilt.test.data.tobuilder.User;
 import org.jilt.test.data.tobuilder.UserBuilder;
+import org.jilt.test.data.tobuilder.lombok.ToBuilderLombokDataBuilder;
 import org.junit.Test;
 
 import java.util.Collections;

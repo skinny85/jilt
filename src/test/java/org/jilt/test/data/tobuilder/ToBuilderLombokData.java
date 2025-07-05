@@ -1,17 +1,14 @@
 package org.jilt.test.data.tobuilder;
 
-import lombok.AccessLevel;
 import lombok.Data;
-import lombok.Getter;
 import org.jilt.Builder;
 
 import java.util.Objects;
 
 @Data
-@Builder(toBuilder = "toBuilder")
+@Builder(toBuilder = "toBuilder", packageName = "org.jilt.test.data.tobuilder.lombok")
 public class ToBuilderLombokData {
     public final String name;
-    @Getter(AccessLevel.PACKAGE)
     private final int value;
     final boolean active;
     protected final Boolean enabled;

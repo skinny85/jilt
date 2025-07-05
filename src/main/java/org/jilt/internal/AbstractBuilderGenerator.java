@@ -244,8 +244,12 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private boolean elementIsFieldPubliclyAccessible(Element element, String fieldName) {
         return element.getKind() == ElementKind.FIELD &&
             element.getSimpleName().toString().equals(fieldName) &&
-            (element.getModifiers().contains(Modifier.PUBLIC) ||
-                element.getModifiers().stream().noneMatch(NON_PUBLIC_MODIFIERS::contains));
+            (element.getModifiers().contains(Modifier.PUBLIC) || elementIsInPackagePrivateAccessible(element));
+    }
+
+    private boolean elementIsInPackagePrivateAccessible(Element element) {
+        return element.getModifiers().stream().noneMatch(NON_PUBLIC_MODIFIERS::contains) &&
+            element.getEnclosingElement().toString().equals(builderClassPackage + "." + targetClassType.getSimpleName());
     }
 
     private static boolean elementIsMethodWithoutArgumentsCalled(Element element, String methodName) {
