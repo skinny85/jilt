@@ -27,6 +27,8 @@ public class ToBuilderValue {
         return methodAttr;
     }
 
+    // Lombok generates Boolean getters with "get", not "is",
+    // but Jilt handles that case correctly
     public Boolean isBooleanGetter() {
         return booleanGetter;
     }
