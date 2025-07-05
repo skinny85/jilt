@@ -214,23 +214,52 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     protected final String accessAttributeOfTargetClass(VariableElement attribute) {
         String fieldName = this.attributeSimpleName(attribute);
+        String capitalizedFieldName = Utils.capitalize(fieldName);
+
+        // candidates are:
+        // 1. The getter method (getXyz() / isXyz())
+        // 2. The record read method (xyz())
+        // 3. The field itself (xyz)
+        String getterMethod = "get" + capitalizedFieldName + "()";
+        String recordReadMethod = fieldName + "()";
+        boolean getterFound = false, recordReaderFound = false, publicFieldFound = false;
+
         for (Element member : this.elements.getAllMembers(this.targetClassType)) {
-            // if there's a getter method, use it
-            if (elementIsMethodWithoutArgumentsCalled(member, "get" + Utils.capitalize(fieldName))) {
-                return member.getSimpleName().toString() + "()";
+            if (elementIsMethodWithoutArgumentsCalled(member, getterMethod)) {
+                getterFound = true;
             }
             // getters for boolean properties start with "is" instead of "get"
-            if (elementIsMethodWithoutArgumentsCalled(member, "is" + Utils.capitalize(fieldName))) {
-                return member.getSimpleName().toString() + "()";
+            if (elementIsMethodWithoutArgumentsCalled(member, "is" + capitalizedFieldName)) {
+                // slight problem - this will not work for Lombok-generated getters,
+                // since we'll never find the isXyz() method in their case :/
+                getterMethod = "is" + capitalizedFieldName + "()";
+                getterFound = true;
             }
-            // if there's a no-argument method with the field name,
-            // like with Records, use that
             if (elementIsMethodWithoutArgumentsCalled(member, fieldName)) {
-                return member.getSimpleName().toString() + "()";
+                recordReaderFound = true;
+            }
+            if (member.getKind() == ElementKind.FIELD &&
+                    member.getSimpleName().toString().equals(fieldName) &&
+                    member.getModifiers().contains(Modifier.PUBLIC)) {
+                publicFieldFound = true;
             }
         }
-        // if we haven't found a sensible method, fall back to the field name
-        return fieldName;
+        if (getterFound) {
+            // we always prefer the getter if we found one
+            return getterMethod;
+        } else if (recordReaderFound) {
+            // if there's no getter, but there's a record-style read method, use that
+            return recordReadMethod;
+        } else if (publicFieldFound) {
+            // if there's no getter or record-style reader,
+            // but the field is public, simply use the field itself
+            return fieldName;
+        } else {
+            // It could be that the class uses Lombok,
+            // and the getter hasn't been generated yet.
+            // To handle that case, default to the getter
+            return getterMethod;
+        }
     }
 
     private static boolean elementIsMethodWithoutArgumentsCalled(Element element, String methodName) {
