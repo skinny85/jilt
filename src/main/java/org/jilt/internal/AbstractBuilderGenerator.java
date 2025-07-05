@@ -27,14 +27,18 @@ import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.util.Elements;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 abstract class AbstractBuilderGenerator implements BuilderGenerator {
+    private static final List<Modifier> NON_PUBLIC_MODIFIERS = Arrays.asList(Modifier.PROTECTED, Modifier.PRIVATE);
+
     protected final Element annotatedElement;
     private final Elements elements;
     private final Filer filer;
@@ -215,6 +219,10 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     protected final String accessAttributeOfTargetClass(VariableElement attribute) {
         String fieldName = this.attributeSimpleName(attribute);
         for (Element member : this.elements.getAllMembers(this.targetClassType)) {
+            // if the member is publicly accessible, use it directly
+            if(elementIsFieldPubliclyAccessible(member, fieldName)) {
+                return fieldName;
+            }
             // if there's a getter method, use it
             if (elementIsMethodWithoutArgumentsCalled(member, "get" + Utils.capitalize(fieldName))) {
                 return member.getSimpleName().toString() + "()";
@@ -229,14 +237,29 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 return member.getSimpleName().toString() + "()";
             }
         }
-        // if we haven't found a sensible method, fall back to the field name
-        return fieldName;
+        // if we haven't found a sensible method, fall back to the default getter
+        return getGetterBeginning(attribute) + Utils.capitalize(attribute.getSimpleName().toString()) + "()";
+    }
+
+    private boolean elementIsFieldPubliclyAccessible(Element element, String fieldName) {
+        return element.getKind() == ElementKind.FIELD &&
+            element.getSimpleName().toString().equals(fieldName) &&
+            (element.getModifiers().contains(Modifier.PUBLIC) || elementIsInPackagePrivateAccessible(element));
+    }
+
+    private boolean elementIsInPackagePrivateAccessible(Element element) {
+        return element.getModifiers().stream().noneMatch(NON_PUBLIC_MODIFIERS::contains) &&
+            element.getEnclosingElement().toString().equals(builderClassPackage + "." + targetClassType.getSimpleName());
     }
 
     private static boolean elementIsMethodWithoutArgumentsCalled(Element element, String methodName) {
         return element.getKind() == ElementKind.METHOD &&
                 element.getSimpleName().toString().equals(methodName) &&
                 ((ExecutableElement) element).getParameters().isEmpty();
+    }
+
+    private String getGetterBeginning(final Element member) {
+        return member.asType().getKind() == TypeKind.BOOLEAN ? "is" : "get";
     }
 
     private List<String> attributeNames() {

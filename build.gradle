@@ -103,7 +103,11 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.assertj:assertj-core:3.6.2'
     testImplementation 'com.google.code.findbugs:jsr305:3.0.2'
+
+    testCompileOnly 'org.projectlombok:lombok:1.18.38'
+
     testAnnotationProcessor project
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.38'
 }
 // required in Gradle 8, since the above line 'testAnnotationProcessor project'
 // creates an implicit dependency on shadowJar from compileTestJava

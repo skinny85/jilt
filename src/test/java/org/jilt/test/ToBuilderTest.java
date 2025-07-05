@@ -1,9 +1,13 @@
 package org.jilt.test;
 
+import org.jilt.test.data.tobuilder.ToBuilderLombokData;
+import org.jilt.test.data.tobuilder.ToBuilderLombokGetter;
+import org.jilt.test.data.tobuilder.ToBuilderLombokGetterBuilder;
 import org.jilt.test.data.tobuilder.ToBuilderValue;
 import org.jilt.test.data.tobuilder.ToBuilderValueBuilder;
 import org.jilt.test.data.tobuilder.User;
 import org.jilt.test.data.tobuilder.UserBuilder;
+import org.jilt.test.data.tobuilder.lombok.ToBuilderLombokDataBuilder;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -37,4 +41,21 @@ public class ToBuilderTest {
         assertThat(modified.lastName).isEqualTo("Last");
         assertThat(modified.displayName).isEqualTo("First Last");
     }
+
+    @Test
+    public void test_to_builder_lombok_getter() {
+        ToBuilderLombokGetter value = new ToBuilderLombokGetter("ToBuilderLombokGetter", 7, true, true);
+        ToBuilderLombokGetter builder = ToBuilderLombokGetterBuilder.toBuilder(value).build();
+
+        assertThat(value).isEqualTo(builder);
+    }
+
+    @Test
+    public void test_to_builder_lombok_data() {
+        ToBuilderLombokData value = new ToBuilderLombokData("ToBuilderLombokData", 7, true, true);
+        ToBuilderLombokData builder = ToBuilderLombokDataBuilder.toBuilder(value).build();
+
+        assertThat(value).isEqualTo(builder);
+    }
+
 }
