@@ -222,8 +222,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         // 2. The record read method (xyz())
         // 3. The field itself (xyz)
         String getterMethod = "get" + capitalizedFieldName ;
-        boolean getterFound = false, recordReaderFound = false, publicFieldFound = false,
-                packagePrivateFieldFound = false;
+        boolean getterFound = false, recordReaderFound = false, publicFieldFound = false;
 
         for (Element member : this.elements.getAllMembers(this.targetClassType)) {
             if (elementIsMethodWithoutArgumentsCalled(member, getterMethod)) {
@@ -237,13 +236,9 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 recordReaderFound = true;
             }
             if (member.getKind() == ElementKind.FIELD &&
-                    member.getSimpleName().toString().equals(fieldName)) {
-                if (member.getModifiers().contains(Modifier.PUBLIC)) {
-                    publicFieldFound = true;
-                } else if (!member.getModifiers().contains(Modifier.PRIVATE) &&
-                        !member.getModifiers().contains(Modifier.PROTECTED)) {
-                    packagePrivateFieldFound = true;
-                }
+                    member.getSimpleName().toString().equals(fieldName) &&
+                    member.getModifiers().contains(Modifier.PUBLIC)) {
+                publicFieldFound = true;
             }
         }
         if (getterFound) {
@@ -255,9 +250,6 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         } else if (publicFieldFound) {
             // if there's no getter or record-style reader,
             // but the field is public, simply use the field itself
-            return fieldName;
-        } else if (packagePrivateFieldFound &&
-                this.determineTargetClassPackage().equals(this.builderClassPackage)) {
             return fieldName;
         } else {
             // It could be that the class uses Lombok,

@@ -8,7 +8,7 @@ import java.util.List;
 public class ToBuilderValue {
     private final int getterAttr;
     private final List<String> methodAttr;
-    final char fieldAttr;
+    public final char fieldAttr;
     private final Boolean booleanGetter;
 
     @Builder(toBuilder = "toBuilder")
