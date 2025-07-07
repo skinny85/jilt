@@ -257,8 +257,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             // To handle that case, default to the getter.
             // Note that Lombok uses the 'is' prefix only for boolean
             // (not Boolean) properties
-            String setterPrefix = attribute.asType().getKind() == TypeKind.BOOLEAN ? "is" : "get";
-            return setterPrefix + capitalizedFieldName + "()";
+            String getterPrefix = attribute.asType().getKind() == TypeKind.BOOLEAN ? "is" : "get";
+            return getterPrefix + capitalizedFieldName + "()";
         }
     }
 
