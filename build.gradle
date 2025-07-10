@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'cc.jilt' // we need a domain we own for Maven Central, and jilt.org is scalped
-version '1.8.2'
+version '1.8.3'
 
 shadowJar {
     relocate 'com.squareup', 'org.jilt.shaded.com.squareup'

@@ -1,3 +1,8 @@
+Version 1.8.3 (2025-07-22)
+--------------------------
+- Fix a bug where Lombok generated getters didn't work with `toBuilder`
+  ([Issue #45](https://github.com/skinny85/jilt/issues/45))
+
 Version 1.8.2 (2025-06-28)
 --------------------------
 - Fix a bug where the Functional Builder style did not work with generic classes
