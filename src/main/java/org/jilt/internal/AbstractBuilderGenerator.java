@@ -95,6 +95,52 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             String fieldName = attributeSimpleName(attribute);
             TypeName fieldType = TypeName.get(attribute.asType());
 
+            boolean isSingular = false;
+            String singularName = null;
+            for (AnnotationMirror annotation : attribute.getAnnotationMirrors()) {
+                if (annotation.getAnnotationType().toString().equals("org.jilt.Singular")) {
+                    isSingular = true;
+                    Object value = annotation.getElementValues().values().stream().findFirst().orElse(null);
+                    singularName = value != null ? value.toString().replaceAll("\"", "") : null;
+                }
+            }
+
+            if (isSingular && fieldType instanceof ParameterizedTypeName) {
+                ParameterizedTypeName pType = (ParameterizedTypeName) fieldType;
+                if (pType.rawType.toString().equals("java.util.List") && this.getClass().getSimpleName().equals("ClassicBuilderGenerator")) {
+                    // Generate accumulator field
+                    String accName = "_" + fieldName;
+                    builderClassBuilder.addField(FieldSpec.builder(fieldType, accName, Modifier.PRIVATE)
+                        .initializer("new $T<>()", java.util.ArrayList.class)
+                        .build());
+
+                    // Generate addX and addAllX methods
+                    String itemType = pType.typeArguments.get(0).toString();
+                    String singular = singularName != null && !singularName.isEmpty() ? singularName : (fieldName.endsWith("s") ? fieldName.substring(0, fieldName.length() - 1) : fieldName);
+                    String addOneName = "add" + Utils.capitalize(singular);
+                    String addAllName = "addAll" + Utils.capitalize(fieldName);
+
+                    builderClassBuilder.addMethod(MethodSpec.methodBuilder(addOneName)
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(this.builderClassTypeName())
+                        .addParameter(pType.typeArguments.get(0), singular)
+                        .addStatement("this.$L.add($L)", accName, singular)
+                        .addStatement("return this")
+                        .build());
+
+                    builderClassBuilder.addMethod(MethodSpec.methodBuilder(addAllName)
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(this.builderClassTypeName())
+                        .addParameter(ParameterizedTypeName.get(ClassName.get("java.util", "Collection"), WildcardTypeName.subtypeOf(pType.typeArguments.get(0))), fieldName)
+                        .addStatement("this.$L.addAll($L)", accName, fieldName)
+                        .addStatement("return this")
+                        .build());
+
+                    // Do not generate normal setter for singular fields in classic builder
+                    continue;
+                }
+            }
+
             builderClassBuilder.addField(FieldSpec
                     .builder(fieldType, fieldName,
                             this.builderClassNeedsToBeAbstract()
@@ -199,12 +245,32 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         if (this.builderClassNeedsToBeAbstract()) {
             buildMethod.addModifiers(Modifier.ABSTRACT);
         } else {
-            String attributes = Utils.join(this.attributeNames());
+            // Prepare arguments for constructor/method
+            List<String> args = new ArrayList<>();
+            for (VariableElement attribute : attributes) {
+                String fieldName = attributeSimpleName(attribute);
+                TypeName fieldType = TypeName.get(attribute.asType());
+                boolean isSingular = false;
+                for (AnnotationMirror annotation : attribute.getAnnotationMirrors()) {
+                    if (annotation.getAnnotationType().toString().equals("org.jilt.Singular")) {
+                        isSingular = true;
+                        break;
+                    }
+                }
+                if (isSingular && fieldType instanceof ParameterizedTypeName) {
+                    ParameterizedTypeName pType = (ParameterizedTypeName) fieldType;
+                    if (pType.rawType.toString().equals("java.util.List") && this.getClass().getSimpleName().equals("ClassicBuilderGenerator")) {
+                        args.add("_" + fieldName);
+                        continue;
+                    }
+                }
+                args.add(fieldName);
+            }
+            String attributes = String.join(", ", args);
             if (this.targetCreationMethodIsConstructor()) {
                 buildMethod.addStatement("return new $T($L)", this.targetClassTypeName(), attributes);
             } else {
                 buildMethod.addStatement("return $T.$L($L)",
-                        // using ClassName gets rid of any type parameters the class might have
                         ClassName.get((TypeElement) this.targetCreationMethod.getEnclosingElement()),
                         this.targetCreationMethod.getSimpleName(),
                         attributes);
