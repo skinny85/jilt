@@ -42,57 +42,7 @@ final class ClassicBuilderGenerator extends AbstractBuilderGenerator {
     }
 
     private List<MethodSpec> generateAddMethods(VariableElement attribute){
-        boolean isSingular = false;
-        String singularName = null;
-        for (AnnotationMirror annotation : attribute.getAnnotationMirrors()) {
-            // Chech that the annotation type is equal to the Singular class
-            if (annotation.getAnnotationType().) { // TODO: Allow for lombok singular
-                isSingular = true;
-                Object value = annotation.getElementValues().values().stream().findFirst().orElse(null);
-                singularName = value != null ? value.toString().replaceAll("\"", "") : null;
-            }
-        }
 
-        if (isSingular && fieldType instanceof ParameterizedTypeName) {
-            ParameterizedTypeName pType = (ParameterizedTypeName) fieldType;
-            if (pType.rawType.toString().equals("java.util.List")) {
-                // Generate accumulator field
-                String accName = "_" + fieldName;
-                builderClassBuilder.addField(FieldSpec.builder(fieldType, accName, Modifier.PRIVATE)
-                        .initializer("new $T<>()", java.util.ArrayList.class)
-                        .build());
-
-                // Generate addX and addAllX methods
-                String itemType = pType.typeArguments.get(0).toString();
-                String singular = singularName != null && !singularName.isEmpty() ? singularName : (fieldName.endsWith("s") ? fieldName.substring(0, fieldName.length() - 1) : fieldName);
-                String addOneName = "add" + Utils.capitalize(singular);
-                String addAllName = "addAll" + Utils.capitalize(fieldName);
-
-                builderClassBuilder.addMethod(MethodSpec.methodBuilder(addOneName)
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(this.builderClassTypeName())
-                        .addParameter(pType.typeArguments.get(0), singular)
-                        .addStatement("this.$L.add($L)", accName, singular)
-                        .addStatement("return this")
-                        .build());
-
-                builderClassBuilder.addMethod(MethodSpec.methodBuilder(addAllName)
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(this.builderClassTypeName())
-                        .addParameter(ParameterizedTypeName.get(ClassName.get("java.util", "Collection"), WildcardTypeName.subtypeOf(pType.typeArguments.get(0))), fieldName)
-                        .addStatement("this.$L.addAll($L)", accName, fieldName)
-                        .addStatement("return this")
-                        .build());
-
-                // Do not generate normal setter for singular fields in classic builder
-                continue;
-            }
-        }
-
-    }
-
-    private List<MethodSpec> generateAddMethods(){
-        // todo
     }
 
     @Override

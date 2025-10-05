@@ -172,7 +172,7 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
                                                      boolean mangleTypeParameters, boolean handleOnlyOptionalAttributes) {
         boolean attributeIsOptional = this.isOptional(attribute);
         if (attributeIsOptional != handleOnlyOptionalAttributes) {
-            return null;
+            return List.of();
         }
 
         TypeName parameterType = this.attributeType(attribute, mangleTypeParameters);
