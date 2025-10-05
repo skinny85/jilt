@@ -1,5 +1,7 @@
 package org.jilt.test;
 
+import org.jilt.test.data.singular.SingularDemo;
+import org.jilt.test.data.singular.SingularDemoBuilder;
 import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
@@ -9,10 +11,11 @@ import static org.junit.Assert.*;
 public class SingularDemoTest {
     @Test
     public void testSingularAddMethods() {
-        SingularDemoBuilder builder = SingularDemoBuilder.singularDemo();
-        builder.addTag("foo");
-        builder.addTag("bar");
-        builder.addAllTags(Arrays.asList("baz", "qux"));
+        SingularDemoBuilder builder = SingularDemoBuilder
+                .singularDemo()
+                .addTag("foo")
+                .addTag("bar")
+                .addAllTags(Arrays.asList("baz", "qux"));
         SingularDemo demo = builder.build();
         List<String> tags = demo.getTags();
         assertEquals(Arrays.asList("foo", "bar", "baz", "qux"), tags);

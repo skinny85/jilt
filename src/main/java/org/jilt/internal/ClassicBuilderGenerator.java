@@ -55,7 +55,6 @@ final class ClassicBuilderGenerator extends AbstractBuilderGenerator {
         TypeName attributeType = TypeName.get(attribute.asType());
         ParameterizedTypeName parameterizedTypeName = (ParameterizedTypeName) attributeType;
         TypeName itemType = parameterizedTypeName.typeArguments.get(0);
-
         String fieldName = attributeSimpleName(attribute);
         String singularName = singularAnnotation.value();
         if (singularName.isEmpty()) {

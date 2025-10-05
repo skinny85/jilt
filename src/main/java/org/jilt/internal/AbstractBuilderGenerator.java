@@ -197,28 +197,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         if (this.builderClassNeedsToBeAbstract()) {
             buildMethod.addModifiers(Modifier.ABSTRACT);
         } else {
-            // Prepare arguments for constructor/method
-            List<String> args = new ArrayList<>();
-            for (VariableElement attribute : attributes) {
-                String fieldName = attributeSimpleName(attribute);
-                TypeName fieldType = TypeName.get(attribute.asType());
-                boolean isSingular = false;
-                for (AnnotationMirror annotation : attribute.getAnnotationMirrors()) {
-                    if (annotation.getAnnotationType().toString().equals("org.jilt.Singular")) {
-                        isSingular = true;
-                        break;
-                    }
-                }
-                if (isSingular && fieldType instanceof ParameterizedTypeName) {
-                    ParameterizedTypeName pType = (ParameterizedTypeName) fieldType;
-                    if (pType.rawType.toString().equals("java.util.List") && this.getClass().getSimpleName().equals("ClassicBuilderGenerator")) {
-                        args.add("_" + fieldName);
-                        continue;
-                    }
-                }
-                args.add(fieldName);
-            }
-            String attributes = String.join(", ", args);
+            String attributes = Utils.join(this.attributeNames());
             if (this.targetCreationMethodIsConstructor()) {
                 buildMethod.addStatement("return new $T($L)", this.targetClassTypeName(), attributes);
             } else {
