@@ -148,10 +148,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                                 : Modifier.PRIVATE)
                     .build());
 
-            MethodSpec setterMethod = this.generateBuilderSetterMethod(attribute);
-            if (setterMethod != null) {
-                builderClassBuilder.addMethod(setterMethod);
-            }
+            List<MethodSpec> setterMethods = this.generateBuilderSetterMethods(attribute);
+            setterMethods.forEach(builderClassBuilder::addMethod);
         }
 
         // add the 'build' method
@@ -348,13 +346,14 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     protected abstract void enhance(TypeSpec.Builder builderClassBuilder);
 
-    private MethodSpec generateBuilderSetterMethod(VariableElement attribute) {
-        return this.generateSetterMethod(attribute, /* mangleTypeParameters */ false,
+    private List<MethodSpec> generateBuilderSetterMethods(VariableElement attribute) {
+        var setterMethod = this.generateSetterMethods(attribute, /* mangleTypeParameters */ false,
                 /* abstractMethod */ false);
+        return setterMethod == null ? List.of() : List.of(setterMethod);
     }
 
-    protected MethodSpec generateSetterMethod(VariableElement attribute,
-            boolean mangleTypeParameters, boolean abstractMethod) {
+    protected List<MethodSpec> generateSetterMethods(VariableElement attribute,
+                                                     boolean mangleTypeParameters, boolean abstractMethod) {
         TypeName parameterType = this.attributeType(attribute, mangleTypeParameters);
         MethodSpec.Builder setter = MethodSpec
                 .methodBuilder(this.setterMethodName(attribute))
@@ -376,7 +375,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                     .addStatement("return this");
         }
 
-        return setter.build();
+        return List.of(setter.build());
     }
 
     protected abstract TypeName returnTypeForSetterFor(VariableElement attribute, boolean withMangledTypeParameters);

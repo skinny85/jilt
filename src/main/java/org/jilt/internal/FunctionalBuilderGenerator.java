@@ -161,24 +161,22 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
                 .addAnnotation(JiltGenerated.class)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         for (VariableElement currentAttribute : this.attributes()) {
-            MethodSpec setterMethod = this.generateSetterMethod(currentAttribute, false, true);
-            if (setterMethod != null) {
-                optionalSettersClass.addMethod(setterMethod);
-            }
+            List<MethodSpec> setterMethod = this.generateSetterMethods(currentAttribute, false, true);
+            setterMethod.forEach(optionalSettersClass::addMethod);
         }
         builderClassBuilder.addType(optionalSettersClass.build());
     }
 
     @Override
-    protected MethodSpec generateSetterMethod(VariableElement attribute,
-            boolean mangleTypeParameters, boolean handleOnlyOptionalAttributes) {
+    protected List<MethodSpec> generateSetterMethods(VariableElement attribute,
+                                                     boolean mangleTypeParameters, boolean handleOnlyOptionalAttributes) {
         boolean attributeIsOptional = this.isOptional(attribute);
         if (attributeIsOptional != handleOnlyOptionalAttributes) {
             return null;
         }
 
         TypeName parameterType = this.attributeType(attribute, mangleTypeParameters);
-        return MethodSpec
+        return List.of(MethodSpec
                 .methodBuilder(this.setterMethodName(attribute))
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addTypeVariables(this.builderClassTypeParameters())
@@ -187,7 +185,7 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
                 .addStatement("return $1L -> $1L.$2L = $2L",
                         this.builderClassMethodParamName(),
                         this.attributeSimpleName(attribute))
-                .build();
+                .build());
     }
 
     @Override

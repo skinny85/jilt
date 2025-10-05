@@ -1,5 +1,6 @@
 package org.jilt.internal;
 
+import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.jilt.Builder;
@@ -21,6 +22,17 @@ final class ClassicBuilderGenerator extends AbstractBuilderGenerator {
 
     @Override
     protected void generateClassesNeededByBuilder() {
+    }
+
+    @Override
+    protected List<MethodSpec> generateSetterMethods(VariableElement attribute,
+                                                     boolean mangleTypeParameters, boolean abstractMethod) {
+        List<MethodSpec> setterMethods = super.generateSetterMethods(attribute, mangleTypeParameters, abstractMethod);
+        // todo
+    }
+
+    private List<MethodSpec> generateAddMethods(){
+        // todo
     }
 
     @Override

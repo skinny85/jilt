@@ -36,7 +36,7 @@ final class TypeSafeBuilderGenerator extends AbstractTypeSafeBuilderGenerator {
 
         for (VariableElement currentAttribute : attributes()) {
             boolean attributeIsOptional = this.isOptional(currentAttribute);
-            MethodSpec setterMethod = this.generateInterfaceSetterMethod(currentAttribute, !attributeIsOptional);
+            MethodSpec setterMethod = this.generateInterfaceSetterMethods(currentAttribute, !attributeIsOptional);
             if (attributeIsOptional) {
                 optionalsInterfaceBuilder.addMethod(setterMethod);
             } else {

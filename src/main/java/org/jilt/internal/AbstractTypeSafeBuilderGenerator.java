@@ -81,9 +81,9 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
         return optionalAttributes.contains(attribute);
     }
 
-    protected final MethodSpec generateInterfaceSetterMethod(VariableElement attribute,
-            boolean mangleTypeParameters) {
-        return this.generateSetterMethod(attribute, mangleTypeParameters,
+    protected final List<MethodSpec> generateInterfaceSetterMethods(VariableElement attribute,
+                                                                    boolean mangleTypeParameters) {
+        return this.generateSetterMethods(attribute, mangleTypeParameters,
                 /* abstractMethod */ true);
     }
 
