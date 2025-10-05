@@ -41,8 +41,8 @@ final class TypeSafeUngroupedOptionalsBuilderGenerator extends AbstractTypeSafeB
                     .addTypeVariables(this.mangledBuilderClassTypeParameters());
 
             do {
-                MethodSpec setterMethod = this.generateInterfaceSetterMethods(currentAttribute, true);
-                innerInterfaceBuilder.addMethod(setterMethod);
+                List<MethodSpec> setterMethod = this.generateInterfaceSetterMethods(currentAttribute, true);
+                setterMethod.forEach(innerInterfaceBuilder::addMethod);
                 if (nextAttribute == null && isOptional(currentAttribute)) {
                     this.addBuildMethodToInterface(innerInterfaceBuilder,
                             /* withMangledTypeParameters */ true);
