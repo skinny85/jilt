@@ -457,6 +457,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     protected final TypeName targetClassTypeName() {
         return this.targetCreationMethodIsConstructor()
+                // if @Builder was placed on the class or constructor,
+                // we know that 'targetClassTypeElement' cannot be null
                 ? TypeName.get(this.targetClassTypeElement.asType())
                 : TypeName.get(this.targetCreationMethod.getReturnType());
     }
@@ -479,6 +481,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     protected final List<TypeVariableName> builderClassTypeParameters() {
         List<? extends TypeParameterElement> typeParameterElements = this.targetCreationMethodIsConstructor()
+                // if @Builder was placed on the class or constructor,
+                // we know that 'targetClassTypeElement' cannot be null
                 ? this.targetClassTypeElement.getTypeParameters()
                 : this.targetCreationMethod.getTypeParameters();
         List<TypeVariableName> ret = new ArrayList<TypeVariableName>(
