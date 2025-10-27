@@ -708,7 +708,7 @@ class Subclass1 extends SomeBaseClass {
             return new Subclass1(this.prop1, this.prop2, this.prop3, ...);
         }
     }
-    
+
     // ...
 }
 
