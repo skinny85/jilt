@@ -688,7 +688,7 @@ With the above code, the only way to create an instance of `User`
 would be to use the `User.builder()` static method,
 and then instantiate it through the (Staged in this case) Builder.
 
-The generated Builder class will also the abstract if the method `@Builder` was placed on is abstract.
+The generated Builder class will also be abstract if the method `@Builder` was placed on is abstract.
 This is helpful when dealing with a family of classes that share a common base class that defines the properties of the class,
 for example:
 
@@ -702,7 +702,7 @@ abstract class JiltContext {
 }
 
 class Subclass1 extends SomeBaseClass {
-    static class Subclass1Builder extends SomeClassBuilder<Subclass1> {
+    static class Subclass1Builder extends SomeBaseClassBuilder<Subclass1> {
         @Override
         public Subclass1 build() {
             return new Subclass1(this.prop1, this.prop2, this.prop3, ...);
@@ -713,7 +713,7 @@ class Subclass1 extends SomeBaseClass {
 }
 
 class Subclass2 extends SomeBaseClass {
-    static class Subclass2Builder extends SomeClassBuilder<Subclass2> {
+    static class Subclass2Builder extends SomeBaseClassBuilder<Subclass2> {
         @Override
         public Subclass2 build() {
             return new Subclass2(this.prop1, this.prop2, this.prop3, ...);
