@@ -151,14 +151,10 @@ class OriginalUsage {
     }
 }
 
-class JiltContainer {
+abstract class JiltContainer {
     @Builder(className = "JiltBaseBuilder", packageName = "org.jilt.test", style = BuilderStyle.STAGED, setterPrefix = "with")
-    private static <T extends Base> T buildBase(
-            LocalDateTime dateTime,
-            Long id,
-            Set<Long> longs) {
-        throw new RuntimeException("Doesn't matter, won't be called anyway");
-    }
+    abstract <T extends Base> T buildBase(
+            LocalDateTime dateTime, Long id, Set<Long> longs);
 }
 
 class JiltUsage {

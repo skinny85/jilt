@@ -688,6 +688,42 @@ With the above code, the only way to create an instance of `User`
 would be to use the `User.builder()` static method,
 and then instantiate it through the (Staged in this case) Builder.
 
+The generated Builder class will also the abstract if the method `@Builder` was placed on is abstract.
+This is helpful when dealing with a family of classes that share a common base class that defines the properties of the class,
+for example:
+
+```java
+import org.jilt.Builder;
+
+abstract class JiltContext {
+    @Builder(className = "SomeBaseClassBuilder", packageName = "my.package")
+    abstract <T extends SomeBaseClass> T produceInstance(
+            String prop1, int prop2, boolean prop3, ...);
+}
+
+class Subclass1 extends SomeBaseClass {
+    static class Subclass1Builder extends SomeClassBuilder<Subclass1> {
+        @Override
+        public Subclass1 build() {
+            return new Subclass1(this.prop1, this.prop2, this.prop3, ...);
+        }
+    }
+    
+    // ...
+}
+
+class Subclass2 extends SomeBaseClass {
+    static class Subclass2Builder extends SomeClassBuilder<Subclass2> {
+        @Override
+        public Subclass2 build() {
+            return new Subclass2(this.prop1, this.prop2, this.prop3, ...);
+        }
+    }
+
+    // ...
+}
+```
+
 #### Working in an IDE
 
 Annotation processors can be a little tricky to get working correctly in an IDE.

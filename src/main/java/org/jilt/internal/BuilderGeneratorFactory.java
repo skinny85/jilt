@@ -89,7 +89,8 @@ public final class BuilderGeneratorFactory {
             attributes = constructor.getParameters();
             targetCreationMethod = constructor;
         } else if (kind == ElementKind.METHOD &&
-                annotatedElement.getModifiers().contains(Modifier.STATIC)) {
+                (annotatedElement.getModifiers().contains(Modifier.STATIC) ||
+                annotatedElement.getModifiers().contains(Modifier.ABSTRACT))) {
             ExecutableElement method = (ExecutableElement) annotatedElement;
             targetClass = method.getReturnType() instanceof DeclaredType
                     ? (TypeElement) ((DeclaredType) method.getReturnType()).asElement()
@@ -100,7 +101,7 @@ public final class BuilderGeneratorFactory {
             targetCreationMethod = method;
         } else {
             throw new IllegalArgumentException(
-                    "@Builder can only be placed on classes/records, constructors or static methods");
+                    "@Builder can only be placed on classes/records, constructors or static/abstract methods");
         }
 
         switch (builderAnnotation.style()) {
