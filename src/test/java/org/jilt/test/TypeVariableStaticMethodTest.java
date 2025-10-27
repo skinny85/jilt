@@ -11,7 +11,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class Base {
+abstract class Base {
     public final LocalDateTime dateTime;
     public final Long id;
     public final Set<Long> longs;
