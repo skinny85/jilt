@@ -686,7 +686,7 @@ public final class User {
 
 With the above code, the only way to create an instance of `User`
 would be to use the `User.builder()` static method,
-and then instantiate it through the (Staged in this case) Builder.
+and then instantiate it through the (Staged, in this case) Builder.
 
 The generated Builder class will also be abstract if the method `@Builder` was placed on is abstract.
 This is helpful when dealing with a family of classes that share a common base class that defines the properties of the class,
