@@ -41,10 +41,10 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     private final Filer filer;
     private final Element optElement;
 
-    private final TypeElement targetClassType;
+    /** nullable */ private final TypeElement targetClassTypeElement;
     private final List<? extends VariableElement> attributes;
     private final Builder builderAnnotation;
-    private final ExecutableElement targetCreationMethod;
+    /** nullable */ private final ExecutableElement targetCreationMethod;
 
     private final String builderClassPackage;
     private final ClassName builderClassClassName;
@@ -57,7 +57,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         this.filer = filer;
         this.optElement = this.elements.getTypeElement(Opt.class.getCanonicalName());
 
-        this.targetClassType = targetClass;
+        this.targetClassTypeElement = targetClass;
         this.attributes = attributes;
         this.builderAnnotation = builderAnnotation;
         this.targetCreationMethod = targetCreationMethod;
@@ -224,21 +224,23 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         String getterMethod = "get" + capitalizedFieldName ;
         boolean getterFound = false, recordReaderFound = false, publicFieldFound = false;
 
-        for (Element member : this.elements.getAllMembers(this.targetClassType)) {
-            if (elementIsMethodWithoutArgumentsCalled(member, getterMethod)) {
-                getterFound = true;
-            }
-            if (elementIsMethodWithoutArgumentsCalled(member, "is" + capitalizedFieldName)) {
-                getterFound = true;
-                getterMethod = "is" + capitalizedFieldName;
-            }
-            if (elementIsMethodWithoutArgumentsCalled(member, fieldName)) {
-                recordReaderFound = true;
-            }
-            if (member.getKind() == ElementKind.FIELD &&
-                    member.getSimpleName().toString().equals(fieldName) &&
-                    member.getModifiers().contains(Modifier.PUBLIC)) {
-                publicFieldFound = true;
+        if (this.targetClassTypeElement != null) {
+            for (Element member : this.elements.getAllMembers(this.targetClassTypeElement)) {
+                if (elementIsMethodWithoutArgumentsCalled(member, getterMethod)) {
+                    getterFound = true;
+                }
+                if (elementIsMethodWithoutArgumentsCalled(member, "is" + capitalizedFieldName)) {
+                    getterFound = true;
+                    getterMethod = "is" + capitalizedFieldName;
+                }
+                if (elementIsMethodWithoutArgumentsCalled(member, fieldName)) {
+                    recordReaderFound = true;
+                }
+                if (member.getKind() == ElementKind.FIELD &&
+                        member.getSimpleName().toString().equals(fieldName) &&
+                        member.getModifiers().contains(Modifier.PUBLIC)) {
+                    publicFieldFound = true;
+                }
             }
         }
         if (getterFound) {
@@ -447,12 +449,17 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     }
 
     protected final Name targetClassSimpleName() {
-        return this.targetClassType.getSimpleName();
+        return this.targetClassTypeElement == null
+                // construct an empty simple name if the target class is a type variable
+                ? this.elements.getPackageElement("").getSimpleName()
+                : this.targetClassTypeElement.getSimpleName();
     }
 
     protected final TypeName targetClassTypeName() {
         return this.targetCreationMethodIsConstructor()
-                ? TypeName.get(this.targetClassType.asType())
+                // if @Builder was placed on the class or constructor,
+                // we know that 'targetClassTypeElement' cannot be null
+                ? TypeName.get(this.targetClassTypeElement.asType())
                 : TypeName.get(this.targetCreationMethod.getReturnType());
     }
 
@@ -474,7 +481,9 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     protected final List<TypeVariableName> builderClassTypeParameters() {
         List<? extends TypeParameterElement> typeParameterElements = this.targetCreationMethodIsConstructor()
-                ? this.targetClassType.getTypeParameters()
+                // if @Builder was placed on the class or constructor,
+                // we know that 'targetClassTypeElement' cannot be null
+                ? this.targetClassTypeElement.getTypeParameters()
                 : this.targetCreationMethod.getTypeParameters();
         List<TypeVariableName> ret = new ArrayList<TypeVariableName>(
                 typeParameterElements.size());
@@ -510,7 +519,9 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     }
 
     private String determineTargetClassPackage() {
-        return this.elements.getPackageOf(this.targetClassType).getQualifiedName().toString();
+        return this.targetClassTypeElement == null
+                ? ""
+                : this.elements.getPackageOf(this.targetClassTypeElement).getQualifiedName().toString();
     }
 
     protected final String builderFactoryMethodName() {

@@ -91,7 +91,11 @@ public final class BuilderGeneratorFactory {
         } else if (kind == ElementKind.METHOD &&
                 annotatedElement.getModifiers().contains(Modifier.STATIC)) {
             ExecutableElement method = (ExecutableElement) annotatedElement;
-            targetClass = (TypeElement) ((DeclaredType) method.getReturnType()).asElement();
+            targetClass = method.getReturnType() instanceof DeclaredType
+                    ? (TypeElement) ((DeclaredType) method.getReturnType()).asElement()
+                    // if @Builder was placed on a static method,
+                    // it can return a type variable instead of a declared type
+                    : null;
             attributes = method.getParameters();
             targetCreationMethod = method;
         } else {
