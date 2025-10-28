@@ -276,6 +276,8 @@ public @interface Builder {
      * This is an optional attribute - the default is to have an empty prefix,
      * in which case the setter name will be exactly as the property name
      * (so, in the above example, the setter would be called <code>name</code>).
+     *
+     * @TagDoesNotExist
      */
     String setterPrefix() default "";
 
