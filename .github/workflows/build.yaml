@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version: [ 8, 9, 11, 17, 21 ]
+        version: [8, 9, 11, 17, 21]
     steps:
       - uses: actions/checkout@v2
 
@@ -20,4 +20,4 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build and test the project
-        run: ./gradlew build
+        run: ./gradlew build check
