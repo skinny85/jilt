@@ -93,7 +93,7 @@ if (JavaVersion.current() < JavaVersion.VERSION_17) {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
     dependencies {
-        testImplementation 'org.jspecify:jspecify:0.3.0'
+        testImplementation 'org.jspecify:jspecify:1.0.0'
     }
 }
 
