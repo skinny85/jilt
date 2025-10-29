@@ -689,12 +689,10 @@ would be to use the `User.builder()` static method,
 and then instantiate it through the (Staged, in this case) Builder.
 
 The generated Builder class will also be abstract if the method `@Builder` was placed on is abstract.
-This is helpful when dealing with a family of classes that share a common base class that defines the properties of the class,
+This is helpful when dealing with a family of classes that share a common base class that defines the Builder properties,
 for example:
 
 ```java
-import org.jilt.Builder;
-
 abstract class JiltContext {
     @Builder(className = "SomeBaseClassBuilder", packageName = "my.package")
     abstract <T extends SomeBaseClass> T produceInstance(
@@ -723,6 +721,9 @@ class Subclass2 extends SomeBaseClass {
     // ...
 }
 ```
+
+In that case, the method `@Builder` is placed on cannot be static,
+since abstract static methods are not allowed in Java.
 
 #### Working in an IDE
 
