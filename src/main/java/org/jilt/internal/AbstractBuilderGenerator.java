@@ -543,7 +543,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             // we assume the implicit constructor is public
             return false;
         }
-        return this.targetCreationMethod.getModifiers().contains(Modifier.PRIVATE);
+        return this.targetCreationMethod.getModifiers().contains(Modifier.PRIVATE) ||
+                this.targetCreationMethod.getModifiers().contains(Modifier.ABSTRACT);
     }
 
     protected final AnnotationSpec generatedAnnotation() {
