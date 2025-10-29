@@ -98,7 +98,7 @@ if (JavaVersion.current() < JavaVersion.VERSION_17) {
 }
 
 dependencies {
-    compileOnly 'com.squareup:javapoet:1.13.0'
+    compileOnly 'com.palantir.javapoet:javapoet:0.7.0'
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.assertj:assertj-core:3.6.2'

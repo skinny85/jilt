@@ -1,7 +1,7 @@
 package org.jilt.internal;
 
-import com.squareup.javapoet.TypeName;
-import com.squareup.javapoet.TypeSpec;
+import com.palantir.javapoet.TypeName;
+import com.palantir.javapoet.TypeSpec;
 import org.jilt.Builder;
 
 import javax.annotation.processing.Filer;

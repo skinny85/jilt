@@ -1,15 +1,15 @@
 package org.jilt.internal;
 
-import com.squareup.javapoet.ArrayTypeName;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.CodeBlock;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
-import com.squareup.javapoet.TypeName;
-import com.squareup.javapoet.TypeSpec;
-import com.squareup.javapoet.TypeVariableName;
+import com.palantir.javapoet.ArrayTypeName;
+import com.palantir.javapoet.ClassName;
+import com.palantir.javapoet.CodeBlock;
+import com.palantir.javapoet.JavaFile;
+import com.palantir.javapoet.MethodSpec;
+import com.palantir.javapoet.ParameterSpec;
+import com.palantir.javapoet.ParameterizedTypeName;
+import com.palantir.javapoet.TypeName;
+import com.palantir.javapoet.TypeSpec;
+import com.palantir.javapoet.TypeVariableName;
 import org.jilt.Builder;
 import org.jilt.BuilderInterfaces;
 import org.jilt.JiltGenerated;
@@ -217,7 +217,7 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
         String baseSetterInterfaceParam = Utils.deCapitalize(this.baseSetterInterfaceName());
         TypeName baseSetterInterface = this.innerInterfaceNamed(this.baseSetterInterfaceName());
         MethodSpec.Builder toBuilderMethod = MethodSpec
-                .methodBuilder(toBuilderSuperMethod.name)
+                .methodBuilder(toBuilderSuperMethod.name())
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addTypeVariables(this.builderClassTypeParameters())
                 .returns(this.targetClassTypeName());

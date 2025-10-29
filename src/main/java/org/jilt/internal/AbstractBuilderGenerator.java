@@ -1,17 +1,17 @@
 package org.jilt.internal;
 
-import com.squareup.javapoet.AnnotationSpec;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.CodeBlock;
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
-import com.squareup.javapoet.TypeName;
-import com.squareup.javapoet.TypeSpec;
-import com.squareup.javapoet.TypeVariableName;
-import com.squareup.javapoet.WildcardTypeName;
+import com.palantir.javapoet.AnnotationSpec;
+import com.palantir.javapoet.ClassName;
+import com.palantir.javapoet.CodeBlock;
+import com.palantir.javapoet.FieldSpec;
+import com.palantir.javapoet.JavaFile;
+import com.palantir.javapoet.MethodSpec;
+import com.palantir.javapoet.ParameterSpec;
+import com.palantir.javapoet.ParameterizedTypeName;
+import com.palantir.javapoet.TypeName;
+import com.palantir.javapoet.TypeSpec;
+import com.palantir.javapoet.TypeVariableName;
+import com.palantir.javapoet.WildcardTypeName;
 import org.jilt.Builder;
 import org.jilt.JiltGenerated;
 import org.jilt.Opt;
@@ -332,16 +332,16 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         // if this is an entire parameterized type, we need to mangle it
         if (ret instanceof ParameterizedTypeName) {
             ParameterizedTypeName parameterizedTypeName = (ParameterizedTypeName) ret;
-            return ParameterizedTypeName.get(parameterizedTypeName.rawType,
-                    this.mangleTypeParameters(parameterizedTypeName.typeArguments).toArray(new TypeName[]{}));
+            return ParameterizedTypeName.get(parameterizedTypeName.rawType(),
+                    this.mangleTypeParameters(parameterizedTypeName.typeArguments()).toArray(new TypeName[]{}));
         }
         return ret;
     }
 
     protected final TypeVariableName mangleTypeParameter(TypeVariableName typeVariableName) {
-        return TypeVariableName.get(typeVariableName.name + "_",
+        return TypeVariableName.get(typeVariableName.name() + "_",
                 // copy over the bounds, if there are any, recursively mangling them too
-                this.mangleTypeParameters(typeVariableName.bounds).toArray(new TypeName[]{}));
+                this.mangleTypeParameters(typeVariableName.bounds()).toArray(new TypeName[]{}));
     }
 
     private List<TypeName> mangleTypeParameters(List<TypeName> typeParameters) {
@@ -353,8 +353,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 ret.add(this.mangleTypeParameterWithoutBounds(typeVariableName));
             } else if (typeParameter instanceof WildcardTypeName) {
                 WildcardTypeName wildcardTypeName = (WildcardTypeName) typeParameter;
-                List<TypeName> lowerBounds = this.mangleTypeParameters(wildcardTypeName.lowerBounds);
-                List<TypeName> upperBounds = this.mangleTypeParameters(wildcardTypeName.upperBounds);
+                List<TypeName> lowerBounds = this.mangleTypeParameters(wildcardTypeName.lowerBounds());
+                List<TypeName> upperBounds = this.mangleTypeParameters(wildcardTypeName.upperBounds());
                 if (!lowerBounds.isEmpty()) {
                     ret.add(WildcardTypeName.supertypeOf(lowerBounds.get(0)));
                 } else if (!upperBounds.isEmpty()) {
@@ -365,8 +365,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             } else if (typeParameter instanceof ParameterizedTypeName) {
                 // if this is an entire parameterized type, we need to mangle it recursively
                 ParameterizedTypeName parameterizedTypeName = (ParameterizedTypeName) typeParameter;
-                ret.add(ParameterizedTypeName.get(parameterizedTypeName.rawType,
-                    this.mangleTypeParameters(parameterizedTypeName.typeArguments).toArray(new TypeName[]{})));
+                ret.add(ParameterizedTypeName.get(parameterizedTypeName.rawType(),
+                    this.mangleTypeParameters(parameterizedTypeName.typeArguments()).toArray(new TypeName[]{})));
             } else {
                 ret.add(typeParameter);
             }
@@ -379,7 +379,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         // we don't want to recursively mangle its bounds,
         // since the bound will contain the reference to the variable itself,
         // which will result in an infinite loop if not excluded
-        return TypeVariableName.get(typeVariableName.name + "_");
+        return TypeVariableName.get(typeVariableName.name() + "_");
     }
 
     protected final ParameterSpec setterParameterSpec(VariableElement attribute, TypeName parameterType) {
