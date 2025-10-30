@@ -1,11 +1,11 @@
 version: 2
 updates:
-  - package-ecosystem: gradle
+  - package-ecosystem: "gradle"
     directory: "/"
     schedule:
       interval: weekly
       day: sunday
-  - package-ecosystem: github-actions
+  - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: weekly
