@@ -17,7 +17,7 @@ jobs:
           java-version: ${{ matrix.version }}
 
       - name: Cache Gradle packages
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Build and test the project
         run: ./gradlew build check
