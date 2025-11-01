@@ -28,10 +28,12 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -195,6 +197,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         MethodSpec.Builder buildMethod = MethodSpec
                 .methodBuilder(this.buildMethodName())
                 .addModifiers(Modifier.PUBLIC)
+                .addExceptions(this.targetCreationMethodThrownExceptions())
                 .returns(this.targetClassTypeName());
         if (this.builderClassNeedsToBeAbstract()) {
             buildMethod.addModifiers(Modifier.ABSTRACT);
@@ -211,6 +214,17 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             }
         }
         return buildMethod.build();
+    }
+
+    protected final Iterable<? extends TypeName> targetCreationMethodThrownExceptions() {
+        if (this.targetCreationMethod == null) {
+            return Collections.emptyList();
+        }
+        List<TypeName> thrownExceptions = new ArrayList<>(this.targetCreationMethod.getThrownTypes().size());
+        for (TypeMirror thrownException : this.targetCreationMethod.getThrownTypes()) {
+            thrownExceptions.add(TypeName.get(thrownException));
+        }
+        return thrownExceptions;
     }
 
     protected final String accessAttributeOfTargetClass(VariableElement attribute) {

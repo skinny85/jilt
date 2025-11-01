@@ -106,6 +106,7 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
         interfaceBuilder.addMethod(MethodSpec
                 .methodBuilder(this.buildMethodName())
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .addExceptions(this.targetCreationMethodThrownExceptions())
                 .returns(buildReturnType)
                 .build());
     }
