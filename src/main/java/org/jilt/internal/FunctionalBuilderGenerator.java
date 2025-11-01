@@ -80,6 +80,7 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
                 .methodBuilder(this.builderFactoryMethodName())
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addTypeVariables(this.builderClassTypeParameters())
+                .addExceptions(this.targetCreationMethodThrownExceptions())
                 .returns(this.targetClassTypeName());
 
         String builderVariableName = this.builderClassMethodParamName();
@@ -220,6 +221,7 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
                 .methodBuilder(toBuilderSuperMethod.name)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addTypeVariables(this.builderClassTypeParameters())
+                .addExceptions(this.targetCreationMethodThrownExceptions())
                 .returns(this.targetClassTypeName());
 
         String builderVariableName = this.builderClassMethodParamName();
