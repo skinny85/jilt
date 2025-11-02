@@ -15,7 +15,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.version }}
-          distribution: 'oracle'
+          distribution: 'adopt-hotspot'
 
       - name: Cache Gradle packages
         uses: gradle/actions/setup-gradle@v4
