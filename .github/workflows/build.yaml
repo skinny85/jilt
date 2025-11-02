@@ -12,9 +12,10 @@ jobs:
       - uses: actions/checkout@v5
 
       - name: Set up JDK version ${{ matrix.version }}
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.version }}
+          distribution: 'adopt-hotspot'
 
       - name: Cache Gradle packages
         uses: gradle/actions/setup-gradle@v5
