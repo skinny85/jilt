@@ -37,7 +37,7 @@ publishing {
 
             pom {
                 name = 'Jilt'
-                description = 'Java annotation processor for auto-generating Builder (including Staged Builder) pattern classes'
+                description = 'Java annotation processor library for auto-generating Builder (including Staged Builder) pattern classes'
                 url = 'https://github.com/skinny85/jilt'
 
                 scm {

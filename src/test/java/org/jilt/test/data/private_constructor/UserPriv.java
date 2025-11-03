@@ -19,7 +19,7 @@ public final class UserPriv {
                 : displayName;
     }
 
-    private static class InnerBuilder extends UserPrivBuilder {
+    private static final class InnerBuilder extends UserPrivBuilder {
         @Override
         public UserPriv build() {
             return new UserPriv(email, username, firstName, lastName, displayName);
