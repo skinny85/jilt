@@ -9,7 +9,7 @@ group 'cc.jilt' // we need a domain we own for Maven Central, and jilt.org is sc
 version '1.8.4'
 
 shadowJar {
-    relocate 'com.squareup', 'org.jilt.shaded.com.squareup'
+    relocate 'com', 'org.jilt.shaded.com'
 
     archiveClassifier = '' // we want the shadow JAR to be the main output JAR
     configurations = [project.configurations.compileClasspath]
@@ -99,7 +99,9 @@ if (JavaVersion.current() < JavaVersion.VERSION_17) {
 
 dependencies {
     compileOnly 'com.squareup:javapoet:1.13.0'
+    compileOnly 'com.github.javaparser:javaparser-core:3.27.1'
 
+    testImplementation 'com.github.javaparser:javaparser-core:3.27.1'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.assertj:assertj-core:3.27.6'
     testImplementation 'com.google.code.findbugs:jsr305:3.0.2'

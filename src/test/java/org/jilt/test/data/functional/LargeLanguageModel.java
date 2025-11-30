@@ -7,6 +7,7 @@ import org.jilt.BuilderStyle;
 @Builder(style = BuilderStyle.FUNCTIONAL, toBuilder = "toBuilder", buildMethod = "create")
 @BuilderInterfaces(outerName = "LargeLanguageModelBuilderInterfaces")
 public final class LargeLanguageModel {
+    /** example JavaDoc of the {@link LargeLanguageModel#name} field */
     public final String name;
     public final float temperature;
     public final int outputTokensLimit;

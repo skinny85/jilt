@@ -179,7 +179,7 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
         }
 
         TypeName parameterType = this.attributeType(attribute, mangleTypeParameters);
-        return MethodSpec
+        MethodSpec.Builder setter = MethodSpec
                 .methodBuilder(this.setterMethodName(attribute))
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addTypeVariables(this.builderClassTypeParameters())
@@ -187,8 +187,15 @@ final class FunctionalBuilderGenerator extends AbstractTypeSafeBuilderGenerator 
                 .addParameter(this.setterParameterSpec(attribute, parameterType))
                 .addStatement("return $1L -> $1L.$2L = $2L",
                         this.builderClassMethodParamName(),
-                        this.attributeSimpleName(attribute))
-                .build();
+                        this.attributeSimpleName(attribute));
+
+        // copy JavaDoc for the property (if there was any) to the setter
+        String elementJavadoc = this.getAttributeJavadoc(attribute);
+        if (elementJavadoc != null) {
+            setter.addJavadoc(elementJavadoc);
+        }
+
+        return setter.build();
     }
 
     @Override

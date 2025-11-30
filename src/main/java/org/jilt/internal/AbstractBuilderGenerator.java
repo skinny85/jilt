@@ -1,5 +1,8 @@
 package org.jilt.internal;
 
+import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.javadoc.Javadoc;
+import com.github.javaparser.javadoc.JavadocBlockTag;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -317,6 +320,13 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                         // where we chain methods of the Builder class directly)
                         : this.builderClassTypeName())
                 .addParameter(this.setterParameterSpec(attribute, parameterType));
+
+        // copy JavaDoc for the property (if there was any) to the setter
+        String elementJavadoc = this.getAttributeJavadoc(attribute);
+        if (elementJavadoc != null) {
+            setter.addJavadoc(elementJavadoc);
+        }
+
         if (abstractMethod) {
             setter.addModifiers(Modifier.ABSTRACT);
         } else {
@@ -327,6 +337,31 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         }
 
         return setter.build();
+    }
+
+    protected final String getAttributeJavadoc(VariableElement attribute) {
+        String elementJavadoc;
+        if (this.targetCreationMethod == null && this.annotatedElement.getKind() == ElementKind.CLASS) {
+            // this means @Builder was placed on a class -
+            // so, in this case, we just copy the JavaDoc from the field
+            elementJavadoc = this.elements.getDocComment(attribute);
+        } else {
+            elementJavadoc = null;
+            String creationMethodJavadocStr = this.elements.getDocComment(this.targetCreationMethod == null
+                // this means @Builder was placed on a Record class
+                ? this.annotatedElement
+                : this.targetCreationMethod);
+            if (creationMethodJavadocStr != null) {
+                Javadoc javadoc = StaticJavaParser.parseJavadoc(creationMethodJavadocStr);
+                for (JavadocBlockTag blockTag : javadoc.getBlockTags()) {
+                    if ("param".equals(blockTag.getTagName()) &&
+                            attribute.getSimpleName().toString().equals(blockTag.getName().orElse(""))) {
+                        elementJavadoc = blockTag.getContent().toText();
+                    }
+                }
+            }
+        }
+        return elementJavadoc;
     }
 
     protected abstract TypeName returnTypeForSetterFor(VariableElement attribute, boolean withMangledTypeParameters);

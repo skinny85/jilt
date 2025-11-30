@@ -9,9 +9,16 @@ import java.util.List;
 public class ClassicValue {
     private static String staticName;
 
+    /** Example JavaDoc for field {@link #name}. */
     private final String name;
+
+    /** Example JavaDoc for field {@link #age}. */
     private final int age;
+
+    /** Example JavaDoc for field {@link #nick}. */
     private final String nick;
+
+    /** Example JavaDoc for field {@link #securityAnswers}. */
     private final List<String> securityAnswers;
 
     {
