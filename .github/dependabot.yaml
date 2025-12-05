@@ -5,8 +5,10 @@ updates:
     schedule:
       interval: weekly
       day: sunday
+    target-branch: develop
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: weekly
       day: sunday
+    target-branch: develop

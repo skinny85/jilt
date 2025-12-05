@@ -37,7 +37,7 @@ publishing {
 
             pom {
                 name = 'Jilt'
-                description = 'Java annotation processor for auto-generating Builder (including Staged Builder) pattern classes'
+                description = 'Java annotation processor library for auto-generating Builder (including Staged Builder) pattern classes'
                 url = 'https://github.com/skinny85/jilt'
 
                 scm {
@@ -101,11 +101,11 @@ dependencies {
     compileOnly 'com.squareup:javapoet:1.13.0'
 
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.assertj:assertj-core:3.6.2'
+    testImplementation 'org.assertj:assertj-core:3.27.6'
     testImplementation 'com.google.code.findbugs:jsr305:3.0.2'
     testAnnotationProcessor project
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
-    testCompileOnly 'org.projectlombok:lombok:1.18.30'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.42'
+    testCompileOnly 'org.projectlombok:lombok:1.18.42'
 }
 // required in Gradle 8, since the above line 'testAnnotationProcessor project'
 // creates an implicit dependency on shadowJar from compileTestJava
