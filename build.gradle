@@ -99,9 +99,9 @@ if (JavaVersion.current() < JavaVersion.VERSION_17) {
 
 dependencies {
     compileOnly 'com.squareup:javapoet:1.13.0'
-    compileOnly 'com.github.javaparser:javaparser-core:3.27.1'
+    compileOnly 'com.github.javaparser:javaparser-core:3.28.0'
 
-    testImplementation 'com.github.javaparser:javaparser-core:3.27.1'
+    testImplementation 'com.github.javaparser:javaparser-core:3.28.0'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.assertj:assertj-core:3.27.6'
     testImplementation 'com.google.code.findbugs:jsr305:3.0.2'
