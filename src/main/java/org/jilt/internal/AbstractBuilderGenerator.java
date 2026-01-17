@@ -377,7 +377,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 ? this.annotatedElement
                 : this.targetCreationMethod);
             if (creationMethodJavadocStr != null) {
-                Javadoc javadoc = StaticJavaParser.parseJavadoc(creationMethodJavadocStr);
+                boolean isMarkdownComment = false;
+                Javadoc javadoc = StaticJavaParser.parseJavadoc(creationMethodJavadocStr, isMarkdownComment);
                 for (JavadocBlockTag blockTag : javadoc.getBlockTags()) {
                     if ("param".equals(blockTag.getTagName()) &&
                             attribute.getSimpleName().toString().equals(blockTag.getName().orElse(""))) {
