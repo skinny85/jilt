@@ -242,7 +242,8 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         // 2. The record read method (xyz())
         // 3. The field itself (xyz)
         String getterMethod = "get" + capitalizedFieldName ;
-        boolean getterFound = false, onlyGetterOptional = false, recordReaderFound = false, publicFieldFound = false;
+        boolean getterFound = false, recordReaderFound = false, publicFieldFound = false;
+        boolean onlyClassicGetterOptional = false, onlyRecordGetterOptional = false;
 
         if (this.targetClassTypeElement != null) {
             for (Element member : this.elements.getAllMembers(this.targetClassTypeElement)) {
@@ -252,7 +253,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                     // but the field is of type T
                     if (!attributeIsTypeOpt &&
                             this.typeIsJavaUtilOptional(((ExecutableElement) member).getReturnType())) {
-                        onlyGetterOptional = true;
+                        onlyClassicGetterOptional = true;
                     }
                 }
                 if (elementIsMethodWithoutArgumentsCalled(member, "is" + capitalizedFieldName)) {
@@ -265,7 +266,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                     // but the field is of type T
                     if (!attributeIsTypeOpt &&
                             this.typeIsJavaUtilOptional(((ExecutableElement) member).getReturnType())) {
-                        onlyGetterOptional = true;
+                        onlyRecordGetterOptional = true;
                     }
                 }
                 if (member.getKind() == ElementKind.FIELD &&
@@ -277,10 +278,10 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         }
         if (getterFound) {
             // we always prefer the getter if we found one
-            return getterMethod + "()" + (onlyGetterOptional ? ".orElse(null)" : "");
+            return getterMethod + "()" + (onlyClassicGetterOptional ? ".orElse(null)" : "");
         } else if (recordReaderFound) {
             // if there's no getter, but there's a record-style read method, use that
-            return fieldName + "()" + (onlyGetterOptional ? ".orElse(null)" : "");
+            return fieldName + "()" + (onlyRecordGetterOptional ? ".orElse(null)" : "");
         } else if (publicFieldFound) {
             // if there's no getter or record-style reader,
             // but the field is public, simply use the field itself
