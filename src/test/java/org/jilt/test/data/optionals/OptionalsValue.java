@@ -5,13 +5,17 @@ import org.jilt.BuilderStyle;
 
 import java.util.Optional;
 
-@Builder(style = BuilderStyle.STAGED)
+@Builder(style = BuilderStyle.STAGED, toBuilder = "toBuilder")
 public final class OptionalsValue<T> {
-    public final Optional<T> optional;
+    private final Optional<T> optional;
     public final Void v;
 
     public OptionalsValue(Optional<T> optional, Void v) {
         this.optional = optional;
         this.v = v;
+    }
+
+    public Optional<T> getOptional() {
+        return this.optional;
     }
 }

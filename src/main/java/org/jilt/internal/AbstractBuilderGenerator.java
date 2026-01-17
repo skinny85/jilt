@@ -41,6 +41,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 abstract class AbstractBuilderGenerator implements BuilderGenerator {
+    private static final ClassName JAVA_UTIL_OPTIONAL = ClassName.get("java.util", "Optional");
+
     protected final Element annotatedElement;
     private final Elements elements;
     private final Filer filer;
@@ -231,20 +233,27 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
     }
 
     protected final String accessAttributeOfTargetClass(VariableElement attribute) {
-        String fieldName = this.attributeSimpleName(attribute);
-        String capitalizedFieldName = Utils.capitalize(fieldName);
+        final String fieldName = this.attributeSimpleName(attribute);
+        final String capitalizedFieldName = Utils.capitalize(fieldName);
+        final boolean attributeIsTypeOpt = this.typeIsJavaUtilOptional(attribute.asType());
 
         // candidates are:
         // 1. The getter method (getXyz() / isXyz())
         // 2. The record read method (xyz())
         // 3. The field itself (xyz)
         String getterMethod = "get" + capitalizedFieldName ;
-        boolean getterFound = false, recordReaderFound = false, publicFieldFound = false;
+        boolean getterFound = false, onlyGetterOptional = false, recordReaderFound = false, publicFieldFound = false;
 
         if (this.targetClassTypeElement != null) {
             for (Element member : this.elements.getAllMembers(this.targetClassTypeElement)) {
                 if (elementIsMethodWithoutArgumentsCalled(member, getterMethod)) {
                     getterFound = true;
+                    // special case: getter that returns Optional<T>,
+                    // but the field is of type T
+                    if (!attributeIsTypeOpt &&
+                            this.typeIsJavaUtilOptional(((ExecutableElement) member).getReturnType())) {
+                        onlyGetterOptional = true;
+                    }
                 }
                 if (elementIsMethodWithoutArgumentsCalled(member, "is" + capitalizedFieldName)) {
                     getterFound = true;
@@ -262,7 +271,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         }
         if (getterFound) {
             // we always prefer the getter if we found one
-            return getterMethod + "()";
+            return getterMethod + "()" + (onlyGetterOptional ? ".orElse(null)" : "");
         } else if (recordReaderFound) {
             // if there's no getter, but there's a record-style read method, use that
             return fieldName + "()";
@@ -279,6 +288,15 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             String getterPrefix = attribute.asType().getKind() == TypeKind.BOOLEAN ? "is" : "get";
             return getterPrefix + capitalizedFieldName + "()";
         }
+    }
+
+    private boolean typeIsJavaUtilOptional(TypeMirror type) {
+        TypeName typeName = TypeName.get(type);
+        if (typeName instanceof ParameterizedTypeName) {
+            // typically java.util.Optional is a parametrized type
+            typeName = ((ParameterizedTypeName) typeName).rawType;
+        }
+        return typeName.equals(JAVA_UTIL_OPTIONAL);
     }
 
     private static boolean elementIsMethodWithoutArgumentsCalled(Element element, String methodName) {
