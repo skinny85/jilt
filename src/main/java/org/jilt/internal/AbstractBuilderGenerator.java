@@ -261,6 +261,12 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 }
                 if (elementIsMethodWithoutArgumentsCalled(member, fieldName)) {
                     recordReaderFound = true;
+                    // special case: recrod-style getter that returns Optional<T>,
+                    // but the field is of type T
+                    if (!attributeIsTypeOpt &&
+                            this.typeIsJavaUtilOptional(((ExecutableElement) member).getReturnType())) {
+                        onlyGetterOptional = true;
+                    }
                 }
                 if (member.getKind() == ElementKind.FIELD &&
                         member.getSimpleName().toString().equals(fieldName) &&
@@ -274,7 +280,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
             return getterMethod + "()" + (onlyGetterOptional ? ".orElse(null)" : "");
         } else if (recordReaderFound) {
             // if there's no getter, but there's a record-style read method, use that
-            return fieldName + "()";
+            return fieldName + "()" + (onlyGetterOptional ? ".orElse(null)" : "");
         } else if (publicFieldFound) {
             // if there's no getter or record-style reader,
             // but the field is public, simply use the field itself

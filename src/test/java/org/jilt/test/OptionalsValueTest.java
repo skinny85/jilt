@@ -5,6 +5,8 @@ import org.jilt.test.data.optionals.OptionalGetterValue;
 import org.jilt.test.data.optionals.OptionalGetterValueBuilder;
 import org.jilt.test.data.optionals.OptionalsRawValue;
 import org.jilt.test.data.optionals.OptionalsRawValueBuilder;
+import org.jilt.test.data.optionals.OptionalsRecordGetterValue;
+import org.jilt.test.data.optionals.OptionalsRecordGetterValueBuilder;
 import org.jilt.test.data.optionals.OptionalsValue;
 import org.jilt.test.data.optionals.OptionalsValueBuilder;
 import org.jilt.test.data.optionals.OptionalsWildcardValue;
@@ -95,5 +97,19 @@ public class OptionalsValueTest {
                 .build();
 
         assertThat(value2.getStrValue()).isEmpty();
+    }
+
+    @Test
+    public void record_style_getter_returning_Optional_works_with_toBuilder() {
+        OptionalsRecordGetterValue value1 = OptionalsRecordGetterValueBuilder.optionalsRecordGetterValue()
+                .object(null)
+                .optionalString(Optional.empty())
+                .build();
+
+        OptionalsRecordGetterValue value2 = OptionalsRecordGetterValueBuilder.toBuilder(value1)
+                .build();
+
+        assertThat(value2.object()).isEmpty();
+        assertThat(value2.optionalString()).isEmpty();
     }
 }
