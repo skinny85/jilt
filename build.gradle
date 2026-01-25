@@ -103,7 +103,7 @@ dependencies {
 
     testImplementation 'com.github.javaparser:javaparser-core:3.28.0'
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.assertj:assertj-core:3.27.6'
+    testImplementation 'org.assertj:assertj-core:3.27.7'
     testImplementation 'com.google.code.findbugs:jsr305:3.0.2'
     testAnnotationProcessor project
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.42'
