@@ -19,7 +19,7 @@ jobs:
           distribution: 'adopt-hotspot'
 
       - name: Cache Gradle packages
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Build and test the project
         run: ./gradlew build check
