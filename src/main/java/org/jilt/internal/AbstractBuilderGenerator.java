@@ -133,6 +133,10 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
                 : new Modifier[]{Modifier.PUBLIC};
     }
 
+    protected final boolean shouldNullablePropertiesBeOptional() {
+        return this.builderAnnotation.treatNullableAsOptional();
+    }
+
     protected MethodSpec makeStaticFactoryMethod() {
         if (this.builderClassNeedsToBeAbstract()) {
             // if the Builder class has to be abstract,
