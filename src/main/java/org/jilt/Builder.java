@@ -329,6 +329,14 @@ public @interface Builder {
     String toBuilder() default "";
 
     /**
+     * Allows configuring whether properties with Nullable annotations are considered optional.
+     * If this setting is turned off, only properties annotated with {@link Opt} will be considered optional.
+     * <p>
+     * This is an optional attribute - the default is to consider nullable properties optional.
+     */
+    boolean nullableIsOptional() default true;
+
+    /**
      * Annotation that ignores the given field of a class when generating a Builder for that class.
      * Used when {@link Builder} is placed on the class being built itself.
      *

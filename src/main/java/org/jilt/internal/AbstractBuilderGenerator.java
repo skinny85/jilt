@@ -50,7 +50,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
 
     /** nullable */ private final TypeElement targetClassTypeElement;
     private final List<? extends VariableElement> attributes;
-    private final Builder builderAnnotation;
+    protected final Builder builderAnnotation;
     /** nullable */ private final ExecutableElement targetCreationMethod;
 
     private final String builderClassPackage;
