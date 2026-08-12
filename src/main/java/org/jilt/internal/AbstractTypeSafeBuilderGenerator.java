@@ -9,6 +9,7 @@ import com.squareup.javapoet.TypeVariableName;
 import org.jilt.Builder;
 import org.jilt.BuilderInterfaces;
 import org.jilt.Opt;
+import org.jilt.Req;
 import org.jilt.utils.Utils;
 
 import javax.annotation.processing.Filer;
@@ -173,6 +174,9 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
     private boolean determineIfAttributeIsOptional(VariableElement attribute) {
         if (attribute.getAnnotation(Opt.class) != null) {
             return true;
+        }
+        if (attribute.getAnnotation(Req.class) != null) {
+            return false;
         }
         if (shouldNullablePropertiesBeOptional() && this.hasAnnotationCalledNullable(attribute)) {
             return true;
