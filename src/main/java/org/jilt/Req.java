@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * Marking a field or constructor/static method parameter with this annotation
- * means the Builder property generated from that field or parameter will not be required (so not optional).
+ * means the Builder property generated from that field or parameter will be required (so not optional).
  * <p>
  * Consumers of that generated Builder are required to provide values for required properties
  * before creating an instance of the target class.
