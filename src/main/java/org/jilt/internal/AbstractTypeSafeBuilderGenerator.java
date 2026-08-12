@@ -178,7 +178,7 @@ abstract class AbstractTypeSafeBuilderGenerator extends AbstractBuilderGenerator
         if (attribute.getAnnotation(Req.class) != null) {
             return false;
         }
-        if (shouldNullablePropertiesBeOptional() && this.hasAnnotationCalledNullable(attribute)) {
+        if (this.hasAnnotationCalledNullable(attribute)) {
             return true;
         }
         return false;

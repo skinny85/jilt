@@ -327,8 +327,10 @@ All types of `@Nullable` annotations are supported,
 including `javax.annotation.Nullable` from [JSR-305](https://central.sonatype.com/artifact/com.google.code.findbugs/jsr305),
 `org.jetbrains.annotations.Nullable` from [JetBrains annotations](https://central.sonatype.com/artifact/org.jetbrains/annotations),
 and others.
-To make a property based on a `@Nullable` field or parameter required, 
-also annotate it with `@Req`.
+
+If you want to annotate a property with a `@Nullable` annotation,
+but keep it as being required,
+annotate it with the `@Req` annotation from the `org.jilt` package.
 
 ##### 'Staged, but preserving order' Builder style
 
