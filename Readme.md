@@ -1,4 +1,4 @@
-# Jilt [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![See on Maven Central](https://img.shields.io/badge/Maven%20Central-v1.9.1-brightgreen.svg)](https://central.sonatype.com/artifact/cc.jilt/jilt/1.9.1) [![Build status](https://github.com/skinny85/jilt/actions/workflows/build.yaml/badge.svg)](https://github.com/skinny85/jilt/actions/workflows/build.yaml)
+# Jilt [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![See on Maven Central](https://img.shields.io/badge/Maven%20Central-v1.9.2-brightgreen.svg)](https://central.sonatype.com/artifact/cc.jilt/jilt/1.9.2) [![Build status](https://github.com/skinny85/jilt/actions/workflows/build.yaml/badge.svg)](https://github.com/skinny85/jilt/actions/workflows/build.yaml)
 
 Jilt is a Java library that automatically generates classes implementing the
 [Builder design pattern](https://en.wikipedia.org/wiki/Builder_pattern#Java).
@@ -89,7 +89,7 @@ Example Maven settings:
     <dependency>
         <groupId>cc.jilt</groupId>
         <artifactId>jilt</artifactId>
-        <version>1.9.1</version>
+        <version>1.9.2</version>
         <scope>provided</scope> <!-- Jilt is not needed at runtime -->
     </dependency>
 </dependencies>
@@ -104,13 +104,13 @@ repositories {
 
 dependencies {
     // ...
-    compileOnly("cc.jilt:jilt:1.9.1") // Jilt is not needed at runtime
-    annotationProcessor("cc.jilt:jilt:1.9.1") // you might also need this dependency in newer Gradle versions
+    compileOnly("cc.jilt:jilt:1.9.2") // Jilt is not needed at runtime
+    annotationProcessor("cc.jilt:jilt:1.9.2") // you might also need this dependency in newer Gradle versions
 }
 ```
 
 If you're not using dependency managers, you can
-[download the JAR directly](https://repo1.maven.org/maven2/cc/jilt/jilt/1.9.1/jilt-1.9.1.jar)
+[download the JAR directly](https://repo1.maven.org/maven2/cc/jilt/jilt/1.9.2/jilt-1.9.2.jar)
 (it's distributed as a self-contained JAR, you don't need any additional dependencies for it)
 and add it to your classpath.
 
@@ -322,7 +322,7 @@ User user = UserBuilder.user()
 ```
 
 In addition to the `@Opt` annotation,
-a property will always be considered optional if the field or parameter it was generated from is annotated with a `@Nullable` annotation.
+a property will be considered optional if the field or parameter it was generated from is annotated with a `@Nullable` annotation.
 All types of `@Nullable` annotations are supported,
 including `javax.annotation.Nullable` from [JSR-305](https://central.sonatype.com/artifact/com.google.code.findbugs/jsr305),
 `org.jetbrains.annotations.Nullable` from [JetBrains annotations](https://central.sonatype.com/artifact/org.jetbrains/annotations),
@@ -330,7 +330,8 @@ and others.
 
 If you want to annotate a property with a `@Nullable` annotation,
 but keep it as being required,
-annotate it with the `@Req` annotation from the `org.jilt` package.
+annotate it with the opposite of `@Opt`,
+the `@Req` annotation, from the same `org.jilt` package.
 
 ##### 'Staged, but preserving order' Builder style
 

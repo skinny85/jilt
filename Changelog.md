@@ -1,3 +1,8 @@
+Version 1.9.2 (2026-08-16)
+--------------------------
+- Allow `@Nullable` properties to be required with the `@Req` annotation
+  ([Pull Request #92](https://github.com/skinny85/jilt/pull/92))
+
 Version 1.9.1 (2026-01-18)
 --------------------------
 - Handle getters returning `Optional` for nullable fields in `toBuilder`

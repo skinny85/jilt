@@ -629,7 +629,7 @@ abstract class AbstractBuilderGenerator implements BuilderGenerator {
         ClassName generatedAnnotationClass = determineGeneratedAnnotationClass();
         return AnnotationSpec
                 .builder(generatedAnnotationClass)
-                .addMember("value", "$S", "Jilt-1.9.1")
+                .addMember("value", "$S", "Jilt-1.9.2")
                 .build();
     }
 
